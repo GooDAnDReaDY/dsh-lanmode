@@ -1,7 +1,7 @@
 {
   "name": "@goodandready/dsh-lanmode",
-  "version": "0.2.0",
-  "description": "Settings over the LAN for DeepSeek Harness: the Web UI turns its settings service off on any page that is not localhost, even though the server serves settings over the network fine. This plugin taps the served index.html and hands the two settings packages a connection that reports loopback, so every settings surface works from any address.",
+  "version": "0.3.0",
+  "description": "LAN and reverse-proxy access for the DeepSeek Harness Web UI: returns the settings service on pages that are not localhost, fills in the Web APIs the browser withholds on plain HTTP, and can open a listener of its own so nothing else is needed.",
   "license": "MIT",
   "type": "module",
   "main": "./lib/index.js",
@@ -22,7 +22,9 @@
     "deepseek-harness",
     "settings",
     "lan",
-    "remote"
+    "remote",
+    "proxy",
+    "nginx"
   ],
   "repository": {
     "type": "git",
