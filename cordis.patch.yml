@@ -1,0 +1,11 @@
+# dsh-lanmode bundle layer: applied automatically when the package is installed
+# as a profile bundle (package.json declares dsh.bundle.patch).
+#
+# `name` must stay the full npm package name: the client-modules registry
+# resolves the browser bundle by the loader entry name, so a shortened name
+# leaves the UI half silently out of window.__DSH_BOOT__ — and the UI half is
+# the whole plugin here.
+- insert:
+    - id: dsh-lanmode
+      name: '@goodandready/dsh-lanmode'
+      config: {}
