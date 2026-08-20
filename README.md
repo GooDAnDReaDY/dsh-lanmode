@@ -45,6 +45,18 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 Restart the Web UI afterwards, then reload the browser.
 
+## Checking it on a machine where it is not needed
+
+The plugin stands aside on a loopback page, which makes it awkward to try out
+on the machine that runs the harness. A debug switch turns it on there anyway:
+
+```js
+localStorage.setItem('dsh-lanmode:force', '1'); location.reload()
+```
+
+Remove the key to go back to normal. This is only for looking at the plugin
+itself; nothing in day-to-day use needs it.
+
 ## What it is not
 
 Not authentication. The plugin does not add a password and does not widen what the server accepts — the harness answers those same calls with or without it. If your harness is reachable by other people, put a real gate in front of it (HTTP auth in your reverse proxy, or a VPN); a plugin cannot do that job, because the web server service hands plugins their own routes and no way to intercept anyone else's.
