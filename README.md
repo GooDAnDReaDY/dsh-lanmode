@@ -28,34 +28,18 @@ Every bound namespace reports `status: "unavailable"` for the life of the page, 
 
 ## What the plugin does
 
-On a loopback page: nothing at all — the core works there, and a second implementation would only be a second source of truth.
+It injects one script into the served `index.html`, through the web server's official index tap, ahead of the boot manifest. The script intercepts module registration and hands the two settings packages a connection whose `isLoopback` reads `true`. Everything downstream — the shared mirror of the settings document, every namespace scope, the core's own settings pages — then behaves exactly as it does on localhost.
 
-On any other page it stands up its own copy of the same machinery over the same two calls, and publishes it:
+The substitution is narrow on purpose. Three packages read that flag, and the third is deliverables, where it decides whether a produced file may be opened locally: forcing it there would ask the Host to open paths on the server's desktop. Only the settings packages see the substitute; the rest of the UI keeps the truth.
 
-- as a service named `lanSettings`, for plugins that want to ask for it explicitly;
-- and, if the runtime allows a plugin to claim the name, in place of `settingsScope` — which repairs every settings surface at once, including the core's plugin configuration tab and plugins that know nothing about this one.
+Taking the core settings service over instead is not possible — cordis refuses a second provider for a registered name, and refuses assignment across fibers.
 
-The snapshot it hands out has the same shape the core's has — `status`, `value`, `base`, `user`, `revision`, `writable` — so cards cannot tell the difference.
+## Checking it
 
-## Install
+- `?lanmode=invert` — report the flag as `false` even on a loopback page. The harness then fails exactly the way it does over the LAN, which is how this plugin is verified.
+- `?lanmode=off` — stand the plugin down entirely.
 
-```bash
-dsh plugin --profile web add @goodandready/dsh-lanmode
-```
-
-Restart the Web UI afterwards, then reload the browser.
-
-## Checking it on a machine where it is not needed
-
-The plugin stands aside on a loopback page, which makes it awkward to try out
-on the machine that runs the harness. A debug switch turns it on there anyway:
-
-```js
-localStorage.setItem('dsh-lanmode:force', '1'); location.reload()
-```
-
-Remove the key to go back to normal. This is only for looking at the plugin
-itself; nothing in day-to-day use needs it.
+On a loopback page the plugin substitutes `true` where the real value is already `true`, so it cannot change behaviour there.
 
 ## What it is not
 
