@@ -1,10 +1,22 @@
 # dsh-lanmode bundle layer: applied automatically when the package is installed
 # as a profile bundle (package.json declares dsh.bundle.patch).
 #
-# `name` must stay the full npm package name: the client-modules registry
-# resolves the browser bundle by the loader entry name, so a shortened name
-# leaves the UI half silently out of window.__DSH_BOOT__ — and the UI half is
-# the whole plugin here.
+# `name` must stay the full npm package name: the loader entry name is how the
+# served bundle is resolved.
+#
+# Everything is configurable in the `dsh-lanmode` settings namespace, so the
+# row below stays empty. To pin the mode in the tree instead of the settings
+# document, override it in your own profile patch:
+#
+#   - id: dsh-lanmode
+#     config:
+#       mode: direct
+#       directPort: 3088
+#
+# Note there is deliberately no webserver override here. Other plugins in this
+# space rebind the harness to 0.0.0.0; that cannot be switched from inside a
+# plugin and collides with a reverse proxy already holding the port. Direct
+# mode opens a listener of its own instead.
 - insert:
     - id: dsh-lanmode
       name: '@goodandready/dsh-lanmode'
