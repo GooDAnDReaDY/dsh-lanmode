@@ -1,13 +1,12 @@
 {
   "name": "@goodandready/dsh-lanmode",
-  "version": "0.1.0",
-  "description": "Settings over the LAN for DeepSeek Harness: the Web UI turns the settings service off on any page that is not localhost, even though the server serves settings over the network just fine. This plugin brings them back.",
+  "version": "0.2.0",
+  "description": "Settings over the LAN for DeepSeek Harness: the Web UI turns its settings service off on any page that is not localhost, even though the server serves settings over the network fine. This plugin taps the served index.html and hands the two settings packages a connection that reports loopback, so every settings surface works from any address.",
   "license": "MIT",
   "type": "module",
   "main": "./lib/index.js",
   "exports": {
     ".": "./lib/index.js",
-    "./client": "./lib/client.js",
     "./package.json": "./package.json",
     "./cordis.patch.yml": "./cordis.patch.yml"
   },
@@ -39,15 +38,10 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
-    },
-    "client": {
-      "platform": "web",
-      "inject": [
-        "@deepseek-ai/dsh-client-runtime"
-      ]
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1"
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-host-webserver": "^0.1.0-rc.6"
   }
 }
