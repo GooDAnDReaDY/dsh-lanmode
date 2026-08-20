@@ -1,6 +1,6 @@
 {
   "name": "@goodandready/dsh-lanmode",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "LAN and reverse-proxy access for the DeepSeek Harness Web UI: returns the settings service on pages that are not localhost, fills in the Web APIs the browser withholds on plain HTTP, and can open a listener of its own so nothing else is needed.",
   "license": "MIT",
   "type": "module",

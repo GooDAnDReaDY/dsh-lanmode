@@ -13,10 +13,10 @@
 #       mode: direct
 #       directPort: 3088
 #
-# Note there is deliberately no webserver override here. Other plugins in this
-# space rebind the harness to 0.0.0.0; that cannot be switched from inside a
-# plugin and collides with a reverse proxy already holding the port. Direct
-# mode opens a listener of its own instead.
+# Note there is deliberately no webserver override here: a bind host lives in
+# the config tree, so it cannot be switched from inside a plugin, and it
+# collides with a reverse proxy already holding the port. Direct mode opens a
+# listener of its own instead.
 - insert:
     - id: dsh-lanmode
       name: '@goodandready/dsh-lanmode'
