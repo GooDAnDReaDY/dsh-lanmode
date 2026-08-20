@@ -101,10 +101,6 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 Restart the harness, then reload the browser.
 
-## Credit
-
-The index-tap approach and the `crypto.randomUUID` polyfill come from [dsh-web-lan-access](https://github.com/AcidGr/dsh-web-lan-access) (MIT), which solves the secure-context half of this problem. Several other plugins in the same space — `dsh-lan-access`, `dsh-lan`, `dsh-LAN`, `dsh-lan-gate`, `dsh-Remote` — cover binding, mobile layout and device approval; none of them return the settings service, which is what this one is for.
-
 ## License
 
 MIT
