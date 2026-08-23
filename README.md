@@ -35,11 +35,23 @@ Everything happens through the web server's official index tap: one script is in
 
 | Piece | Setting | What it does |
 |---|---|---|
-| Settings | `settings` | Hands the two settings packages a connection whose `isLoopback` reads `true`. Everything downstream — the shared mirror, every namespace scope, the core's own pages — then behaves as it does on localhost. |
+| Settings | `settings` | Hands every package a connection whose `isLoopback` reads `true`. The shared mirror, every namespace scope, the core's own pages and every plugin's settings section then behave as they do on localhost. |
 | `crypto.randomUUID` | `randomUuid` | Provides an RFC 4122 v4 implementation over `crypto.getRandomValues`, which insecure origins do have. A no-op where the real one exists. |
 | `navigator.clipboard` | `clipboard` | Provides a `writeText` fallback so the copy buttons keep working. A no-op where the real one exists. |
 
-The settings substitution is deliberately narrow. Three packages read that flag, and the third is deliverables, where it decides whether a produced file may be opened locally — forcing it there would ask the Host to open paths on the server's desktop. Only the settings packages see the substitute.
+One package is excluded on purpose: deliverables, where the flag decides whether a produced file may be opened locally. Forcing it there would ask the Host to open paths on the server's desktop. Nothing else in the web UI reads the flag.
+
+The exclusion list replaced an allow list, and the reason is worth writing down. A namespace scope is bound like this:
+
+```js
+bind(spec) {
+  const ctx = this.ctx                      // the caller's context
+  const connection = ctx.get('connection')
+  ... connection.isLoopback ? 'host' : 'memory'
+}
+```
+
+`this.ctx` belongs to whichever plugin calls `bind`, not to the settings package. Handing the substitute to the settings packages alone therefore fixed the shared mirror and the core's own pages, while every plugin's own settings section still went to memory mode and reported that the harness had not announced its settings.
 
 ## Two modes
 
