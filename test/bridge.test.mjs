@@ -40,7 +40,7 @@ async function withBridge(run) {
   const messages = []
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
-    { host: '127.0.0.1', port: bridgePort, log: (m) => messages.push(m) },
+    { hosts: ['127.0.0.1'], port: bridgePort, log: (m) => messages.push(m) },
   )
   await new Promise((resolve) => setTimeout(resolve, 120))
   try {
@@ -81,7 +81,7 @@ test('заголовки, которых не было, не выдумываю�
 
 test('без порта харнесса мост не поднимается и говорит об этом', () => {
   const messages = []
-  const stop = startDirectBridge({ webServer: {} }, { host: '127.0.0.1', port: 0, log: (m) => messages.push(m) })
+  const stop = startDirectBridge({ webServer: {} }, { hosts: ['127.0.0.1'], port: 0, log: (m) => messages.push(m) })
   stop()
   assert.match(messages.join(' '), /порт/)
 })
@@ -96,7 +96,7 @@ test('упавший харнесс превращается в 502, а не в 
 
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
-    { host: '127.0.0.1', port: bridgePort, log: () => {} },
+    { hosts: ['127.0.0.1'], port: bridgePort, log: () => {} },
   )
   await new Promise((resolve) => setTimeout(resolve, 120))
   try {
@@ -146,7 +146,7 @@ test('адрес в списке проходит как обычно', async ()
 
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
-    { host: '127.0.0.1', port: bridgePort, log: () => {}, allow: parseAllow(['127.0.0.0/8']).rules },
+    { hosts: ['127.0.0.1'], port: bridgePort, log: () => {}, allow: parseAllow(['127.0.0.0/8']).rules },
   )
   await new Promise((resolve) => setTimeout(resolve, 120))
   try {
