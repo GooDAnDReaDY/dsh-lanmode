@@ -132,6 +132,64 @@ A self-signed certificate is a compromise, not a solution: the browser will
 still ask. But it turns "impossible" into "confirm once", and that is the whole
 difference between voice input working over the network and not.
 
+## Replacing a reverse proxy
+
+Direct mode is meant to be the whole answer: install the plugin, set two fields,
+switch the proxy off. What a reverse proxy in front of the harness has to do,
+the bridge does — rewrite `Host` and `Origin` so the same-origin fence passes,
+carry WebSockets, keep long-lived streams alive, terminate TLS.
+
+**Moving over without anyone noticing.** Keep the address, the port and the
+certificate the browsers have already accepted:
+
+```yaml
+- id: dsh-lanmode
+  config:
+    mode: direct
+    directPort: 3080          # the port the proxy served on
+    tls: files
+    tlsCert: /path/to/your/existing/fullchain.pem
+    tlsKey: /path/to/your/existing/key.pem
+    unlockPrivileged: true
+    allow:
+      - 192.168.0.0/16
+```
+
+Then stop the proxy. Nothing changes for anyone: same URL, same certificate, no
+second confirmation.
+
+The harness already holds that port on the loopback, so `directHost` is left
+alone: the plugin notices the clash and binds this machine's network addresses
+by name instead of binding everything. It says so in the log.
+
+**Starting from nothing.** No proxy, no certificate:
+
+```yaml
+- id: dsh-lanmode
+  config:
+    mode: direct
+    directPort: 3088
+    tls: self-signed
+    unlockPrivileged: true
+    allow:
+      - 192.168.0.0/16
+```
+
+The browser asks once about the certificate; compare the fingerprint printed in
+the log and accept it.
+
+**What you lose compared with a real proxy.** Not much, and it is worth naming:
+no HTTP/2, no gzip, no request logging beyond refusals, no rate limiting, no
+virtual hosts. If you need any of those, keep the proxy — the plugin does not
+mind sitting behind one, and that is exactly what `proxy` mode is.
+
+**What you do not lose.** Settings and credentials over the network, WebSockets,
+streamed replies of any length, TLS, the microphone.
+
+**Check after switching**, in this order: the conversation opens and a reply
+streams to the end; settings open and save; a long reply is not cut; the
+microphone works on `/dsh-lanmode/health`.
+
 ## Who may connect
 
 The direct listener has no password and will not get one: the plugin does not
@@ -155,6 +213,33 @@ a limited rate so a scanner cannot drown the log.
 Two honest limits. This is not authentication: whoever is on the list gets in
 unchecked. And behind a reverse proxy it means nothing — every request arrives
 from the proxy, so filter there instead.
+
+## The price of it working
+
+The harness pins its privileged calls — settings, credentials, agent presets,
+opening paths on the machine, model discovery — to the loopback on purpose, and
+no trusted-host list opens them. The bridge presents itself as a loopback
+client, so those calls go through. That is not a side effect: without it a page
+on the network shows the settings and can neither read nor write them, which is
+the whole reason this plugin exists.
+
+The price, stated plainly: **any device that reaches this port can read and
+change your API keys, with no authentication at all.** Nothing here asks who you
+are.
+
+It is a setting, not a secret:
+
+```yaml
+    unlockPrivileged: false   # settings over the network stop working
+```
+
+Off, the privileged calls are refused by the bridge with a message saying why,
+and everything else keeps working. On — which is the default, because otherwise
+the plugin does not do its job — the log says at startup exactly what is open,
+and the diagnostics page shows it as a separate line.
+
+Fill in `allow` either way. It is not authentication, but it narrows the circle
+from «the whole network» to «these addresses».
 
 ## Diagnostics
 
@@ -197,6 +282,9 @@ All of it can be edited as the `dsh-lanmode` namespace — in `$DSH_HOME/setting
 | `tlsCert` | — | `files`: path to the certificate in PEM |
 | `tlsKey` | — | `files`: path to the private key in PEM |
 | `allow` | `[]` | `direct`: addresses and CIDR ranges allowed in. Empty means everyone |
+| `unlockPrivileged` | `true` | `direct`: let the settings and credentials calls through. What makes the plugin work, and what opens your keys to the network |
+| `privilegedExtra` | `[]` | `direct`: extra path patterns to treat as privileged |
+| `streamTimeoutMs` | `0` | `direct`: limit on one request. Zero means none, and that is what long replies need |
 | `diagnostics` | `true` | serve `GET /dsh-lanmode/health` |
 | `settings` | `true` | return the settings service |
 | `randomUuid` | `true` | provide `crypto.randomUUID` on plain HTTP |
