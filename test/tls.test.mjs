@@ -16,7 +16,7 @@ function withInterfaces(fake, body) {
   }
 }
 
-const REAL_NIC = { address: '192.168.1.111', internal: false }
+const REAL_NIC = { address: '192.168.1.10', internal: false }
 const LINK_LOCAL = { address: 'fe80::2e0:4cff:fe56:34f0', internal: false }
 
 test('адреса докера в список не попадают', () => {
@@ -29,7 +29,7 @@ test('адреса докера в список не попадают', () => {
     },
     localAddresses,
   )
-  assert.ok(hosts.includes('192.168.1.111'), 'настоящий адрес машины нужен')
+  assert.ok(hosts.includes(REAL_NIC.address), 'настоящий адрес машины нужен')
   assert.ok(hosts.includes('127.0.0.1'), 'петля нужна')
   assert.equal(hosts.some((h) => h.startsWith('fe80')), false, 'связь-локальные не нужны')
   assert.equal(hosts.includes('172.28.0.1'), false, 'мост докера не нужен')
