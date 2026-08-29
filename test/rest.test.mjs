@@ -111,7 +111,7 @@ const goodPage = '<html><head><script data-dsh-lanmode="1"></script></head>'
 test('на здоровом харнессе все точки на месте', async () => {
   const results = await checkAssumptions({
     webServer: { tapIndex: () => {}, port: 3080 },
-    fetchIndex: async () => goodPage,
+    fetchIndex: async () => ({ status: 200, html: goodPage }),
   })
   assert.ok(results.every((item) => item.ok), JSON.stringify(results))
   assert.match(summarize(results), /на месте/)
@@ -120,7 +120,7 @@ test('на здоровом харнессе все точки на месте',
 test('исчезнувшая точка вставки замечена', async () => {
   const results = await checkAssumptions({
     webServer: { port: 3080 },
-    fetchIndex: async () => goodPage,
+    fetchIndex: async () => ({ status: 200, html: goodPage }),
   })
   const item = results.find((each) => each.name.includes('вставки'))
   assert.equal(item.ok, false)
@@ -130,7 +130,7 @@ test('исчезнувшая точка вставки замечена', async 
 test('заплатка не доехала до страницы — это замечено', async () => {
   const results = await checkAssumptions({
     webServer: { tapIndex: () => {}, port: 3080 },
-    fetchIndex: async () => '<html><head></head></html>',
+    fetchIndex: async () => ({ status: 200, html: '<html><head></head></html>' }),
   })
   assert.equal(results.find((each) => each.name.includes('заплатка')).ok, false)
 })
@@ -140,7 +140,7 @@ test('пакет-исключение переименовали — это за
   // кому нельзя подменять флаг.
   const results = await checkAssumptions({
     webServer: { tapIndex: () => {}, port: 3080 },
-    fetchIndex: async () => '<html><head><script data-dsh-lanmode="1"></script></head></html>',
+    fetchIndex: async () => ({ status: 200, html: '<html><head><script data-dsh-lanmode="1"></script></head></html>' }),
   })
   assert.equal(results.find((each) => each.name.includes('исключение')).ok, false)
 })
@@ -188,4 +188,20 @@ test('истекающий сертификат перевыпускается �
   }
   assert.equal(stillGood(info, ['localhost'], now), false)
   assert.equal(stillGood(null, ['localhost'], now), false)
+})
+
+// Харнесс с 0.1.2 просит токен и отвечает 401 всем, кто пришёл без него.
+// Тело отказа — не страница интерфейса: раньше плагин искал в нём заплатку,
+// не находил и уверенно сообщал, что она пропала. Проверка на месте.
+test('отказ харнесса не выдаётся за пропавшую заплатку', async () => {
+  const results = await checkAssumptions({
+    webServer: { tapIndex: () => () => {}, port: 3080 },
+    fetchIndex: async () => ({ status: 401, html: 'Unauthorized' }),
+  })
+  const names = results.map((item) => item.name)
+  assert.equal(names.includes('заплатка попала на страницу'), false, 'о заплатке судить нечем')
+  const gate = results.find((item) => item.name === 'страница отдаётся нам')
+  assert.ok(gate, 'должен быть отдельный вердикт про отказ')
+  assert.equal(gate.ok, false)
+  assert.match(gate.detail, /401/, 'в пояснении виден код ответа')
 })
