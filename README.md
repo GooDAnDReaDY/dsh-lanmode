@@ -1,5 +1,8 @@
 # dsh-lanmode
 
+> Adapted for DeepSeek Harness **0.1.2-alpha.1**: the host now decides LAN trust from the request `Host` header, so the plugin no longer patches the page for it.
+
+
 Open the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) Web UI from another device — a phone, a tablet, the laptop on the other side of the room — and have **all of it** work, including the parts the UI switches off when the page is not `localhost`.
 
 Works whether you put a reverse proxy in front of the harness or let this plugin serve the network itself. Pick a mode, restart, done.
