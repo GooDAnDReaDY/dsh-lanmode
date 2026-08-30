@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<h3>LAN Subnet Routing & HTTP Browser Media API Compatibility Helper</h3>
+<h3>Доступ по локальной сети и полифиллы медиа-API браузера без HTTPS</h3>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@goodandready/dsh-lanmode"><img src="https://img.shields.io/npm/v/@goodandready/dsh-lanmode.svg?style=for-the-badge&color=6366f1&labelColor=1e1b4b" alt="npm version"></a>
@@ -21,20 +21,20 @@
 
 ---
 
-## ⚡ Overview
+## ⚡ Обзор
 
-**`dsh-lanmode`** unlocks smooth local network access across subnets (`192.168.x.x` / `10.x.x.x`) and injects polyfills for browser media and microphone APIs over plain HTTP.
+**`dsh-lanmode`** обеспечивает доступ к веб-интерфейсу DSH с мобильных устройств по локальной сети (`192.168.x.x` / `10.x.x.x`) и снимает блокировки браузера на микрофон при работе без HTTPS.
 
 ```mermaid
 graph LR
-    Phone[📱 Mobile / Tablet in LAN] -->|Plain HTTP Connection| DSH[DSH Web UI]
-    DSH --> Polyfill[dsh-lanmode Media Polyfill]
-    Polyfill --> MicAPI[🎙️ Unlocked Web Audio & Dictation]
+    Phone[📱 Смартфон / Планшет в LAN] -->|Подключение по HTTP| DSH[Web UI DeepSeek Harness]
+    DSH --> Polyfill[Полифилл dsh-lanmode]
+    Polyfill --> MicAPI[🎙️ Разблокированная диктовка и аудио]
 ```
 
 ---
 
-## 📦 Quick Installation
+## 📦 Быстрая установка
 
 ```bash
 dsh plugin --profile web add @goodandready/dsh-lanmode
@@ -42,6 +42,6 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 ---
 
-## 📄 License
+## 📄 Лицензия
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)

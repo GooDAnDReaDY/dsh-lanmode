@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<h3>LAN Subnet Routing & HTTP Browser Media API Compatibility Helper</h3>
+<h3>DeepSeek Harness 局域网访问优化与非 HTTPS 媒体接口兼容插件</h3>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@goodandready/dsh-lanmode"><img src="https://img.shields.io/npm/v/@goodandready/dsh-lanmode.svg?style=for-the-badge&color=6366f1&labelColor=1e1b4b" alt="npm version"></a>
@@ -21,20 +21,20 @@
 
 ---
 
-## ⚡ Overview
+## ⚡ 插件概览
 
-**`dsh-lanmode`** unlocks smooth local network access across subnets (`192.168.x.x` / `10.x.x.x`) and injects polyfills for browser media and microphone APIs over plain HTTP.
+**`dsh-lanmode`** 解决移动端通过局域网内网 IP (`192.168.x.x`) 访问时浏览器纯 HTTP 环境对麦克风及媒体 API 的安全拦截。
 
 ```mermaid
 graph LR
-    Phone[📱 Mobile / Tablet in LAN] -->|Plain HTTP Connection| DSH[DSH Web UI]
-    DSH --> Polyfill[dsh-lanmode Media Polyfill]
-    Polyfill --> MicAPI[🎙️ Unlocked Web Audio & Dictation]
+    Phone[📱 局域网内手机 / 平板端] -->|HTTP 协议访问| DSH[DSH Web 界面]
+    DSH --> Polyfill[dsh-lanmode 媒体接口 Polyfill]
+    Polyfill --> MicAPI[🎙️ 解除限制的录音与语音接口]
 ```
 
 ---
 
-## 📦 Quick Installation
+## 📦 安装指南
 
 ```bash
 dsh plugin --profile web add @goodandready/dsh-lanmode
@@ -42,6 +42,6 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 ---
 
-## 📄 License
+## 📄 开源协议
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
