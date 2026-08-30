@@ -22,6 +22,9 @@ LAN network routing and browser media API compatibility helper for DeepSeek Harn
 - **LAN Subnet Support**: Access DSH Web UI from phones and tablets over `192.168.x.x` / `10.x.x.x`.
 - **Media API Polyfills**: Bypasses browser HTTPS security restrictions for dictation and microphone APIs over plain HTTP in local environments.
 - **Reverse Proxy Compatibility**: Seamless support for Nginx, Traefik, and Caddy.
+- **Token-free LAN entry**: after a Harness restart the bridge hands the current launch
+  token to the guest itself, so nobody hunts for a fresh link. This is not an identity
+  check — whoever reaches the port gets in. Turn it off with `autoAuth: false`.
 
 ### Install
 
@@ -42,6 +45,9 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 - **Доступ по локальной сети**: вход в Web UI с телефонов и планшетов в подсетях `192.168.x.x` / `10.x.x.x`.
 - **Полифиллы медиа-API**: обход ограничений браузера на работу микрофона и диктовки без HTTPS в локальной сети.
 - **Совместимость с прокси**: прозрачная работа за Nginx, Traefik и Caddy.
+- **Вход из сети без токена**: после перезапуска харнесса мост сам подставляет гостю
+  нынешний токен запуска, и новую ссылку искать не нужно. Это не проверка личности:
+  кто дотянулся до порта, тот и вошёл. Выключается настройкой `autoAuth: false`.
 
 ### Установка
 
@@ -64,6 +70,8 @@ DeepSeek Harness 局域网访问优化与 HTTP 媒体接口兼容插件：支持
 - **局域网全端接入**：支持移动设备通过 `192.168.x.x` 等内网网段顺畅访问。
 - **媒体接口 Polyfill**：解除纯 HTTP 环境下浏览器录音与语音 API 的安全阻断。
 - **反向代理完美适配**：兼容 Nginx、Traefik、Caddy 等反向代理方案。
+- **局域网免令牌进入**：Harness 重启后，网桥会自行把当前启动令牌交给访客，无需再去找新链接。
+  这不是身份校验：能连到该端口的人都能进入。用 `autoAuth: false` 关闭。
 
 ### 安装方法
 
