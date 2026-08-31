@@ -80,3 +80,51 @@ test('первый кадр харнесса доходит до браузер�
   upstream.close()
   assert.match(seen, new RegExp(payload), 'кадр, посланный вместе с рукопожатием, должен дойти')
 })
+
+/** Харнесс, который подъёму отказывает: отвечает обычным ответом, а не 101. */
+function refusingUpstream() {
+  return net.createServer((socket) => {
+    socket.once('data', () => {
+      socket.write(
+        'HTTP/1.1 401 Unauthorized\r\n'
+        + 'content-length: 12\r\n\r\n'
+        + 'unauthorized',
+      )
+      socket.end()
+    })
+  })
+}
+
+// Отказ в подъёме мост обязан передать браузеру. Если проглотить, страница
+// будет ждать вечно: поток событий не поднимется, и по сети пропадут список
+// бесед и ответы агента — при живой странице, работающем харнессе и полной
+// тишине в журнале. Причину в таком виде ищут где угодно, только не здесь.
+test('отказ в подъёме доходит до браузера, а не проглатывается', async () => {
+  const upstream = refusingUpstream()
+  const upstreamPort = await listen(upstream)
+  const port = await freePort()
+
+  const stop = startDirectBridge({ webServer: { port: upstreamPort } },
+    { hosts: ['127.0.0.1'], port, log: () => {} })
+  await new Promise((resolve) => setTimeout(resolve, 150))
+
+  const seen = await new Promise((resolve) => {
+    const req = http.request({
+      host: '127.0.0.1', port, path: '/api/remote.mux',
+      headers: {
+        Connection: 'Upgrade',
+        Upgrade: 'websocket',
+        'Sec-WebSocket-Key': crypto.randomBytes(16).toString('base64'),
+      },
+    })
+    req.on('response', (res) => resolve(res.statusCode))
+    req.on('upgrade', () => resolve('подъём'))
+    req.on('error', (e) => resolve('ошибка: ' + e.message))
+    req.setTimeout(3000, () => { req.destroy(); resolve('молчание') })
+    req.end()
+  })
+
+  assert.equal(seen, 401, 'браузер должен увидеть отказ, а не тишину')
+  stop()
+  upstream.close()
+})
