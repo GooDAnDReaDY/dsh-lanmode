@@ -1,5 +1,9 @@
 # 📦 @goodandready/dsh-lanmode
 
+**修复 DSH 0.1.2-alpha.5 兼容性：** 保留异步插件初始化的等待语义，避免 Web UI
+启动时服务尚未就绪。查看[兼容性测试](docs/testing/alpha5-compatibility.md)
+和 [0.6.11 更新说明](docs/releases/0.6.11.md)。
+
 <div align="center">
 
 <h3>DeepSeek Harness 局域网访问优化、mDNS (dsh.local)、PWA、Root CA、QR 码、后台通知与自动 TLS 插件</h3>
