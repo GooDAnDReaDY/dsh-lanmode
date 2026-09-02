@@ -1,0 +1,24 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+
+import { readRootCA, inspect, checkOpenSsl } from '../lib/tls.js'
+
+test('проверка доступности openssl', async () => {
+  const info = await checkOpenSsl()
+  assert.equal(typeof info.available, 'boolean')
+})
+
+test('чтение Root CA из временной папки', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-ca-test-'))
+  try {
+    assert.equal(readRootCA(tmpDir), null)
+    const dummyCA = '-----BEGIN CERTIFICATE-----\nMIIB...\n-----END CERTIFICATE-----\n'
+    fs.writeFileSync(path.join(tmpDir, 'lanmode-ca.pem'), dummyCA, 'utf8')
+    assert.equal(readRootCA(tmpDir), dummyCA)
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true })
+  }
+})

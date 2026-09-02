@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<h3>DeepSeek Harness 局域网访问优化、安全上下文补丁、直连网桥与自动 TLS 插件</h3>
+<h3>DeepSeek Harness 局域网访问优化、mDNS (dsh.local)、PWA、Root CA、QR 码、后台通知与自动 TLS 插件</h3>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@goodandready/dsh-lanmode"><img src="https://img.shields.io/npm/v/@goodandready/dsh-lanmode.svg?style=for-the-badge&color=6366f1&labelColor=1e1b4b" alt="npm version"></a>
@@ -35,19 +35,21 @@
 4. 🎙️ **麦克风语音输入拦截**：移动端浏览器禁止纯 HTTP 访问麦克风接口，导致 [`dsh-voice`](https://github.com/GooDAnDReaDY/dsh-voice) 语音功能瘫痪；
 5. 🛡️ **核心 API 环回接口限制**：核心设置及密钥接口只接受来自 `127.0.0.1` 的请求。
 
-`dsh-lanmode` 通过 `webServer.tapIndex` 动态注入无侵入 Polyfill 补丁、启动直连网桥及自动颁发局域网 TLS 证书，在局域网内 100% 恢复全功能体验。
+`dsh-lanmode` 通过 `webServer.tapIndex` 动态注入无侵入 Polyfill 补丁、启动直连网桥、mDNS 域名解析、本地根证书（Root CA）生成以及客户端设置卡片，在局域网内 100% 恢复全功能体验。
 
 ```mermaid
 graph LR
     subgraph RemoteDevices [局域网终端设备]
-        Client[📱 移动端 Safari / 💻 局域网笔记本: 192.168.1.50] -->|HTTP / LAN HTTPS| Bridge[dsh-lanmode 智能直连网桥]
+        Client[📱 移动端 Safari / 💻 局域网笔记本: dsh.local:3088] -->|mDNS & HTTPS| Bridge[dsh-lanmode 智能直连网桥]
     end
 
-    subgraph ShimsLayer [前端 tapIndex 注入补丁层]
+    subgraph ShimsLayer [前端 tapIndex 注入补丁层 & PWA]
         Bridge --> Shim1[🔓 解除 Loopback 限制: 开启设置与模型管理]
         Bridge --> Shim2[🆔 补全 RFC 4122 crypto.randomUUID Polyfill]
         Bridge --> Shim3[📋 补全剪贴板复制降级兼容]
-        Bridge --> Shim4[🔐 自动颁发 TLS 证书: 解锁 dsh-voice 麦克风权限]
+        Bridge --> Shim4[🔐 Local Root CA & TLS: 解锁麦克风权限]
+        Bridge --> Shim5[📱 PWA Manifest 与移动端安全区适配]
+        Bridge --> Shim6[🔔 Agent 生成结束后台系统通知]
     end
 
     subgraph HostBackend [DSH 服务端核心]
@@ -56,10 +58,12 @@ graph LR
     end
 
     subgraph Output [最终效果]
-        Shim1 --> FullWeb[✅ 局域网内 100% 完整可用体验]
+        Shim1 --> FullWeb[✅ 局域网与移动端 100% 完整体验]
         Shim2 --> FullWeb
         Shim3 --> FullWeb
         Shim4 --> FullWeb
+        Shim5 --> FullWeb
+        Shim6 --> FullWeb
         PrivilegedAPI --> FullWeb
     end
 
@@ -68,6 +72,18 @@ graph LR
     style HostBackend fill:#11111b,stroke:#a6e3a1,stroke-width:2px,color:#cdd6f4
     style Output fill:#181825,stroke:#f38ba8,stroke-width:2px,color:#cdd6f4
 ```
+
+---
+
+## ✨ 核心特性
+
+1. 📱 **/mobileqr 命令与二维码快速扫码连接**：一键生成纯 SVG 二维码与内网连接带 Token 链接，手机扫码秒进；
+2. 📲 **PWA 与移动端全屏模式**：支持添加到主屏幕全屏无边框运行，完美适配刘海屏与状态栏；
+3. 🌐 **自动 mDNS (`dsh.local`) 发现**：局域网内直接输入 `https://dsh.local:3088` 即可访问；
+4. 🔐 **本地 Root CA 根证书**：提供 `GET /dsh-lanmode/ca.crt` 下载，安装至手机即可获得永久绿色可信 HTTPS；
+5. 🔔 **后台系统通知（Web Notifications）**：当浏览器最小化或手机锁屏时，Agent 回复完毕自动推送系统通知；
+6. 🎨 **UI 设置卡片（`lib/client.js`）**：无缝融入 DSH 设置面板，支持一键复制内网 URL 与切换二维码；
+7. 🛡️ **访问控制与可选 LAN PIN 码**：支持 CIDR 子网白名单及特权修改 PIN 保护。
 
 ---
 
