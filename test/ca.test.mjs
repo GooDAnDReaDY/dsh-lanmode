@@ -22,3 +22,14 @@ test('чтение Root CA из временной папки', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true })
   }
 })
+
+test('altNames корректно форматирует DNS, IP и IPv6 в скобках', async () => {
+  const { altNames } = await import('../lib/tls.js')
+  const san = altNames(['localhost', '192.168.1.1', '[::1]', 'dsh.local', 'fd7a:115c::1'])
+  assert.ok(san.includes('DNS:localhost'))
+  assert.ok(san.includes('IP:192.168.1.1'))
+  assert.ok(san.includes('IP:::1'))
+  assert.ok(san.includes('DNS:dsh.local'))
+  assert.ok(san.includes('IP:fd7a:115c::1'))
+  assert.ok(!san.includes('['))
+})

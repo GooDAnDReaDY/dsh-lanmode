@@ -46,3 +46,10 @@ test('формирование mDNS ответа с A и AAAA записями',
   const anCount = response.readUInt16BE(6)
   assert.equal(anCount, 2) // 2 записи
 })
+
+test('защита от бесконечного цикла при зацикленных указателях сжатия DNS', () => {
+  // Пакет с циклическим указателем сжатия: 0xC0, 0x00 указывает на самого себя
+  const malicious = Buffer.from([0xC0, 0x00])
+  const result = parseDnsName(malicious, 0)
+  assert.equal(result.name, '')
+})
