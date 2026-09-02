@@ -1,5 +1,9 @@
 # 📦 @goodandready/dsh-lanmode
 
+**Alpha.5 compatibility hotfix:** async browser plugin initialization now
+retains its awaited lifecycle. See [compatibility and tests](docs/testing/alpha5-compatibility.md)
+and [0.6.11 patch notes](docs/releases/0.6.11.md).
+
 <div align="center">
 
 <h3>Local Area Network (LAN) Access Enabler, mDNS (dsh.local), PWA, Root CA, QR Code, Background Notifications & Auto-TLS for DeepSeek Harness</h3>

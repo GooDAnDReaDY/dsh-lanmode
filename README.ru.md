@@ -1,5 +1,9 @@
 # 📦 @goodandready/dsh-lanmode
 
+**Исправлена совместимость с DSH 0.1.2-alpha.5:** загрузчик корректно ожидает
+асинхронный запуск плагинов. [Проверки](docs/testing/alpha5-compatibility.md)
+и [патчноут 0.6.11](docs/releases/0.6.11.md).
+
 <div align="center">
 
 <h3>Доступ к веб-интерфейсу по локальной сети (LAN), mDNS (dsh.local), PWA, Root CA, QR-код, фоновые уведомления и авто-TLS для DeepSeek Harness</h3>
