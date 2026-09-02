@@ -32,5 +32,6 @@ script in package.json. See [index.md](index.md) for the test matrix and
 
 ## Status
 
-2026-09-02: version 0.6.10 has a confirmed async loader regression tracked in
-Gitea #31. Repair is in an isolated worktree; production acceptance is pending.
+2026-09-02: Gitea #31's async loader regression is fixed. Unit, actual-core,
+independent review and installed test-host browser checks passed. Hotfix
+0.6.11 is approved for publication; production acceptance remains required.

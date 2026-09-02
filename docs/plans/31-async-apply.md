@@ -40,4 +40,9 @@ historical worktrees are preserved. Source main is read-only.
   subagents are present immediately at await, without a timeout workaround.
 - Owner explicitly authorized a new hotfix release and production restore;
   requested patch notes explicitly mention alpha.5 compatibility.
-- Independent review, test-host/package and runtime acceptance: pending.
+- Independent review: PASS; full suite 86/86 and actual-core integration PASS.
+- Test-host installed artifact: HTTPS and session/plugin inventory RPC PASS;
+  real browser boots alpha.5 with no loader error and no console errors.
+- Browser test required trusting the test CA; owner explicitly approved.
+- No model/provider credentials were copied into the isolated test profile.
+- Release 0.6.11 authorized; publication and production acceptance follow.
