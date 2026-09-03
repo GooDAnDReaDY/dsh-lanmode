@@ -131,14 +131,30 @@ dsh-lanmode:
   directHost: 0.0.0.0
   directPort: 3088
   mdns: true               # Announce dsh.local in LAN
-  pwa: true                # PWA manifest & mobile viewport
+  pwa: true                # PWA manifest, splash screen & mobile viewport
+  mobileEnterSends: false  # When false (default), Enter adds newline on mobile touch
   tls: self-signed         # 'self-signed' (with Root CA), 'files', or 'off'
   unlockPrivileged: true   # Permit settings & credentials from LAN
   lanPin: ""               # Optional PIN code for settings from LAN
+  tunnel: off              # Cloudflare WAN tunnel: 'off', 'quick', or 'named'
+  tunnelToken: ""          # Cloudflare named tunnel token
+  tunnelPin: true          # Require PIN for requests from WAN
   allow:
     - 192.168.0.0/16
     - 10.0.0.0/8
 ```
+
+---
+
+## 📱 Mobile & WAN Modernization Suite (39 Features)
+
+- **Mobile Touch**: iOS anti-zoom (16px), safe-area insets, 44px touch targets, auto-focus suppression, edge swipe gestures, auto-collapsing sidebar, FAB button, opt-in `mobileEnterSends`.
+- **Quick Access UI**: Sidebar footer quick QR button, interactive modal with QR, URL copy and Root CA download, server startup terminal ASCII QR code.
+- **Network Reliability**: Transparent Brotli & Gzip streaming compression, 25s WebSocket heartbeat against carrier drops, visibility change fast reconnect, RTT ping latency display.
+- **Security & Roster**: User-Agent device recognition (iPhone, Android, Windows, Mac), live presence & activity tracking, individual device session revoke, emergency kill switch.
+- **Firewall & Network Stack**: Automated Windows Defender Firewall, Linux UFW and firewalld management, WSL2 host IP discovery, Tailscale CGNAT detection, diagnostic `/probe` endpoint.
+- **PIN & PWA Resilience**: Native client PIN prompt modal with auto-retry, brute-force rate limiting (5 attempts / 30s lockout), PWA memory eviction state mirror.
+- **Cloudflare WAN Tunnels**: Built-in zero-config Quick Tunnels and Named Tunnels, public URL auto-parsing, dynamic start/stop toggle, mandatory WAN PIN protection.
 
 ---
 
