@@ -3,9 +3,12 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import fs from 'node:fs'
+import os from 'node:os'
 import { parseUserAgent, DeviceRegistry } from '../lib/devices.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
+const tmpFile = (name) => path.join(os.tmpdir(), `dsh-test-${Date.now()}-${Math.random().toString(36).slice(2)}-${name}.json`)
 
 test('Блок 6: #51 Распознавание User-Agent (iPhone, Android, Windows, Mac)', () => {
   const iphone = parseUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1')
@@ -23,7 +26,8 @@ test('Блок 6: #51 Распознавание User-Agent (iPhone, Android, Wi
 })
 
 test('Блок 6: #52 Реестр устройств, онлайн статус и touch', () => {
-  const reg = new DeviceRegistry('/tmp/test-devices-1.json')
+  const file = tmpFile('1')
+  const reg = new DeviceRegistry(file)
   reg.touch('tok-1', {
     headers: { 'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4) Safari/604.1' },
     socket: { remoteAddress: '192.168.1.55' },
@@ -38,7 +42,8 @@ test('Блок 6: #52 Реестр устройств, онлайн статус
 })
 
 test('Блок 6: #53 Индивидуальный отзыв устройства (Revoke)', () => {
-  const reg = new DeviceRegistry('/tmp/test-devices-2.json')
+  const file = tmpFile('2')
+  const reg = new DeviceRegistry(file)
   reg.touch('tok-2', { headers: {}, socket: {} })
   assert.equal(reg.isRevoked('tok-2'), false)
 
@@ -47,7 +52,8 @@ test('Блок 6: #53 Индивидуальный отзыв устройств
 })
 
 test('Блок 6: #54 Экстренное отключение всех сессий (Emergency Kill Switch)', () => {
-  const reg = new DeviceRegistry('/tmp/test-devices-3.json')
+  const file = tmpFile('3')
+  const reg = new DeviceRegistry(file)
   reg.touch('tok-a', { headers: {}, socket: {} })
   reg.touch('tok-b', { headers: {}, socket: {} })
 
