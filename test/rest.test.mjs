@@ -154,6 +154,31 @@ test('страница не отдаётся — проверка не пада�
   assert.match(results.at(-1).detail, /соединение закрыто/)
 })
 
+test('Issue #34: харнесс с токен-аутентификацией (401/302) не вызывает ложного предупреждения ТОЧКИ КРЕПЛЕНИЯ УЕХАЛИ', async () => {
+  const results401 = await checkAssumptions({
+    webServer: { tapIndex: () => {}, port: 3080 },
+    fetchIndex: async () => ({ status: 401, html: 'authentication required' }),
+  })
+  assert.ok(results401.every((item) => item.ok || item.unverifiable), JSON.stringify(results401))
+  assert.match(summarize(results401), /на месте/)
+
+  const results302 = await checkAssumptions({
+    webServer: { tapIndex: () => {}, port: 3080 },
+    fetchIndex: async () => ({ status: 302, html: 'redirecting to login' }),
+  })
+  assert.ok(results302.every((item) => item.ok || item.unverifiable))
+  assert.match(summarize(results302), /на месте/)
+})
+
+test('Issue #34: настоящая ошибка 500 по-прежнему считается сбоем точек крепления', async () => {
+  const results500 = await checkAssumptions({
+    webServer: { tapIndex: () => {}, port: 3080 },
+    fetchIndex: async () => ({ status: 500, html: 'Internal Server Error' }),
+  })
+  assert.equal(results500.at(-1).ok, false)
+  assert.match(summarize(results500), /УЕХАЛИ/)
+})
+
 // ------------------------------------------------------------ сертификат
 
 test('имена и адреса в сертификате различаются', () => {
