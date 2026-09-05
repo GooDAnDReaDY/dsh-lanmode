@@ -111,3 +111,81 @@ test('Issue #89: Отложенная регистрация слотов чер
   assert.equal(registeredFallback[1].name, 'sidebar.footer.action')
   assert.equal(registeredFallback[1].id, '@goodandready/dsh-lanmode:qr')
 })
+
+test('Issue #92: LanModeCard корректно рендерится в раскрытом состоянии (open = true, copyLanUrl defined)', async () => {
+  const vm = await import('node:vm')
+  const clientCode = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+
+  assert.ok(clientCode.includes('var copyLanUrl ='), 'copyLanUrl должен быть объявлен в компоненте')
+
+  let loaded = null
+  const mockWindow = {
+    __ModuleLoader__: { load: (e) => { loaded = e } },
+    addEventListener: () => {},
+    dispatchEvent: () => {},
+    location: { href: 'http://localhost:3080/', hostname: 'localhost', port: '3080', origin: 'http://localhost:3080' },
+    isSecureContext: true,
+  }
+
+  let copiedText = null
+  const context = vm.createContext({
+    window: mockWindow,
+    document: {
+      addEventListener: () => {},
+      head: { appendChild: () => {} },
+      getElementById: () => null,
+      createElement: () => ({ setAttribute: () => {}, textContent: '' }),
+    },
+    navigator: {
+      clipboard: {
+        writeText: (txt) => {
+          copiedText = txt
+          return Promise.resolve()
+        },
+      },
+    },
+    console,
+    setTimeout: (fn) => { fn(); return 1 },
+    clearTimeout: () => {},
+    setInterval: () => 1,
+    clearInterval: () => {},
+    Notification: { permission: 'granted' },
+    sessionStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+    fetch: () => Promise.resolve({ json: () => Promise.resolve([]) }),
+    CustomEvent: class {},
+  })
+
+  vm.runInContext(clientCode, context)
+
+  const mockReact = {
+    useState: (v) => {
+      if (typeof v === 'boolean') return [true, () => {}] // open = true
+      if (Array.isArray(v)) return [[{ id: '1', name: 'iPhone', ip: '192.168.1.5', online: true, revoked: false }], () => {}]
+      if (v && typeof v === 'object') return [{ active: true, publicUrl: 'https://test.trycloudflare.com', status: 'running' }, () => {}]
+      return [v, () => {}]
+    },
+    useEffect: () => {},
+    useCallback: (fn) => fn,
+    useMemo: (fn) => fn(),
+    createElement: (type, props, ...children) => ({ type, props, children }),
+    Fragment: 'Fragment',
+  }
+
+  let LanModeCardComp = null
+  const mod = loaded.factory((m) => (m === 'react' ? mockReact : {}))
+  const mockCtx = {
+    slots: {
+      inject: (name, cb) => { cb() },
+      register: (opts, comp) => {
+        if (opts.name === 'settings.plugin.item') LanModeCardComp = comp
+      },
+    },
+    locale: { register: () => {} },
+    on: () => {},
+  }
+  mod.apply(mockCtx)
+
+  assert.ok(LanModeCardComp, 'компонент LanModeCard зарегистрирован')
+  const element = LanModeCardComp({ t: (k) => k, ctx: mockCtx })
+  assert.ok(element, 'компонент успешно отрендерился в раскрытом состоянии')
+})
