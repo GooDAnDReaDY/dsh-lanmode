@@ -111,7 +111,7 @@ graph LR
 ### 7. 🛡️ Access Control & Optional LAN PIN
 * **`unlockPrivileged`**: Master gate for settings & credentials mutation from LAN.
 * **`lanPin`**: Optional PIN code (disabled by default). When set, LAN guests can chat freely, but changing system settings or API keys requires PIN authentication.
-* **CIDR Subnet Filtering**: Restrict access to trusted subnets (`allow: ["192.168.1.0/24"]`).
+* **CIDR Subnet Filtering**: Restrict access to trusted subnets (`allow: ["192.168.77.0/24"]`).
 
 ---
 

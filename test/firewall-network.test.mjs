@@ -21,7 +21,7 @@ test('Блок 5: #58 Определение физического IP хост�
 
 test('Блок 5: #62 Определение Tailscale CGNAT диапазона 100.64.0.0/10', () => {
   assert.equal(isTailscaleAddress('100.64.0.1'), true, '100.64.0.1 входит в Tailscale')
-  assert.equal(isTailscaleAddress('100.123.213.28'), true, '100.123.213.28 входит в Tailscale')
+  assert.equal(isTailscaleAddress('100.64.0.28'), true, '100.64.0.28 входит в Tailscale')
   assert.equal(isTailscaleAddress('100.127.255.254'), true, '100.127.255.254 входит в Tailscale')
   assert.equal(isTailscaleAddress('100.128.0.1'), false, '100.128.0.1 НЕ входит в Tailscale')
   assert.equal(isTailscaleAddress('192.168.1.1'), false, '192.168.1.1 обычный LAN')

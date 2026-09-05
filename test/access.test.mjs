@@ -17,7 +17,7 @@ test('одиночный адрес — это подсеть из одного 
 })
 
 test('подсеть IPv4', () => {
-  const { rules } = parseAllow(['192.168.1.0/24'])
+  const { rules } = parseAllow(['192.168.77.0/24'])
   assert.equal(allowed('192.168.1.1', rules), true)
   assert.equal(allowed('192.168.1.255', rules), true)
   assert.equal(allowed('192.168.2.1', rules), false)
@@ -32,7 +32,7 @@ test('граница подсети считается по битам, а не 
 test('адрес IPv4 внутри записи IPv6 признаётся своим', () => {
   // Именно в таком виде Node отдаёт адрес на сокете двойного стека, и без
   // этого правило для IPv4 не сработало бы вовсе.
-  const { rules } = parseAllow(['192.168.1.0/24'])
+  const { rules } = parseAllow(['192.168.77.0/24'])
   assert.equal(allowed('::ffff:192.168.1.5', rules), true)
   assert.equal(allowed('::ffff:192.168.2.5', rules), false)
 })
@@ -44,7 +44,7 @@ test('подсеть IPv6', () => {
 })
 
 test('петля пускается, только если её вписали', () => {
-  const { rules } = parseAllow(['192.168.1.0/24'])
+  const { rules } = parseAllow(['192.168.77.0/24'])
   assert.equal(allowed('127.0.0.1', rules), false)
   const local = parseAllow(['127.0.0.0/8', '::1']).rules
   assert.equal(allowed('127.0.0.1', local), true)
@@ -52,7 +52,7 @@ test('петля пускается, только если её вписали',
 })
 
 test('мусорные записи отбрасываются и не превращаются в правило', () => {
-  const { rules, dropped } = parseAllow(['192.168.1.0/24', 'не адрес', '1.2.3.4/99', ''])
+  const { rules, dropped } = parseAllow(['192.168.77.0/24', 'не адрес', '1.2.3.4/99', ''])
   assert.equal(rules.length, 1)
   assert.deepEqual(dropped, ['не адрес', '1.2.3.4/99'])
 })
@@ -65,7 +65,7 @@ test('список из одного мусора никого не запира
 })
 
 test('неразбираемый адрес гостя не пускается, когда список задан', () => {
-  const { rules } = parseAllow(['192.168.1.0/24'])
+  const { rules } = parseAllow(['192.168.77.0/24'])
   assert.equal(allowed(undefined, rules), false)
   assert.equal(allowed('', rules), false)
 })
