@@ -135,9 +135,11 @@ dsh-lanmode:
   mobileEnterSends: false  # When false (default), Enter adds newline on mobile touch
   tls: self-signed         # 'self-signed' (with Root CA), 'files', or 'off'
   unlockPrivileged: true   # Permit settings & credentials from LAN
-  lanPin: ""               # Optional PIN code for settings from LAN
+  lanPinRef: ""            # Credential reference name or ENV var for LAN PIN
+  lanPin: ""               # (Deprecated) Plain PIN string for backwards compatibility
   tunnel: off              # Cloudflare WAN tunnel: 'off', 'quick', or 'named'
-  tunnelToken: ""          # Cloudflare named tunnel token
+  tunnelTokenRef: ""       # Credential reference name or ENV var for Cloudflare tunnel token
+  tunnelToken: ""          # (Deprecated) Plain tunnel token string for backwards compatibility
   tunnelPin: true          # Require PIN for requests from WAN
   allow:
     - 192.168.0.0/16
