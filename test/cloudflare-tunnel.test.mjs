@@ -36,7 +36,7 @@ test('Блок 8: #48 & #49 Получение состояния и управ�
 test('Блок 8: #50 Детекция входящего трафика Cloudflare WAN (isCloudflareRequest)', () => {
   assert.equal(isCloudflareRequest({ 'cf-ray': '8bd927f8a812-DME' }), true, 'наличие cf-ray означает трафик Cloudflare')
   assert.equal(isCloudflareRequest({ 'cf-connecting-ip': '203.0.113.195' }), true, 'наличие cf-connecting-ip')
-  assert.equal(isCloudflareRequest({ 'host': '192.168.1.111:3088' }), false, 'обычный LAN трафик')
+  assert.equal(isCloudflareRequest({ 'host': '192.168.77.111:3088' }), false, 'обычный LAN трафик')
 })
 
 test('Блок 8: Регистрация эндпоинтов /tunnel и /tunnel/toggle в index.js', () => {

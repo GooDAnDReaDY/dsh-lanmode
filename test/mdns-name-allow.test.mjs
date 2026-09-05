@@ -31,17 +31,17 @@ test('Issue #78: bindAddresses исключает любое .local имя из 
 })
 
 test('Issue #78: Просеивание mDNS-анонса через allow (не объявлять адреса, куда не пускаем)', () => {
-  const { rules } = parseAllow(['192.168.1.0/24'])
-  const machineAddresses = ['192.168.1.111', '100.123.213.28', '172.17.0.1']
+  const { rules } = parseAllow(['192.168.77.0/24'])
+  const machineAddresses = ['192.168.77.111', '100.64.0.28', '172.17.0.1']
 
   const announced = machineAddresses.filter((ip) => allowed(ip, rules))
-  assert.deepEqual(announced, ['192.168.1.111'], 'Должен быть объявлен только адрес подсети 192.168.1.0/24')
-  assert.equal(announced.includes('100.123.213.28'), false, 'Адрес Tailscale должен быть отсеян')
+  assert.deepEqual(announced, ['192.168.77.111'], 'Должен быть объявлен только адрес подсети 192.168.77.0/24')
+  assert.equal(announced.includes('100.64.0.28'), false, 'Адрес Tailscale должен быть отсеян')
 })
 
 test('Issue #78: Если allow исключил все адреса, анонс пуст (не анонсируем заведомо отвергаемый трафик)', () => {
   const { rules } = parseAllow(['10.50.0.0/16'])
-  const machineAddresses = ['192.168.1.111', '100.123.213.28']
+  const machineAddresses = ['192.168.77.111', '100.64.0.28']
 
   const announced = machineAddresses.filter((ip) => allowed(ip, rules))
   assert.equal(announced.length, 0, 'Список адресов должен быть пустым')
