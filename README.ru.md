@@ -135,7 +135,10 @@ dsh-lanmode:
   pwa: true                # PWA manifest и мобильный viewport
   tls: self-signed         # 'self-signed' (с Root CA), 'files' или 'off'
   unlockPrivileged: true   # Разрешить настройки и ключи из LAN
-  lanPin: ""               # Опциональный PIN для защиты настроек из LAN
+  lanPinRef: ""            # Ссылка на секрет в credentials или ENV для LAN PIN
+  lanPin: ""               # (Устарело) Прямой PIN-код для обратной совместимости
+  tunnelTokenRef: ""       # Ссылка на секрет в credentials или ENV для токена туннеля
+  tunnelToken: ""          # (Устарело) Прямой токен для обратной совместимости
   allow:
     - 192.168.0.0/16
     - 10.0.0.0/8
