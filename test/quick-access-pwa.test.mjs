@@ -33,3 +33,81 @@ test('Блок 3: #39/74 Расширенный манифест PWA и Splash S
   assert.ok(indexSource.includes('categories'), 'в манифесте должны быть categories')
   assert.ok(indexSource.includes('orientation'), 'в манифесте должна быть orientation')
 })
+
+test('Issue #89: Отложенная регистрация слотов через ctx.slots.inject (settings.plugin.item, sidebar.footer.action)', async () => {
+  const vm = await import('node:vm')
+  const clientCode = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+
+  assert.ok(clientCode.includes('registerSlotWhenReady'), 'должен использовать вспомогательную функцию отложенной регистрации')
+  assert.ok(clientCode.includes('@goodandready/dsh-lanmode:qr'), 'слот списка sidebar.footer.action должен иметь уникальный id')
+
+  function runClient(mockCtx) {
+    let loaded = null
+    const mockWindow = {
+      __ModuleLoader__: { load: (entry) => { loaded = entry } },
+      addEventListener: () => {},
+      dispatchEvent: () => {},
+    }
+    const context = vm.createContext({
+      window: mockWindow,
+      document: { addEventListener: () => {} },
+      navigator: {},
+      console,
+      setTimeout,
+      clearTimeout,
+      CustomEvent: class {},
+    })
+    vm.runInContext(clientCode, context)
+
+    const mockReact = {
+      useState: (v) => [v, () => {}],
+      useEffect: () => {},
+      useCallback: (fn) => fn,
+      useMemo: (fn) => fn(),
+      createElement: () => ({}),
+    }
+    const modExports = loaded.factory((mod) => (mod === 'react' ? mockReact : {}))
+    modExports.apply(mockCtx)
+  }
+
+  // Сценарий 1: DSH UI с поддержкой отложенного монтирования слотов ctx.slots.inject
+  const injected = []
+  const registered = []
+  const mockCtxInject = {
+    slots: {
+      inject: (name, cb) => {
+        injected.push(name)
+        cb()
+      },
+      register: (opts) => {
+        registered.push(opts)
+      },
+    },
+    locale: { register: () => {} },
+    on: () => {},
+  }
+  runClient(mockCtxInject)
+  assert.deepEqual(injected, ['settings.plugin.item', 'sidebar.footer.action'])
+  assert.equal(registered.length, 2)
+  assert.equal(registered[0].name, 'settings.plugin.item')
+  assert.equal(registered[0].key, 'dsh-lanmode')
+  assert.equal(registered[1].name, 'sidebar.footer.action')
+  assert.equal(registered[1].id, '@goodandready/dsh-lanmode:qr')
+
+  // Сценарий 2: Fallback режим прямой регистрации (если slots.inject отсутствует)
+  const registeredFallback = []
+  const mockCtxFallback = {
+    slots: {
+      register: (opts) => {
+        registeredFallback.push(opts)
+      },
+    },
+    locale: { register: () => {} },
+    on: () => {},
+  }
+  runClient(mockCtxFallback)
+  assert.equal(registeredFallback.length, 2)
+  assert.equal(registeredFallback[0].name, 'settings.plugin.item')
+  assert.equal(registeredFallback[1].name, 'sidebar.footer.action')
+  assert.equal(registeredFallback[1].id, '@goodandready/dsh-lanmode:qr')
+})
