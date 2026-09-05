@@ -14,9 +14,9 @@ test('Блок 3: #35 Генерация компактного ASCII QR-код�
   assert.ok(ascii.split('\n').length > 5, 'должен быть многострочным')
 })
 
-test('Блок 3: #33 & #34 Регистрация QuickQrPopover и слота sidebar.footer в client.js', () => {
+test('Блок 3: #33 & #34 Регистрация QuickQrPopover и слота sidebar.footer.action в client.js', () => {
   const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
-  assert.ok(client.includes('sidebar.footer'), 'должен регистрироваться слот sidebar.footer')
+  assert.ok(client.includes('sidebar.footer.action'), 'должен регистрироваться слот sidebar.footer.action')
   assert.ok(client.includes('QuickQrPopover'), 'должен объявляться компонент QuickQrPopover')
   assert.ok(client.includes('lm-modal-backdrop'), 'должен рендерить модальное окно с QR')
 })

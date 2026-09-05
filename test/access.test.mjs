@@ -18,8 +18,8 @@ test('одиночный адрес — это подсеть из одного 
 
 test('подсеть IPv4', () => {
   const { rules } = parseAllow(['192.168.77.0/24'])
-  assert.equal(allowed('192.168.1.1', rules), true)
-  assert.equal(allowed('192.168.1.255', rules), true)
+  assert.equal(allowed('192.168.77.1', rules), true)
+  assert.equal(allowed('192.168.77.255', rules), true)
   assert.equal(allowed('192.168.2.1', rules), false)
 })
 
@@ -33,7 +33,7 @@ test('адрес IPv4 внутри записи IPv6 признаётся сво
   // Именно в таком виде Node отдаёт адрес на сокете двойного стека, и без
   // этого правило для IPv4 не сработало бы вовсе.
   const { rules } = parseAllow(['192.168.77.0/24'])
-  assert.equal(allowed('::ffff:192.168.1.5', rules), true)
+  assert.equal(allowed('::ffff:192.168.77.5', rules), true)
   assert.equal(allowed('::ffff:192.168.2.5', rules), false)
 })
 
