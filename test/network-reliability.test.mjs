@@ -15,10 +15,9 @@ test('Блок 4: #64 Потоковая компрессия Brotli и Gzip в 
   assert.ok(bridge.includes('content-encoding'), 'должен выставляться заголовок content-encoding')
 })
 
-test('Блок 4: #65 WebSocket Heartbeat ping/pong в bridge.js', () => {
+test('Блок 4: #65 WebSocket TCP Keep-Alive в bridge.js', () => {
   const bridge = readFileSync(path.join(here, '..', 'lib', 'bridge.js'), 'utf8')
-  assert.ok(bridge.includes('0x89, 0x00'), 'должен отправляться RFC 6455 Ping-кадр [0x89, 0x00]')
-  assert.ok(bridge.includes('setInterval'), 'должен быть таймер heartbeat')
+  assert.ok(bridge.includes('setKeepAlive(true, 25000)'), 'должен настраиваться TCP keep-alive 25с без инъекции сырых байт')
   assert.ok(bridge.includes('25000'), 'интервал должен составлять 25 секунд')
 })
 
