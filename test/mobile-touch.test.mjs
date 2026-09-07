@@ -33,23 +33,21 @@ test('Блок 1: #45 Подавление залипающих ховер-ту�
   assert.ok(css.includes('tooltip'), 'должно подавлять селекторы tooltip')
 })
 
-test('Блок 1: #40 Подавление паразитного авто-фокуса в shim.js', () => {
+test('Блок 1: #40 Безопасный фокус без глобального monkey-patching в shim.js', () => {
   const shim = readFileSync(path.join(here, '..', 'lib', 'shim.js'), 'utf8')
-  assert.ok(shim.includes('suppressFocus'), 'в shim.js должен быть механизм suppressFocus')
-  assert.ok(shim.includes('isTouchDevice'), 'в shim.js должна быть детекция touch устройства')
+  assert.ok(!shim.includes('HTMLElement.prototype.focus'), 'shim не должен ломать глобальный focus прототипа')
 })
 
-test('Блок 2: #39 Опция Enter = New Line в mobile-nav.js', () => {
+test('Блок 2: #39 Корректная обработка клавиш без блокировки Enter в mobile-nav.js', () => {
   const code = mobileNavSource()
-  assert.ok(code.includes('enterSends'), 'должна проверяться опция enterSends')
-  assert.ok(code.includes('stopPropagation'), 'должна предотвращать отправку для вставки переноса')
+  assert.ok(!code.includes('e.stopPropagation()'), 'mobile-nav не должен глушить нажатия клавиш')
 })
 
-test('Блок 2: #41 Скрытие тяжелых панелей на экранах < 768px', () => {
+test('Блок 2: #41 Скрытие второстепенных колонок без подавления чужих плагинов', () => {
   const css = mobileStyles()
   assert.ok(css.includes('max-width: 768px'), 'должно быть правило max-width: 768px')
   assert.ok(css.includes('detailsColumn'), 'должна скрываться detailsColumn')
-  assert.ok(css.includes('terminal'), 'должен скрываться terminal')
+  assert.ok(!css.includes('terminal'), 'чужой плагин terminal не должен скрываться насильно')
 })
 
 test('Блок 2: #42 Свайп жесты для сайдбара', () => {
