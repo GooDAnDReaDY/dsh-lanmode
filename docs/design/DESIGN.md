@@ -112,3 +112,8 @@
      - Устаревшие поля `lanPin` и `tunnelToken` помечены Deprecated и поддерживаются для совместимости со старыми конфигурациями; в UI карточки используются современные безопасные ссылки `lanPinRef` и `tunnelTokenRef`.
   3. *Устранение сбоев проксирования Cordis*: прямой доступ `ctx.settings` и `ctx.settingsScope` заменен на безопасные селекторы `(ctx.get?.('settings') || ctx.settings)` и `(ctx.get?.('settingsScope') || ctx.settingsScope)` в `lib/index.js` и `lib/client.js`.
   4. *Изоляция стилей*: тег динамических стилей `<style>` карточки снабжен обязательным атрибутом `data-dsh-plugin="dsh-lanmode"`.
+
+- 2026-09-10 — Устранение ложной классификации мобильных устройств и защита нативного Enter (#112, GitHub #1):
+  1. *Защита нативного Enter*: подтверждено и зафиксировано тестами полное отсутствие `e.stopPropagation()` и обработчиков `keydown` в `lib/mobile-nav.js`, гарантируя штатную отправку сообщений по Enter в редакторе Lexical ядра DSH на любых десктопных устройствах.
+  2. *Точная классификация сенсорных устройств*: грубое условие `window.innerWidth < 1024 || maxTouchPoints > 0` заменено на строгую связку экрана и типа указателя `isNarrowScreen && (hasCoarsePointer || hasTouch)`, где `hasCoarsePointer` проверяется через `window.matchMedia('(pointer: coarse)').matches`. Ноутбуки с сенсорными экранами и узкие окна браузеров больше не активируют мобильные тач-сценарии.
+  3. *Очистка мертвого кода*: удалены неиспользуемые переменные `enterSends` из `lib/mobile-nav.js`.
