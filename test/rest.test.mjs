@@ -15,7 +15,7 @@ test('кто-то уже отвечает на сетевом адресе — �
     probe: async () => true,
   })
   assert.equal(verdict.mode, 'proxy')
-  assert.match(verdict.reason, /уже кто-то отвечает/)
+  assert.match(verdict.reason, /already responding|уже кто-то отвечает/)
 })
 
 test('никто не отвечает — поднимаем свой слушатель', async () => {
@@ -82,7 +82,7 @@ test('занятый порт для своего слушателя — ост�
     probe: async (host) => host === '127.0.0.1',
   })
   assert.equal(verdict.mode, 'proxy')
-  assert.match(verdict.reason, /уже занят/)
+  assert.match(verdict.reason, /already in use|уже занят/)
 })
 
 test('свободный порт — поднимаемся', async () => {
@@ -114,7 +114,7 @@ test('на здоровом харнессе все точки на месте',
     fetchIndex: async () => ({ status: 200, html: goodPage }),
   })
   assert.ok(results.every((item) => item.ok), JSON.stringify(results))
-  assert.match(summarize(results), /на месте/)
+  assert.match(summarize(results), /ready|на месте/)
 })
 
 test('исчезнувшая точка вставки замечена', async () => {
@@ -122,9 +122,9 @@ test('исчезнувшая точка вставки замечена', async 
     webServer: { port: 3080 },
     fetchIndex: async () => ({ status: 200, html: goodPage }),
   })
-  const item = results.find((each) => each.name.includes('вставки'))
+  const item = results.find((each) => (each.name.includes('tap') || each.name.includes('вставки')))
   assert.equal(item.ok, false)
-  assert.match(summarize(results), /УЕХАЛИ/)
+  assert.match(summarize(results), /DRIFTED|УЕХАЛИ/)
 })
 
 test('заплатка не доехала до страницы — это замечено', async () => {
@@ -132,7 +132,7 @@ test('заплатка не доехала до страницы — это за
     webServer: { tapIndex: () => {}, port: 3080 },
     fetchIndex: async () => ({ status: 200, html: '<html><head></head></html>' }),
   })
-  assert.equal(results.find((each) => each.name.includes('заплатка')).ok, false)
+  assert.equal(results.find((each) => (each.name.includes('patch') || each.name.includes('заплатка'))).ok, false)
 })
 
 test('пакет-исключение переименовали — это замечено', async () => {
@@ -142,7 +142,7 @@ test('пакет-исключение переименовали — это за
     webServer: { tapIndex: () => {}, port: 3080 },
     fetchIndex: async () => ({ status: 200, html: '<html><head><script data-dsh-lanmode="1"></script></head></html>' }),
   })
-  assert.equal(results.find((each) => each.name.includes('исключение')).ok, false)
+  assert.equal(results.find((each) => (each.name.includes('deliverables') || each.name.includes('исключение'))).ok, false)
 })
 
 test('страница не отдаётся — проверка не падает, а сообщает', async () => {
@@ -160,14 +160,14 @@ test('Issue #34: харнесс с токен-аутентификацией (40
     fetchIndex: async () => ({ status: 401, html: 'authentication required' }),
   })
   assert.ok(results401.every((item) => item.ok || item.unverifiable), JSON.stringify(results401))
-  assert.match(summarize(results401), /на месте/)
+  assert.match(summarize(results401), /ready|на месте/)
 
   const results302 = await checkAssumptions({
     webServer: { tapIndex: () => {}, port: 3080 },
     fetchIndex: async () => ({ status: 302, html: 'redirecting to login' }),
   })
   assert.ok(results302.every((item) => item.ok || item.unverifiable))
-  assert.match(summarize(results302), /на месте/)
+  assert.match(summarize(results302), /ready|на месте/)
 })
 
 test('Issue #34: настоящая ошибка 500 по-прежнему считается сбоем точек крепления', async () => {
@@ -176,7 +176,7 @@ test('Issue #34: настоящая ошибка 500 по-прежнему сч�
     fetchIndex: async () => ({ status: 500, html: 'Internal Server Error' }),
   })
   assert.equal(results500.at(-1).ok, false)
-  assert.match(summarize(results500), /УЕХАЛИ/)
+  assert.match(summarize(results500), /DRIFTED|УЕХАЛИ/)
 })
 
 // ------------------------------------------------------------ сертификат
@@ -224,8 +224,8 @@ test('отказ харнесса не выдаётся за пропавшую 
     fetchIndex: async () => ({ status: 401, html: 'Unauthorized' }),
   })
   const names = results.map((item) => item.name)
-  assert.equal(names.includes('заплатка попала на страницу'), false, 'о заплатке судить нечем')
-  const gate = results.find((item) => item.name === 'страница отдаётся нам')
+  assert.equal((names.includes('patch injected into page') || names.includes('заплатка попала на страницу')), false, 'о заплатке судить нечем')
+  const gate = results.find((item) => (item.name === 'page content accessible' || item.name === 'страница отдаётся нам'))
   assert.ok(gate, 'должен быть отдельный вердикт про отказ')
   assert.equal(gate.ok, false)
   assert.match(gate.detail, /401/, 'в пояснении виден код ответа')

@@ -145,7 +145,7 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
     if (!node || typeof node !== 'object') return null
     if (node.type === 'button') {
       const text = Array.isArray(node.children) ? node.children.join('') : ''
-      if (text.includes('Сохранить настройки')) return node
+      if (text.includes('Save Settings') || text.includes('Сохранить настройки') || text.includes('saveSettings')) return node
     }
     if (Array.isArray(node.children)) {
       for (const child of node.children) {

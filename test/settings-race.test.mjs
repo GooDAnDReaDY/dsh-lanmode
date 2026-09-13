@@ -50,7 +50,7 @@ test("Issue #106: apply() успешно применяет настройки �
   // Проверяем наличие защищенного блока try-catch и say() при регистрации
   assert.ok(indexSource.includes("settingsService.register(NS, Config"), "apply обязан регистрировать NS в settingsService")
   assert.ok(indexSource.includes("configSource = 'settings'"), "apply обязан устанавливать configSource: 'settings' при получении настроек")
-  assert.ok(indexSource.includes("configWarning = 'Ошибка регистрации настроек: '"), "apply обязан фиксировать ошибку регистрации в configWarning")
+  assert.ok(indexSource.includes("configWarning = 'Failed to register settings: '") || indexSource.includes("configWarning = 'Ошибка регистрации настроек: '"), "apply обязан фиксировать ошибку регистрации в configWarning")
   assert.ok(indexSource.includes("syncListener(config)"), "apply обязан обновлять слушателей при получении обновлений через subscribe")
 })
 
@@ -72,7 +72,7 @@ test("Issue #106: health.js включает configSource и configWarning в ho
   assert.equal(report.configWarning, "")
 
   const html = healthModule.healthPage(stateWithSettings)
-  assert.ok(html.includes("<dt>источник конфигурации</dt><dd>settings"), "HTML обязан содержать раздел 'источник конфигурации'")
+  assert.ok(html.includes("<dt>configuration source</dt><dd>settings") || html.includes("<dt>источник конфигурации</dt><dd>settings"), "HTML обязан содержать раздел 'источник конфигурации'")
 
   const stateWithWarning = {
     version: "0.7.11",
