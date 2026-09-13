@@ -158,6 +158,14 @@ dsh-lanmode:
 
 ---
 
+## 🚀 What is New in 0.7.15 (Issue #123 Evolution)
+
+- 📱 **Connected Devices & Session Management**: Live client presence tracking, device OS/browser discovery, per-device token revocation, and emergency "Revoke All Others" kill switch.
+- 🍏 **1-Click Apple Configuration Profile**: Native `.mobileconfig` payload for Safari on iOS, iPadOS, and macOS to trust DeepSeek Harness Local Root CA in one tap.
+- 🛡️ **Subnet Role Separation (Admin vs Guest)**: Distinct `adminAllow` and `guestAllow` CIDR rules. Guests can chat and interact with agents while access to harness configuration, plugins, and settings is protected with 403 Forbidden.
+- 🌐 **Multi-Interface & Mesh Detection**: Automatic identification of local LAN, Tailscale (100.x.y.z), WireGuard, and VPN adapters with quick-select UI pills.
+- ⚡ **Live Network Telemetry**: Compact real-time telemetry widget displaying RTT ping latency, active concurrent connections, and streaming data volume.
+
 ## 📱 Mobile & WAN Modernization Suite (39 Features)
 
 - **Mobile Touch**: iOS anti-zoom (16px), safe-area insets, 44px touch targets, auto-focus suppression, edge swipe gestures, auto-collapsing sidebar, FAB button, opt-in `mobileEnterSends`.

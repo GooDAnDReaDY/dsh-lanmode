@@ -101,6 +101,14 @@ graph LR
 
 ---
 
+## 🚀 0.7.15 新增特性 (Issue #123)
+
+1. 📱 **已连接设备与会话管理**：自动识别客户端设备型号与浏览器（iOS、Android、macOS、Windows），展示实时在线状态，支持单设备即时吊销（Revoke）与一键下线其它设备（Revoke All Others）。
+2. 🍏 **Apple 描述文件一键安装 (.mobileconfig)**：提供专属 iOS/macOS 描述文件一键下载安装，快速信任局域网自签根证书。
+3. 🛡️ **子网角色隔离 (管理员 vs 访客)**：支持 `adminAllow` 与 `guestAllow` 配置，访客仅可进行对话交流，系统配置与插件管理接口均受 403 Forbidden 保护。
+4. 🌐 **多网卡与 Mesh 组网识别**：自动探测局域网、Tailscale (100.x.y.z)、WireGuard 和 VPN 接口并提供一键切换药丸按钮。
+5. ⚡ **实时网络遥测**：界面实时呈现 RTT 往返延迟、当前并发活跃连接数及传输字节流量。
+
 ## 📦 安装指南
 
 ```bash

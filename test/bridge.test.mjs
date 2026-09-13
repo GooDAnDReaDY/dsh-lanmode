@@ -83,7 +83,7 @@ test('без порта харнесса мост не поднимается и
   const messages = []
   const stop = startDirectBridge({ webServer: {} }, { hosts: ['127.0.0.1'], port: 0, log: (m) => messages.push(m) })
   stop()
-  assert.match(messages.join(' '), /порт/)
+  assert.match(messages.join(' '), /port|порт/)
 })
 
 test('упавший харнесс превращается в 502, а не в повисший запрос', async () => {
@@ -102,7 +102,7 @@ test('упавший харнесс превращается в 502, а не в 
   try {
     const answer = await get(bridgePort, {})
     assert.equal(answer.status, 502)
-    assert.match(answer.body, /не отвечает/)
+    assert.match(answer.body, /not responding|не отвечает/)
   } finally {
     stop()
   }
@@ -130,7 +130,7 @@ test('адрес вне списка получает отказ и до хар�
   try {
     const answer = await get(bridgePort, {})
     assert.equal(answer.status, 403)
-    assert.match(messages.join(' '), /не в списке разрешённых/)
+    assert.match(messages.join(' '), /not in allowlist|не в списке разрешённых/)
   } finally {
     stop()
     upstream.close()

@@ -157,7 +157,7 @@ test('несколько адресов — несколько слушател�
   const stop = startDirectBridge({ webServer: { port: upstreamPort } },
     { hosts: ['127.0.0.1', '127.0.0.2'], port, log: (m) => said.push(m) })
   await new Promise((resolve) => setTimeout(resolve, 200))
-  assert.equal(said.filter((m) => m.startsWith('слушаю')).length, 2)
+  assert.equal(said.filter((m) => (m.startsWith('listening') || m.startsWith('слушаю'))).length, 2)
   stop()
   upstream.close()
 })
