@@ -120,3 +120,10 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 ## 📄 开源协议
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
+
+### 连接池与 SSE 流式传输隔离 (v0.7.17+)
+
+在直连网桥模式下，通往 DeepSeek Harness 的上游连接分为两个独立的连接池：
+- **标准 HTTP 连接池**：启用 Keep-Alive，最多保留 100 个复用套接字，用于极速加载 WebUI 静态资源、插件脚本和 REST API。配备排队超时机制（默认 15 秒），在连接池饱和时返回 HTTP 503，避免无限挂起。
+- **专属流式传输池**：为长连接 Server-Sent Events (SSE) 和大模型输出流分配独立的套接字，确保 100+ 个并发流式连接不会占用或阻塞静态页面和常规 API 流量。
+

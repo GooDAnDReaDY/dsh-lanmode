@@ -181,3 +181,10 @@ dsh-lanmode:
 ## 📄 License
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
+
+### Connection Pooling & SSE Streaming Isolation (v0.7.17+)
+
+In direct bridge mode, upstream connections to DeepSeek Harness are segregated into two independent pools:
+- **Standard HTTP Pool**: Keep-alive enabled with up to 100 reusable sockets for rapid loading of WebUI assets, static scripts, and REST endpoints. Protected by a queue timeout (15s default) returning HTTP 503 rather than stalling indefinitely if saturated.
+- **Dedicated Streaming Pool**: Independent unpooled socket handling for long-lived Server-Sent Events (SSE), token streaming (`/api/chat/stream`), and live notifications. 100+ concurrent streaming clients can run without exhausting or starving the WebUI static and API traffic.
+
