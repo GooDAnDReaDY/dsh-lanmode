@@ -191,3 +191,9 @@ In direct bridge mode, upstream connections to DeepSeek Harness are segregated i
 - **Standard HTTP Pool**: Keep-alive enabled with up to 100 reusable sockets for rapid loading of WebUI assets, static scripts, and REST endpoints. Protected by a queue timeout (15s default) returning HTTP 503 rather than stalling indefinitely if saturated.
 - **Dedicated Streaming Pool**: Independent unpooled socket handling for long-lived Server-Sent Events (SSE), token streaming (`/api/chat/stream`), and live notifications. 100+ concurrent streaming clients can run without exhausting or starving the WebUI static and API traffic.
 
+### In-App One-Click Plugin Updates (v0.7.19+)
+
+The plugin provides a built-in one-click updater service and settings card UI (`/api/dsh-lanmode/update`):
+- **Version Awareness**: Real-time display of the currently installed version and availability of new releases from the npm registry.
+- **Security Perimeter**: Checks loopback origin or admin session credentials, origin/host match, anti-CSRF headers, and the mandatory `x-dsh-plugin-update: 1` verification header.
+- **In-App Upgrades**: Upgrade `@goodandready/dsh-lanmode` directly from the DSH settings card with zero terminal commands required.
