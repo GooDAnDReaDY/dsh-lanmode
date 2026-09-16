@@ -132,3 +132,10 @@ MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
 * **管理端点防护**：内部插件路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel/toggle`）具备内置的纵深防御鉴权。绕过本地桥接或从不受信任的网络访问需要有效的管理员会话或可信环回来源。
 * **访客角色隔离**：在 `guestAllow` 下指定的子网被严格禁止修改系统设置、撤销会话或切换 WAN 隧道（`403 Forbidden`）。
 * **CSRF 防护**：状态变更 POST 请求会拒绝跨站调用（`Sec-Fetch-Site: cross-site`）并校验来源头。
+
+### 界面内一键平滑更新 (v0.7.19+)
+
+插件内置宿主端更新服务与设置卡片操作界面 (`/api/dsh-lanmode/update`)：
+- **版本感知**：即时显示当前运行版本并检测 npm 官方仓库中的最新发布版本。
+- **安全验证**：必须通过本地回环检测或管理员权限验证，校验 Origin/Host 与 CSRF 防护，且需附带 `x-dsh-plugin-update: 1` 标头。
+- **一键升级**：直接在 DSH 插件设置界面中完成 `@goodandready/dsh-lanmode` 的平滑升级，无需手动登录终端执行命令。
