@@ -27,3 +27,9 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# internal docs & planning (issue #135)
+AGENTS.md
+index.md
+docs/plans/
+docs/testing/
