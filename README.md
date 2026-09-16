@@ -122,6 +122,9 @@ graph LR
 * **`unlockPrivileged`**: Master gate for settings & credentials mutation from LAN.
 * **`lanPin`**: Optional PIN code (disabled by default). When set, LAN guests can chat freely, but changing system settings or API keys requires PIN authentication.
 * **CIDR Subnet Filtering**: Restrict access to trusted subnets (`allow: ["192.168.77.0/24"]`).
+* **Administrative Endpoints Protection (v0.7.18+)**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
+* **Guest Role Quarantine**: Subnets designated under `guestAllow` are strictly prohibited from mutating system settings, revoking sessions, or toggling WAN tunnels (`403 Forbidden`).
+* **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
 
 ---
 

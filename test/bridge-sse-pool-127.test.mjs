@@ -70,7 +70,10 @@ test('Issue #127: 100+ concurrent SSE connections do not block standard HTTP req
     }
 
     // Give time for SSE connections to establish at upstream
-    await new Promise((r) => setTimeout(r, 200))
+    const waitStart = Date.now()
+    while (sseConnectionsCount < numSse && Date.now() - waitStart < 3000) {
+      await new Promise((r) => setTimeout(r, 50))
+    }
     assert.equal(sseConnectionsCount, numSse, `Expected ${numSse} established SSE connections`)
 
     // 4. Concurrently perform 10 standard HTTP requests

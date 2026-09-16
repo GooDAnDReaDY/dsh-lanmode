@@ -127,3 +127,8 @@ MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
 - **标准 HTTP 连接池**：启用 Keep-Alive，最多保留 100 个复用套接字，用于极速加载 WebUI 静态资源、插件脚本和 REST API。配备排队超时机制（默认 15 秒），在连接池饱和时返回 HTTP 503，避免无限挂起。
 - **专属流式传输池**：为长连接 Server-Sent Events (SSE) 和大模型输出流分配独立的套接字，确保 100+ 个并发流式连接不会占用或阻塞静态页面和常规 API 流量。
 
+
+## 🛡️ 边界加固与管理路由安全 (v0.7.18+)
+* **管理端点防护**：内部插件路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel/toggle`）具备内置的纵深防御鉴权。绕过本地桥接或从不受信任的网络访问需要有效的管理员会话或可信环回来源。
+* **访客角色隔离**：在 `guestAllow` 下指定的子网被严格禁止修改系统设置、撤销会话或切换 WAN 隧道（`403 Forbidden`）。
+* **CSRF 防护**：状态变更 POST 请求会拒绝跨站调用（`Sec-Fetch-Site: cross-site`）并校验来源头。
