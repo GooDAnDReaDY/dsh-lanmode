@@ -87,12 +87,16 @@ test('Issue #89: Отложенная регистрация слотов чер
     on: () => {},
   }
   runClient(mockCtxInject)
-  assert.deepEqual(injected, ['settings.plugin.item', 'sidebar.footer.action'])
-  assert.equal(registered.length, 2)
-  assert.equal(registered[0].name, 'settings.plugin.item')
-  assert.equal(registered[0].key, 'dsh-lanmode')
-  assert.equal(registered[1].name, 'sidebar.footer.action')
-  assert.equal(registered[1].id, '@goodandready/dsh-lanmode:qr')
+  // Two settings seats now: the Plugins page row seat the current core renders, and
+  // the legacy settings.plugin.item card kept as a fallback — plus the footer action.
+  assert.deepEqual(injected, ['plugins.row.config', 'settings.plugin.item', 'sidebar.footer.action'])
+  assert.equal(registered.length, 3)
+  assert.equal(registered[0].name, 'plugins.row.config')
+  assert.equal(registered[0].key, '@goodandready/dsh-lanmode#dsh-lanmode')
+  assert.equal(registered[1].name, 'settings.plugin.item')
+  assert.equal(registered[1].key, 'dsh-lanmode')
+  assert.equal(registered[2].name, 'sidebar.footer.action')
+  assert.equal(registered[2].id, '@goodandready/dsh-lanmode:qr')
 
   // Сценарий 2: Fallback режим прямой регистрации (если slots.inject отсутствует)
   const registeredFallback = []
@@ -106,10 +110,12 @@ test('Issue #89: Отложенная регистрация слотов чер
     on: () => {},
   }
   runClient(mockCtxFallback)
-  assert.equal(registeredFallback.length, 2)
-  assert.equal(registeredFallback[0].name, 'settings.plugin.item')
-  assert.equal(registeredFallback[1].name, 'sidebar.footer.action')
-  assert.equal(registeredFallback[1].id, '@goodandready/dsh-lanmode:qr')
+  assert.equal(registeredFallback.length, 3)
+  assert.equal(registeredFallback[0].name, 'plugins.row.config')
+  assert.equal(registeredFallback[0].key, '@goodandready/dsh-lanmode#dsh-lanmode')
+  assert.equal(registeredFallback[1].name, 'settings.plugin.item')
+  assert.equal(registeredFallback[2].name, 'sidebar.footer.action')
+  assert.equal(registeredFallback[2].id, '@goodandready/dsh-lanmode:qr')
 })
 
 test('Issue #92: LanModeCard корректно рендерится в раскрытом состоянии (open = true, copyLanUrl defined)', async () => {
