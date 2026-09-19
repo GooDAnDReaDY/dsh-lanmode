@@ -87,16 +87,20 @@ test('Issue #89: Отложенная регистрация слотов чер
     on: () => {},
   }
   runClient(mockCtxInject)
-  // Two settings seats now: the Plugins page row seat the current core renders, and
-  // the legacy settings.plugin.item card kept as a fallback — plus the footer action.
-  assert.deepEqual(injected, ['plugins.row.config', 'settings.plugin.item', 'sidebar.footer.action'])
-  assert.equal(registered.length, 3)
-  assert.equal(registered[0].name, 'plugins.row.config')
-  assert.equal(registered[0].key, '@goodandready/dsh-lanmode#dsh-lanmode')
-  assert.equal(registered[1].name, 'settings.plugin.item')
-  assert.equal(registered[1].key, 'dsh-lanmode')
-  assert.equal(registered[2].name, 'sidebar.footer.action')
-  assert.equal(registered[2].id, '@goodandready/dsh-lanmode:qr')
+  // Three settings seats: the plugin-list seat the current core renders as the plugin's
+  // own page, the row seat and the legacy settings.plugin.item card kept as fallbacks —
+  // plus the footer action.
+  assert.deepEqual(injected, ['plugins.item', 'plugins.row.config', 'settings.plugin.item', 'sidebar.footer.action'])
+  assert.equal(registered.length, 4)
+  assert.equal(registered[0].name, 'plugins.item')
+  assert.equal(registered[0].id, 'dsh-lanmode')
+  assert.equal(registered[0].label(), 'LAN Access & Mobile Gateway', 'the label is a static string')
+  assert.equal(registered[1].name, 'plugins.row.config')
+  assert.equal(registered[1].key, '@goodandready/dsh-lanmode#dsh-lanmode')
+  assert.equal(registered[2].name, 'settings.plugin.item')
+  assert.equal(registered[2].key, 'dsh-lanmode')
+  assert.equal(registered[3].name, 'sidebar.footer.action')
+  assert.equal(registered[3].id, '@goodandready/dsh-lanmode:qr')
 
   // Сценарий 2: Fallback режим прямой регистрации (если slots.inject отсутствует)
   const registeredFallback = []
@@ -110,12 +114,14 @@ test('Issue #89: Отложенная регистрация слотов чер
     on: () => {},
   }
   runClient(mockCtxFallback)
-  assert.equal(registeredFallback.length, 3)
-  assert.equal(registeredFallback[0].name, 'plugins.row.config')
-  assert.equal(registeredFallback[0].key, '@goodandready/dsh-lanmode#dsh-lanmode')
-  assert.equal(registeredFallback[1].name, 'settings.plugin.item')
-  assert.equal(registeredFallback[2].name, 'sidebar.footer.action')
-  assert.equal(registeredFallback[2].id, '@goodandready/dsh-lanmode:qr')
+  assert.equal(registeredFallback.length, 4)
+  assert.equal(registeredFallback[0].name, 'plugins.item')
+  assert.equal(registeredFallback[0].id, 'dsh-lanmode')
+  assert.equal(registeredFallback[1].name, 'plugins.row.config')
+  assert.equal(registeredFallback[1].key, '@goodandready/dsh-lanmode#dsh-lanmode')
+  assert.equal(registeredFallback[2].name, 'settings.plugin.item')
+  assert.equal(registeredFallback[3].name, 'sidebar.footer.action')
+  assert.equal(registeredFallback[3].id, '@goodandready/dsh-lanmode:qr')
 })
 
 test('Issue #92: LanModeCard корректно рендерится в раскрытом состоянии (open = true, copyLanUrl defined)', async () => {

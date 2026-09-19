@@ -2,6 +2,16 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.7.24
+
+### Fixed
+- **Settings reachable again on the plugin's own page**: the current DSH core
+  (0.1.6-alpha.2) renders a plugin's configuration page only for entries registered
+  in the plugin-list seat `plugins.item`. The view-aware `LanModeCard` is now
+  registered there (`id: 'dsh-lanmode'`, order 40, static label); the row seat and the
+  legacy card stay as fallbacks. The deferred-registration test (#89) now expects the
+  three settings seats in order, in the inject and the direct-registration paths alike.
+
 ## 0.7.23
 
 ### Fixed
