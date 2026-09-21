@@ -118,13 +118,40 @@ graph LR
   * One-click background notification toggle;
   * Download Root CA link (`ca.crt`).
 
-### 7. 🛡️ Access Control & Optional LAN PIN
+### 7. 🛡️ Access Control, LAN PIN & Security
 * **`unlockPrivileged`**: Master gate for settings & credentials mutation from LAN.
-* **`lanPin`**: Optional PIN code (disabled by default). When set, LAN guests can chat freely, but changing system settings or API keys requires PIN authentication.
-* **CIDR Subnet Filtering**: Restrict access to trusted subnets (`allow: ["192.168.77.0/24"]`).
-* **Administrative Endpoints Protection (v0.7.18+)**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
-* **Guest Role Quarantine**: Subnets designated under `guestAllow` are strictly prohibited from mutating system settings, revoking sessions, or toggling WAN tunnels (`403 Forbidden`).
+* **`lanPin` / `lanPinRef`**: Optional PIN protection for privileged operations. When enabled, LAN guests can chat freely, but changing system settings, installing plugins, or mutating credentials requires PIN verification.
+* **Brute-Force Rate Limiting**: PIN authentication enforces automatic rate limiting (HTTP 429 status after 5 consecutive failed attempts per IP) with temporary lockout.
+* **Subnet Role Separation**: Distinct `adminAllow` and `guestAllow` CIDR rules. Subnets designated under `guestAllow` are strictly prohibited from mutating system settings, revoking sessions, or toggling WAN tunnels (`403 Forbidden`).
+* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
 * **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
+
+### 8. 📱 Connected Devices & Session Management
+* Live client presence tracking and device OS/browser discovery (iOS, Android, Windows, macOS, Linux).
+* Per-device token revocation and emergency "Revoke All Others" kill switch in the settings card.
+
+### 9. 🌐 Multi-Interface & Mesh Detection
+* Automatic identification of local LAN, Tailscale (100.x.y.z), WireGuard, and VPN network adapters with quick-select UI pills.
+* Automated firewall management for Windows Defender Firewall, Linux UFW, and firewalld.
+
+### 10. ⚡ Live Network Telemetry & HTTP/2 ALPN
+* Compact real-time telemetry widget displaying RTT ping latency, active concurrent connections, and streaming data volume.
+* Native HTTP/2 (ALPN `h2`) bridge support alongside HTTP/1.1 for multiplexed low-latency streaming.
+
+### 11. 🚀 Connection Pooling & SSE Streaming Isolation
+* Upstream connections to DeepSeek Harness are segregated into two independent pools:
+  * **Standard HTTP Pool**: Keep-alive enabled with up to 100 reusable sockets for rapid loading of WebUI assets, static scripts, and REST endpoints. Protected by a queue timeout (15s default) returning HTTP 503 rather than stalling indefinitely if saturated.
+  * **Dedicated Streaming Pool**: Independent unpooled socket handling for long-lived Server-Sent Events (SSE), token streaming (`/api/chat/stream`), and live notifications. 100+ concurrent streaming clients can run without exhausting or starving WebUI static and API traffic.
+
+### 12. ☁️ Cloudflare WAN Tunnels & Tunnel PIN
+* Built-in zero-config Quick Tunnels and Named Tunnels for remote WAN access without port forwarding.
+* Mandatory WAN PIN challenge (`tunnelPin: true`) preventing unauthorized external access.
+
+### 13. 🔄 In-App One-Click Plugin Updates
+* Built-in updater service and settings card UI (`/api/dsh-lanmode/update`):
+  * Real-time display of the currently installed version and availability of new releases from the npm registry;
+  * Security perimeter requiring loopback origin or admin session credentials, origin/host match, anti-CSRF headers, and the mandatory `x-dsh-plugin-update: 1` verification header;
+  * One-click upgrade of `@goodandready/dsh-lanmode` directly from the DSH settings card with zero terminal commands required.
 
 ---
 
@@ -161,39 +188,6 @@ dsh-lanmode:
 
 ---
 
-## 🚀 What is New in 0.7.15 (Issue #123 Evolution)
-
-- 📱 **Connected Devices & Session Management**: Live client presence tracking, device OS/browser discovery, per-device token revocation, and emergency "Revoke All Others" kill switch.
-- 🍏 **1-Click Apple Configuration Profile**: Native `.mobileconfig` payload for Safari on iOS, iPadOS, and macOS to trust DeepSeek Harness Local Root CA in one tap.
-- 🛡️ **Subnet Role Separation (Admin vs Guest)**: Distinct `adminAllow` and `guestAllow` CIDR rules. Guests can chat and interact with agents while access to harness configuration, plugins, and settings is protected with 403 Forbidden.
-- 🌐 **Multi-Interface & Mesh Detection**: Automatic identification of local LAN, Tailscale (100.x.y.z), WireGuard, and VPN adapters with quick-select UI pills.
-- ⚡ **Live Network Telemetry**: Compact real-time telemetry widget displaying RTT ping latency, active concurrent connections, and streaming data volume.
-
-## 📱 Mobile & WAN Modernization Suite (39 Features)
-
-- **Mobile Touch**: iOS anti-zoom (16px), safe-area insets, 44px touch targets, auto-focus suppression, edge swipe gestures, auto-collapsing sidebar, FAB button, opt-in `mobileEnterSends`.
-- **Quick Access UI**: Sidebar footer quick QR button, interactive modal with QR, URL copy and Root CA download, server startup terminal ASCII QR code.
-- **Network Reliability**: Transparent Brotli & Gzip streaming compression, 25s WebSocket heartbeat against carrier drops, visibility change fast reconnect, RTT ping latency display.
-- **Security & Roster**: User-Agent device recognition (iPhone, Android, Windows, Mac), live presence & activity tracking, individual device session revoke, emergency kill switch.
-- **Firewall & Network Stack**: Automated Windows Defender Firewall, Linux UFW and firewalld management, WSL2 host IP discovery, Tailscale CGNAT detection, diagnostic `/probe` endpoint.
-- **PIN & PWA Resilience**: Native client PIN prompt modal with auto-retry, brute-force rate limiting (5 attempts / 30s lockout), PWA memory eviction state mirror.
-- **Cloudflare WAN Tunnels**: Built-in zero-config Quick Tunnels and Named Tunnels, public URL auto-parsing, dynamic start/stop toggle, mandatory WAN PIN protection.
-
----
-
 ## 📄 License
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
-
-### Connection Pooling & SSE Streaming Isolation (v0.7.17+)
-
-In direct bridge mode, upstream connections to DeepSeek Harness are segregated into two independent pools:
-- **Standard HTTP Pool**: Keep-alive enabled with up to 100 reusable sockets for rapid loading of WebUI assets, static scripts, and REST endpoints. Protected by a queue timeout (15s default) returning HTTP 503 rather than stalling indefinitely if saturated.
-- **Dedicated Streaming Pool**: Independent unpooled socket handling for long-lived Server-Sent Events (SSE), token streaming (`/api/chat/stream`), and live notifications. 100+ concurrent streaming clients can run without exhausting or starving the WebUI static and API traffic.
-
-### In-App One-Click Plugin Updates (v0.7.19+)
-
-The plugin provides a built-in one-click updater service and settings card UI (`/api/dsh-lanmode/update`):
-- **Version Awareness**: Real-time display of the currently installed version and availability of new releases from the npm registry.
-- **Security Perimeter**: Checks loopback origin or admin session credentials, origin/host match, anti-CSRF headers, and the mandatory `x-dsh-plugin-update: 1` verification header.
-- **In-App Upgrades**: Upgrade `@goodandready/dsh-lanmode` directly from the DSH settings card with zero terminal commands required.
