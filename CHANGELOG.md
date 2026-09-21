@@ -2,6 +2,16 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.7.25
+
+### Fixed
+- **LAN PIN challenge and rate-limiting defense**: PIN verification in the local bridge and privileged route dispatcher now validates incoming PIN tokens (`verifyLanPin`) and enforces brute-force protection with HTTP 429 status after 5 consecutive failed attempts per IP (#154).
+- **Protected WAN and diagnostic endpoints**: Internal diagnostic routes `/dsh-lanmode/api/interfaces` and `/dsh-lanmode/api/telemetry` are now strictly authenticated via `passwordAuth` to prevent unauthorized network and interface enumeration from untrusted origins (#156).
+- **Dead code and unused export elimination**: Removed obsolete `manifestPath` variable in bridge diagnostics and cleaned up unused export symbols (`isConnectionBundle`, `recordPinAttempt`, etc.) to keep package footprint minimal (#157).
+
+### Added
+- **AI Agent Tool `/mobileqr` (`lanmode.mobileqr`)**: Registered interactive agent command in `lib/index.js` enabling AI assistants to render clean SVG QR codes and instant connection links directly into chat responses upon user request (#155).
+
 ## 0.7.24
 
 ### Fixed
