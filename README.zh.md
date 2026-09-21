@@ -97,17 +97,15 @@ graph LR
 4. 🔐 **本地 Root CA 根证书**：提供 `GET /dsh-lanmode/ca.crt` 下载，安装至手机即可获得永久绿色可信 HTTPS；
 5. 🔔 **后台系统通知（Web Notifications）**：当浏览器最小化或手机锁屏时，Agent 回复完毕自动推送系统通知；
 6. 🎨 **UI 设置卡片（`lib/client.js`）**：无缝融入 DSH 设置面板，支持一键复制内网 URL 与切换二维码；
-7. 🛡️ **访问控制与可选 LAN PIN 码**：支持 CIDR 子网白名单及特权修改 PIN 保护。
+7. 🛡️ **访问控制、LAN PIN 与边界安全**：支持 CIDR 子网白名单、特权修改 PIN 验证及防暴力破解限流（连续 5 次失败触发 HTTP 429 锁定）。
+8. 📱 **连接设备感知与会话管理**：自动识别客户端系统与浏览器，支持单设备吊销与一键下线其它设备；
+9. 🌐 **多网卡与 Mesh 组网识别**：自动识别局域网、Tailscale、WireGuard 及 VPN 接口，提供界面快捷切换；
+10. ⚡ **实时网络遥测与 HTTP/2 ALPN**：呈现 RTT 延迟、连接数及流量，支持 HTTP/2 `h2` 多路复用；
+11. 🚀 **连接池与 SSE 流式传输隔离**：独立分配套接字处理长连接 SSE 与大模型流式输出，不占用常规 Web 资源；
+12. ☁️ **Cloudflare WAN 隧道与远程 PIN 防护**：零配置远程访问，外网请求强制验证 PIN 码；
+13. 🔄 **界面内一键平滑更新**：在设置卡片中一键安全更新插件。
 
 ---
-
-## 🚀 0.7.15 新增特性 (Issue #123)
-
-1. 📱 **已连接设备与会话管理**：自动识别客户端设备型号与浏览器（iOS、Android、macOS、Windows），展示实时在线状态，支持单设备即时吊销（Revoke）与一键下线其它设备（Revoke All Others）。
-2. 🍏 **Apple 描述文件一键安装 (.mobileconfig)**：提供专属 iOS/macOS 描述文件一键下载安装，快速信任局域网自签根证书。
-3. 🛡️ **子网角色隔离 (管理员 vs 访客)**：支持 `adminAllow` 与 `guestAllow` 配置，访客仅可进行对话交流，系统配置与插件管理接口均受 403 Forbidden 保护。
-4. 🌐 **多网卡与 Mesh 组网识别**：自动探测局域网、Tailscale (100.x.y.z)、WireGuard 和 VPN 接口并提供一键切换药丸按钮。
-5. ⚡ **实时网络遥测**：界面实时呈现 RTT 往返延迟、当前并发活跃连接数及传输字节流量。
 
 ## 📦 安装指南
 
@@ -120,22 +118,3 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 ## 📄 开源协议
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
-
-### 连接池与 SSE 流式传输隔离 (v0.7.17+)
-
-在直连网桥模式下，通往 DeepSeek Harness 的上游连接分为两个独立的连接池：
-- **标准 HTTP 连接池**：启用 Keep-Alive，最多保留 100 个复用套接字，用于极速加载 WebUI 静态资源、插件脚本和 REST API。配备排队超时机制（默认 15 秒），在连接池饱和时返回 HTTP 503，避免无限挂起。
-- **专属流式传输池**：为长连接 Server-Sent Events (SSE) 和大模型输出流分配独立的套接字，确保 100+ 个并发流式连接不会占用或阻塞静态页面和常规 API 流量。
-
-
-## 🛡️ 边界加固与管理路由安全 (v0.7.18+)
-* **管理端点防护**：内部插件路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel/toggle`）具备内置的纵深防御鉴权。绕过本地桥接或从不受信任的网络访问需要有效的管理员会话或可信环回来源。
-* **访客角色隔离**：在 `guestAllow` 下指定的子网被严格禁止修改系统设置、撤销会话或切换 WAN 隧道（`403 Forbidden`）。
-* **CSRF 防护**：状态变更 POST 请求会拒绝跨站调用（`Sec-Fetch-Site: cross-site`）并校验来源头。
-
-### 界面内一键平滑更新 (v0.7.19+)
-
-插件内置宿主端更新服务与设置卡片操作界面 (`/api/dsh-lanmode/update`)：
-- **版本感知**：即时显示当前运行版本并检测 npm 官方仓库中的最新发布版本。
-- **安全验证**：必须通过本地回环检测或管理员权限验证，校验 Origin/Host 与 CSRF 防护，且需附带 `x-dsh-plugin-update: 1` 标头。
-- **一键升级**：直接在 DSH 插件设置界面中完成 `@goodandready/dsh-lanmode` 的平滑升级，无需手动登录终端执行命令。
