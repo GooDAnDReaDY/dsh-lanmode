@@ -89,7 +89,7 @@ test('Issue #140: package.json declares dsh.client.inject matching client runtim
     'inject must declare @deepseek-ai/dsh-client-ui-slots',
   )
   assert.ok(
-    injects.includes('@deepseek-ai/dsh-client-ui-settings'),
-    'inject must declare @deepseek-ai/dsh-client-ui-settings',
+    !injects.includes('@deepseek-ai/dsh-client-ui-settings'),
+    'inject must NOT declare @deepseek-ai/dsh-client-ui-settings anymore',
   )
 })

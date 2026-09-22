@@ -104,7 +104,9 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
     },
   }
 
-  // Проверяем, что get('settingsScope') работает
+  let patchPayload = null
+  let patchCalled = false
+
   const mockCtx = {
     locale: { register: () => {} },
     slots: {
@@ -115,10 +117,53 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
         }
       },
     },
-    get: (serviceName) => {
-      if (serviceName === 'settingsScope') return { bind: () => mockScope }
-      return null
-    },
+    get: (serviceName) => null,
+  }
+
+  // Переопределяем fetch в контексте
+  context.fetch = (url, opts) => {
+    if (url === '/dsh-lanmode/api/config' && (!opts || opts.method === 'GET' || !opts.method)) {
+      return Promise.resolve({
+        json: () => Promise.resolve({
+          status: 'ready',
+          value: {
+            mode: 'direct',
+            directPort: 3088,
+            tls: 'files',
+            tlsHosts: ['dsh.example.org'],
+            tlsCert: '/tmp/cert.pem',
+            tlsKey: '/tmp/key.pem',
+            allow: ['192.168.1.0/24'],
+            unlockPrivileged: true,
+            lanPinRef: 'MY_PIN_REF',
+            privilegedExtra: ['/api/secret'],
+            streamTimeoutMs: 5000,
+            mdns: true,
+            mdnsName: 'dsh.local',
+            pwa: true,
+            mobileEnterSends: false,
+            diagnostics: true,
+            settings: true,
+            randomUuid: true,
+            clipboard: true,
+            passwordAuth: true,
+            authUser: 'admin',
+            authPassword: 'secretpassword',
+            authPasswordRef: 'MY_AUTH_REF',
+            authSessionDays: 30,
+            tunnel: 'quick',
+            tunnelTokenRef: 'MY_TUNNEL_REF',
+            tunnelPin: true,
+          }
+        })
+      })
+    }
+    if (url === '/dsh-lanmode/api/config' && opts && opts.method === 'PATCH') {
+      patchCalled = true
+      patchPayload = JSON.parse(opts.body)
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
+    }
+    return Promise.resolve({ json: () => Promise.resolve([]) })
   }
 
   modExports.apply(mockCtx)
@@ -127,15 +172,45 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
   // 1-й проход рендера для инициализации хуков и запуска useEffect
   cursor = 0
   states[0] = true // open = true
+  // Устанавливаем snapshot искусственно, так как fetch асинхронный
+  states[12] = { status: 'ready', value: {
+    mode: 'direct',
+    directPort: 3088,
+    tls: 'files',
+    tlsHosts: ['dsh.example.org'],
+    tlsCert: '/tmp/cert.pem',
+    tlsKey: '/tmp/key.pem',
+    allow: ['192.168.1.0/24'],
+    unlockPrivileged: true,
+    lanPinRef: 'MY_PIN_REF',
+    privilegedExtra: ['/api/secret'],
+    streamTimeoutMs: 5000,
+    mdns: true,
+    mdnsName: 'dsh.local',
+    pwa: true,
+    mobileEnterSends: false,
+    diagnostics: true,
+    settings: true,
+    randomUuid: true,
+    clipboard: true,
+    passwordAuth: true,
+    authUser: 'admin',
+    authPassword: 'secretpassword',
+    authPasswordRef: 'MY_AUTH_REF',
+    authSessionDays: 30,
+    tunnel: 'quick',
+    tunnelTokenRef: 'MY_TUNNEL_REF',
+    tunnelPin: true,
+  }}
   registeredComponent({ ctx: mockCtx, t: (k) => k })
 
-  // Запуск эффектов (заполняет draft из snapshot.value)
+  // Запуск эффектов
   while (effects.length > 0) {
     const eff = effects.shift()
     eff()
   }
 
-  // 2-й проход рендера с уже заполненным состоянием draft
+  // 2-й проход рендера
   cursor = 0
   const tree = registeredComponent({ ctx: mockCtx, t: (k) => k })
   assert.ok(tree)
@@ -163,7 +238,9 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
   saveBtn.props.onClick()
   await new Promise((resolve) => setTimeout(resolve, 50))
 
-  const savedKeys = setCalls.map((c) => c.k)
+  assert.ok(patchCalled, 'Должен быть вызван PATCH к /dsh-lanmode/api/config')
+  
+  const savedKeys = Object.keys(patchPayload || {})
   const expectedKeys = [
     'mode', 'directPort', 'tls', 'allow', 'tlsHosts', 'tlsCert', 'tlsKey',
     'unlockPrivileged', 'lanPinRef', 'privilegedExtra', 'streamTimeoutMs',
@@ -174,6 +251,6 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
   ]
 
   for (const expected of expectedKeys) {
-    assert.ok(savedKeys.includes(expected), `Поле ${expected} обязано сохраняться при нажатии кнопки Сохранить`)
+    assert.ok(savedKeys.includes(expected), `Поле ${expected} обязано сохраняться при нажатии кнопки Сохранить (найдено в payload: ${savedKeys.join(', ')})`)
   }
 })
