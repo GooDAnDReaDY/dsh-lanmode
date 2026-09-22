@@ -2,6 +2,21 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.0
+
+### ⚠ Breaking — requires DSH 0.1.7+
+- **`settings.register` removed**: the host-side `settings` service dependency was dropped. Configuration is now loaded exclusively from the profile row (`cordis.patch.yml` `config:` section) via `apply(ctx, config)`. This aligns with DSH 0.1.7 which removed the global settings.yaml store (#161).
+- **`settingsScope` removed (client-side)**: the settings card no longer depends on the removed `settingsScope` service. Config is read from `GET /dsh-lanmode/api/config` and saved via `PATCH /dsh-lanmode/api/config`.
+- **`@deepseek-ai/dsh-client-ui-settings` client inject removed**: no longer needed after `settingsScope` migration.
+
+### Security
+- **Fail-closed defaults**: `directHost` defaults to `127.0.0.1` (was `0.0.0.0`) and `allow` defaults to `['127.0.0.0/8']` (was `[]`). A fresh install no longer opens a network listener without explicit configuration.
+- **Security guard**: the plugin refuses to start a listener on `0.0.0.0` when both `allow` and `passwordAuth` are unset, logging a clear SECURITY warning.
+
+### Added
+- **Config HTTP API**: `GET /dsh-lanmode/api/config` and `PATCH /dsh-lanmode/api/config` endpoints for reading and updating plugin configuration from the settings card. Secrets are masked in responses.
+- **`cordis.patch.yml` ships safe defaults**: new installs get `mode: auto`, `directHost: 127.0.0.1`, `directPort: 3088`, `allow: ['127.0.0.0/8']`.
+
 ## 0.7.25
 
 ### Fixed

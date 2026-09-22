@@ -4,20 +4,27 @@
 # `name` must stay the full npm package name: the loader entry name is how the
 # served bundle is resolved.
 #
-# Everything is configurable in the `dsh-lanmode` settings namespace, so the
-# row below stays empty. To pin the mode in the tree instead of the settings
-# document, override it in your own profile patch:
+# DSH 0.1.7+: configuration lives directly in the profile row config below.
+# The settings.register API was removed; the profile row is the single source
+# of truth. Override values in your own profile patch as needed:
 #
 #   - id: dsh-lanmode
 #     config:
 #       mode: direct
-#       directPort: 3088
+#       directHost: '0.0.0.0'
+#       directPort: 3080
+#       tls: self-signed
+#       allow:
+#         - '192.168.1.0/24'
 #
-# Note there is deliberately no webserver override here: a bind host lives in
-# the config tree, so it cannot be switched from inside a plugin, and it
-# collides with a reverse proxy already holding the port. Direct mode opens a
-# listener of its own instead.
+# Default config below is fail-closed: localhost-only, loopback allowlist.
+# To enable network access, set directHost and allow in your profile.
 - insert:
     - id: dsh-lanmode
       name: '@goodandready/dsh-lanmode'
-      config: {}
+      config:
+        mode: auto
+        directHost: '127.0.0.1'
+        directPort: 3088
+        allow:
+          - '127.0.0.0/8'

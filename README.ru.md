@@ -164,24 +164,27 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 ---
 
-## ⚙️ Пример конфигурации (`settings.yaml`)
+## ⚙️ Конфигурация (профиль `cordis.patch.yml`)
+
+Начиная с v0.8.0 (DSH 0.1.7+), конфигурация хранится в строке плагина профиля.
+Переопределите значения в `cordis.patch.yml` своего профиля:
 
 ```yaml
-dsh-lanmode:
-  mode: direct             # 'direct', 'proxy' или 'auto'
-  directHost: 0.0.0.0
-  directPort: 3088
-  mdns: true               # Анонс dsh.local в LAN
-  pwa: true                # PWA manifest и мобильный viewport
-  tls: self-signed         # 'self-signed' (с Root CA), 'files' или 'off'
-  unlockPrivileged: true   # Разрешить настройки и ключи из LAN
-  lanPinRef: ""            # Ссылка на секрет в credentials или ENV для LAN PIN
-  lanPin: ""               # (Устарело) Прямой PIN-код для обратной совместимости
-  tunnelTokenRef: ""       # Ссылка на секрет в credentials или ENV для токена туннеля
-  tunnelToken: ""          # (Устарело) Прямой токен для обратной совместимости
-  allow:
-    - 192.168.0.0/16
-    - 10.0.0.0/8
+# ~/.dsh/profiles/web/cordis.patch.yml
+- id: dsh-lanmode
+  config:
+    mode: direct             # 'direct', 'proxy' или 'auto'
+    directHost: 0.0.0.0      # По умолчанию: 127.0.0.1 (только localhost)
+    directPort: 3080
+    mdns: true               # Анонс dsh.local в LAN
+    pwa: true                # PWA manifest и мобильный viewport
+    tls: self-signed         # 'self-signed' (с Root CA), 'files' или 'off'
+    unlockPrivileged: true   # Разрешить настройки и ключи из LAN
+    lanPinRef: ""            # Ссылка на секрет в credentials или ENV для LAN PIN
+    tunnelTokenRef: ""       # Ссылка на секрет для токена туннеля
+    allow:                   # По умолчанию: ['127.0.0.0/8'] (только loopback)
+      - 192.168.0.0/16
+      - 10.0.0.0/8
 ```
 
 ---

@@ -8,9 +8,9 @@ test("Issue #106: статический анализ index.js на правил
   
   // 1. Проверка inject
   assert.ok(
-    indexSource.includes("export const inject = ['webServer', 'settings']") ||
-    indexSource.includes('export const inject = ["webServer", "settings"]'),
-    "export const inject обязан содержать 'webServer' и 'settings'"
+    indexSource.includes("export const inject = ['webServer']") ||
+    indexSource.includes('export const inject = ["webServer"]'),
+    "export const inject обязан содержать только 'webServer', без 'settings'"
   )
 
   // 2. Проверка значения по умолчанию для mode
@@ -47,11 +47,10 @@ test("Issue #106: изоляция apply() в VM контексте с моко�
 test("Issue #106: apply() успешно применяет настройки из ctx.settings", () => {
   const indexSource = fs.readFileSync(new URL("../lib/index.js", import.meta.url), "utf8")
   
-  // Проверяем наличие защищенного блока try-catch и say() при регистрации
-  assert.ok(indexSource.includes("settingsService.register(NS, Config"), "apply обязан регистрировать NS в settingsService")
-  assert.ok(indexSource.includes("configSource = 'settings'"), "apply обязан устанавливать configSource: 'settings' при получении настроек")
-  assert.ok(indexSource.includes("configWarning = 'Failed to register settings: '") || indexSource.includes("configWarning = 'Ошибка регистрации настроек: '"), "apply обязан фиксировать ошибку регистрации в configWarning")
-  assert.ok(indexSource.includes("syncListener(config)"), "apply обязан обновлять слушателей при получении обновлений через subscribe")
+  // Проверяем, что apply принимает config напрямую и больше не использует settings.register
+  assert.ok(!indexSource.includes("settingsService.register(NS, Config"), "apply больше не должен использовать settings.register")
+  assert.ok(indexSource.includes("configSource = (config && Object.keys(config).length > 0) ? 'row' : 'defaults'"), "apply обязан определять источник конфига как 'row' при наличии данных")
+  assert.ok(indexSource.includes("function apply(ctx, config)"), "apply должен принимать config напрямую из профиля")
 })
 
 test("Issue #106: health.js включает configSource и configWarning в hostReport и HTML", async () => {

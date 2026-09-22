@@ -163,27 +163,30 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 ---
 
-## ⚙️ Configuration Reference (`settings.yaml`)
+## ⚙️ Configuration Reference (profile `cordis.patch.yml`)
+
+Since v0.8.0 (DSH 0.1.7+), all configuration lives in the profile row `config:` section.
+Edit your profile's `cordis.patch.yml` to override defaults:
 
 ```yaml
-dsh-lanmode:
-  mode: direct             # 'direct', 'proxy', or 'auto'
-  directHost: 0.0.0.0
-  directPort: 3088
-  mdns: true               # Announce dsh.local in LAN
-  pwa: true                # PWA manifest, splash screen & mobile viewport
-  mobileEnterSends: false  # When false (default), Enter adds newline on mobile touch
-  tls: self-signed         # 'self-signed' (with Root CA), 'files', or 'off'
-  unlockPrivileged: true   # Permit settings & credentials from LAN
-  lanPinRef: ""            # Credential reference name or ENV var for LAN PIN
-  lanPin: ""               # (Deprecated) Plain PIN string for backwards compatibility
-  tunnel: off              # Cloudflare WAN tunnel: 'off', 'quick', or 'named'
-  tunnelTokenRef: ""       # Credential reference name or ENV var for Cloudflare tunnel token
-  tunnelToken: ""          # (Deprecated) Plain tunnel token string for backwards compatibility
-  tunnelPin: true          # Require PIN for requests from WAN
-  allow:
-    - 192.168.0.0/16
-    - 10.0.0.0/8
+# ~/.dsh/profiles/web/cordis.patch.yml
+- id: dsh-lanmode
+  config:
+    mode: direct             # 'direct', 'proxy', or 'auto'
+    directHost: 0.0.0.0      # Default: 127.0.0.1 (localhost only)
+    directPort: 3080
+    mdns: true               # Announce dsh.local in LAN
+    pwa: true                # PWA manifest, splash screen & mobile viewport
+    mobileEnterSends: false  # When false (default), Enter adds newline on mobile touch
+    tls: self-signed         # 'self-signed' (with Root CA), 'files', or 'off'
+    unlockPrivileged: true   # Permit settings & credentials from LAN
+    lanPinRef: ""            # Credential reference name or ENV var for LAN PIN
+    tunnel: off              # Cloudflare WAN tunnel: 'off', 'quick', or 'named'
+    tunnelTokenRef: ""       # Credential reference name or ENV var for tunnel token
+    tunnelPin: true          # Require PIN for requests from WAN
+    allow:                   # Default: ['127.0.0.0/8'] (loopback only)
+      - 192.168.0.0/16
+      - 10.0.0.0/8
 ```
 
 ---
