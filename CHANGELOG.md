@@ -2,6 +2,15 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.1
+
+### Fixed
+- **Root CA expiration check (#165)**: fixed `inspect()` return value handling in `ensureRootCA` where `info.expires` was `undefined` instead of timestamp milliseconds, causing the Root CA to be needlessly regenerated upon every DSH restart.
+- **Bridge 502 / TCP RST prevention on keep-alive idle connections (#164)**: tuned `upstreamAgent` idle socket timeout and pruning to 3500ms (below harness core's 5000ms `keepAliveTimeout`) to eliminate socket race conditions and `ECONNRESET` packet bursts when browsers resume activity.
+- **Detailed 502 error reporting (#164)**: upstream bridge errors now log exact error codes and URLs, returning descriptive bodies (`dsh-lanmode: Harness backend is not responding (ECONNRESET: ...)`) instead of opaque 502s.
+- **DSH 0.1.7 HTTP 303 support in assumption checks (#164)**: added HTTP 303 (See Other) to expected authentication challenge responses in `checkAssumptions` and made token extraction dynamic to prevent false-positive `MOUNTING POINTS DRIFTED` logs with one-time tokens.
+- **WebSocket upgrade header deduplication (#164)**: prevented duplicate `connection: close` headers in `lib/bridge-ws.js`.
+
 ## 0.8.0
 
 ### ⚠ Breaking — requires DSH 0.1.7+
