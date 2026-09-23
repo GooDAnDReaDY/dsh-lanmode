@@ -2,6 +2,14 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.3
+
+### Fixed
+- **Idempotent request retry on socket reset (#164)**: automatically retry GET and HEAD requests once on upstream connection reset (`ECONNRESET`, `socket hang up`, `EPIPE`) or when a reused keep-alive socket drops before headers are sent.
+- **Upstream agent pool purging on connection drop (#164)**: stale idle sockets in `upstreamAgent.freeSockets` are purged upon reset so retries and subsequent requests obtain fresh TCP connections.
+- **Eliminate MaxListenersExceededWarning on socket reuse (#164)**: removed `socket.setTimeout(..., cb)` from `upstreamAgent.on('free')` and replaced with listener-free socket timer references (`_lanmodeIdleTimer`), eliminating `EventEmitter` listener leaks.
+- **Unified downstream client lifecycle (#164)**: consolidated single `close` / `error` handlers on downstream client requests and responses to avoid listener duplication.
+
 ## 0.8.2
 
 ### Fixed
