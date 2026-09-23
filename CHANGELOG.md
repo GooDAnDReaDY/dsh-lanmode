@@ -2,6 +2,11 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.2
+
+### Fixed
+- **Suppress client teardown error logs (#164)**: when client disconnects (tab closed, page navigation, SSE cancel), subsequent upstream socket destroy errors (`ECONNRESET`, `socket hang up`) are recognized as normal teardown and no longer logged as backend errors or replied to closed sockets.
+
 ## 0.8.1
 
 ### Fixed
