@@ -43,3 +43,11 @@ test('Issue #246: locale preference is a trimmed string from string or event', (
   assert.equal(helpers.localePreference({ preference: 'en' }), 'en')
   assert.equal(helpers.localePreference({}), null)
 })
+
+test('Issue #281: open path is read from payload.path or payload.args.*.path', () => {
+  const helpers = loadHelpers()
+  assert.equal(helpers.extractOpenPath({ path: '/tmp/a' }), '/tmp/a')
+  assert.equal(helpers.extractOpenPath({ args: { file: { path: '/tmp/b' } } }), '/tmp/b')
+  assert.equal(helpers.extractOpenPath({ args: { path: '/tmp/c' } }), '/tmp/c')
+  assert.equal(helpers.extractOpenPath({}), '')
+})

@@ -444,3 +444,9 @@ Allowlist отвергает пустые и битые адреса, сопос
 Проверено 2026-09-24 после #246.
 
 Клиент подписан на `locale.subscribe`. Новое значение уходит в `settings.mutate` как `locale.preference`, чтобы язык переживал перезагрузку удалённой сессии.
+
+## Open-Path Payload Shapes
+
+Проверено 2026-09-24 после #281.
+
+`extractOpenPath` читает путь из `payload.path`, `payload.args.path` или первого `payload.args.*.path`, чтобы клиент понимал оба поколения RPC.
