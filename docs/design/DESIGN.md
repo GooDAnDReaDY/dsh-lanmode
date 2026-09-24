@@ -432,3 +432,9 @@ Allowlist отвергает пустые и битые адреса, сопос
 Проверено 2026-09-24 после #235.
 
 Если `settings.describe` возвращает `ui-onboarding.welcomeNoticeVersion`, клиент помечает слот `settings.onboarding` как `acknowledged`, чтобы окно внутреннего теста не открывалось на каждом обновлении.
+
+## Settings Describe Mirror
+
+Проверено 2026-09-24 после #234.
+
+Если `settings.describe` не содержит `view`, клиент собирает зеркало из `schema` и `document` и передаёт его в `configForms.describe`, когда этот метод есть.

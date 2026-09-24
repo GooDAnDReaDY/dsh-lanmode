@@ -27,3 +27,12 @@ test('Issue #235: client acknowledges a known welcome version', () => {
   assert.ok(src.includes('acknowledged: true'))
   assert.ok(src.includes('settings.onboarding'))
 })
+
+test('Issue #234: settings view falls back to schema and document', () => {
+  const helpers = loadHelpers()
+  assert.deepEqual(helpers.settingsView({ view: { ok: 1 } }), { ok: 1 })
+  const mirrored = helpers.settingsView({ value: { schema: { a: 1 }, document: { b: 2 } } })
+  assert.equal(mirrored.source, 'dsh-lanmode-mirror')
+  assert.deepEqual(mirrored.document, { b: 2 })
+  assert.equal(helpers.settingsView({ value: {} }), null)
+})
