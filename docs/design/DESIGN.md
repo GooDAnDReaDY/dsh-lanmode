@@ -474,3 +474,9 @@ Shim до загрузки бандлов ставит `__DSH_TRANSPORT__.ownsHo
 Проверено 2026-09-24 после #202.
 
 `GET /dsh-lanmode/loopback-token` отдаёт токен ядра только с `127.0.0.0/8` и `::1`. С LAN ответ 403. При включённом passwordAuth нужна действующая сессия.
+
+## Heavy Desktop Surfaces On Mobile
+
+Проверено 2026-09-24 после #175.
+
+На узком экране панели с `data-dsh-plugin`, содержащим terminal, ssh, git-graph или skill-tree, скрываются. Если ядро отдало `ctx.layout`, мобильный адаптер вызывает `closeDetails()`.
