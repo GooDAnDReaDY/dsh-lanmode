@@ -194,3 +194,35 @@
   2. *Активация агентского инструмента /mobileqr (#155)*: Раскомментирован вызов `registerMobileQrTool(ctx, state)` в `lib/index.js:431`, ранее блокированный экранированными символами новой строки. Инструмент `mobileqr` полноценно регистрируется в сервисе `tools`.
   3. *Защита WAN-туннелей Cloudflare через tunnelPin (#156)*: Функция `isCloudflareRequest` подключена к мосту `lib/bridge.js`. При включенном `tunnelPin: true` входящие запросы через туннель Cloudflare требуют подтверждения LAN PIN.
   4. *Защита интерфейсов и телеметрии парольной аутентификацией (#157)*: Маршруты `/dsh-lanmode/api/interfaces` и `/dsh-lanmode/api/telemetry` перемещены под защиту `passwordAuth` (при отсутствии активной сессии отдается HTTP 401 вместо раскрытия внутренней топологии сети). Удалена мертвая переменная `manifestPath` в `lib/routes/diagnostics.js`. В мосте задействован штатный экспорт `isConnectionBundle(req.url)`.
+
+## Route Policy
+
+Проверено 2026-09-24 по коду ветки после закрытия #219, #220 и #163. Новых правил доступа здесь нет: таблица повторяет то, что делают обработчики. Пишущий вызов, которого нет в таблице, в `lib/routes/` и `lib/bridge.js` не найден.
+
+| Путь | Метод | Кто проходит | Где |
+| --- | --- | --- | --- |
+| `/dsh-lanmode/auth/login` | POST | Публичный вход. После 5 неудач с одного IP ответ 429. | `lib/routes/auth.js` |
+| `/dsh-lanmode/auth/logout` | POST | Стирает сессию из cookie, если она есть. Отдельного admin-шлюза нет: выходит тот, у кого есть эта cookie. | `lib/routes/auth.js` |
+| `/dsh-lanmode/api/config` | PATCH | `verifyAdminAccess`. Гость 403, пароль без сессии 401. Тело больше 64 КиБ — 413, профиль не меняется. | `lib/routes/config.js` |
+| `/dsh-lanmode/devices/nickname` | POST | `verifyAdminAccess` и same-origin. Тело больше 64 КиБ — 413. | `lib/routes/devices.js` |
+| `/dsh-lanmode/devices/revoke` | POST | `verifyAdminAccess` и same-origin. Тело больше 64 КиБ — 413. | `lib/routes/devices.js` |
+| `/dsh-lanmode/devices/kill-all` | POST | `verifyAdminAccess` и same-origin. | `lib/routes/devices.js` |
+| `/dsh-lanmode/tunnel/toggle` | POST | `verifyAdminAccess` и same-origin. Тело больше 64 КиБ — 413, туннель не стартует. | `lib/routes/tunnel.js` |
+| `/api/dsh-lanmode/update` | POST | `verifyAdminAccess`, заголовок `x-dsh-plugin-update: 1`, same-origin. Пароль требует сессию даже с loopback. | `lib/plugin-updater.js` |
+| `/dsh-lanmode/api/devices/revoke` | POST | На мосте `denyUnlessAdmin`. Тело больше 64 КиБ — 413, реестр не меняется. | `lib/bridge.js` |
+| `/dsh-lanmode/api/devices/revoke-others` | POST | На мосте `denyUnlessAdmin`. Тело больше 64 КиБ — 413. | `lib/bridge.js` |
+
+Чтение, которое стоит рядом: GET `/dsh-lanmode/api/config` тоже требует `verifyAdminAccess` и маскирует PIN, токен туннеля и пароль. GET `/dsh-lanmode/api/devices` на мосте требует администратора. GET `/dsh-lanmode/tunnel` администратора не требует. GET `/dsh-lanmode/api/interfaces` и GET `/dsh-lanmode/api/telemetry` при включённом пароле требуют сессию (#157).
+
+## Publication Set
+
+Проверено 2026-09-24 по полю `files` в `package.json`. В npm-пакет входят только:
+
+- `lib/`
+- `cordis.patch.yml`
+- `README.md`
+- `README.ru.md`
+- `README.zh.md`
+- `LICENSE`
+
+В пакет и в публичный GitHub не входят `docs/`, `AGENTS.md`, `index.md`, `deploy.sh`. Перед публикацией состав сверяется с `npm pack --dry-run`.
