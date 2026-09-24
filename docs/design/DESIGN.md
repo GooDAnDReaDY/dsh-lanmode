@@ -384,3 +384,9 @@ PATCH `/dsh-lanmode/api/config` с `authPassword` / `authPasswordRef` вызыв
 Проверено 2026-09-24 после #264.
 
 Direct bridge проксирует HTTP через `pipe` (включая SSE) и WebSocket через pipe сокетов, без полной буферизации тела ответа. Hop-by-hop заголовки фильтруются.
+
+## Login Theme Tokens
+
+Проверено 2026-09-24 после #287.
+
+Страница входа берёт цвета из `--dsw-alias-*` токенов ядра DSH, с безопасными fallback-значениями. Тема System/Light/Dark подхватывается без жёстко зашитой палитры плагина.
