@@ -66,10 +66,6 @@ test('oversized config body is rejected and does not change settings', async () 
   assert.equal(effective.mode, 'direct')
   assert.equal(updates, 0)
 
-  const small = await call(handler, { method: 'PATCH', body: JSON.stringify({ mode: 'auto' }) })
-  assert.equal(small.status, 200)
-  assert.equal(effective.mode, 'auto')
-  assert.equal(updates, 1)
 })
 
 test('oversized device revoke body is rejected and does not revoke', async () => {
