@@ -110,3 +110,17 @@ test('Issue #173: programmatic focus without a gesture is blurred on mobile', ()
   assert.ok(code.includes('.blur()'), 'blurs unsolicited focus')
   assert.ok(!/HTMLElement\.prototype\.focus\s*=/.test(code), 'does not patch focus')
 })
+
+test('Issue #204: fullscreen right panel clears the mobile header', () => {
+  const css = mobileStyles()
+  assert.ok(css.includes('--dsh-mobile-header-h'))
+  assert.ok(css.includes('data-sidebar-right-panel'))
+  assert.ok(css.includes('top: var(--dsh-mobile-header-h)'))
+})
+
+test('Issue #214: mobile nav watches late frames with MutationObserver', () => {
+  const src = mobileNavSource()
+  assert.ok(src.includes('MutationObserver'))
+  assert.ok(src.includes('data-dsh-mobile-ready'))
+  assert.ok(src.includes('APP_FRAME_SELECTOR') || src.includes('_app'))
+})

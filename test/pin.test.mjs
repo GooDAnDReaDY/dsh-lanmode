@@ -21,3 +21,10 @@ test('проверка PIN через cookie dsh_lan_pin', () => {
   assert.equal(verifyLanPin({ cookie: 'foo=bar; dsh_lan_pin=secret123; other=val' }, pin), true)
   assert.equal(verifyLanPin({ cookie: 'dsh_lan_pin=wrong' }, pin), false)
 })
+
+test('Issue #206 plain PIN still verifies via header and cookie', () => {
+  const pin = '998877'
+  assert.equal(verifyLanPin({ 'x-dsh-lan-pin': '998877' }, pin), true)
+  assert.equal(verifyLanPin({ cookie: 'dsh_lan_pin=998877' }, pin), true)
+  assert.equal(verifyLanPin({ 'x-dsh-lan-pin': '998878' }, pin), false)
+})

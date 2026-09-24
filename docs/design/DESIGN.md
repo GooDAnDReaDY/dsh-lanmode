@@ -306,3 +306,33 @@ GET `/dsh-lanmode/qr` без параметра `url` рисует текущи�
 Проверено 2026-09-24 после #276.
 
 Манифест отдаётся без сессии по `/dsh-lanmode/manifest.json`, `/dsh-lanmode/manifest.webmanifest` и `/manifest.webmanifest`. Эти пути входят в публичный белый список парольного шлюза и не открывают WebSocket upgrade.
+
+## Fullscreen Right Panel On Mobile
+
+Проверено 2026-09-24 после #204.
+
+На узком экране панель `[data-sidebar-right-panel='fullscreen']` сдвигается вниз на `--dsh-mobile-header-h`, чтобы кнопка закрытия не перекрывалась мобильной шапкой.
+
+## LAN PIN Brute-Force Protection
+
+Проверено 2026-09-24 после #206.
+
+LAN PIN проверяется через `timingSafeEqual` для plaintext и через PBKDF2 (100k, sha512) для значений формата `pbkdf2$...`. После 5 неудачных попыток IP блокируется на 15 минут. Операторы могут заранее захешировать PIN через `hashLanPin()`.
+
+## Late Frame Mobile Guards
+
+Проверено 2026-09-24 после #214.
+
+Мобильный адаптер наблюдает DOM через `MutationObserver` и помечает поздно появившиеся фреймы `data-dsh-mobile-ready`, повторно применяя FAB/адаптеры к асинхронно смонтированным чатам.
+
+## Trusted Proxy CIDRs
+
+Проверено 2026-09-24 после #269.
+
+`clientIp` читает `X-Forwarded-For` / `CF-Connecting-IP` только если непосредственный peer входит в `trustedProxyCidrs` (по умолчанию loopback). Прямые LAN/WAN клиенты не могут подделать IP через заголовок.
+
+## Login Notice Allowlist
+
+Проверено 2026-09-24 после #277.
+
+Параметр `?notice=` на странице входа принимает только константные идентификаторы (`password-changed`, `session-expired`, `logged-out`). Текст берётся из статической карты и пишется через `textContent`, без отражения сырого URL.
