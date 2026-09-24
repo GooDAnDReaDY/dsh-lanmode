@@ -372,3 +372,9 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #259.
 
 PATCH `/dsh-lanmode/api/config` с `authPassword` / `authPasswordRef` вызывает `revokeSessionsForUser` для текущего `authUser`, сохраняя только сессию текущего запроса.
+
+## Local QR Generation
+
+Проверено 2026-09-24 после #263.
+
+`lib/qr.js` генерирует SVG локально (ISO/IEC 18004) без внешних HTTP-сервисов. Секреты TOTP / handoff URL не уходят на chart APIs.
