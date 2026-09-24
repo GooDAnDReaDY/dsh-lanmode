@@ -84,3 +84,12 @@ test('mobile stylesheet is owned by dsh-lanmode', () => {
   const css = mobileStyles()
   assert.ok(css.includes('data-dsh-plugin="dsh-lanmode"'), 'style tag must declare the plugin owner')
 })
+
+test('Issue #168: mobile styles use semantic CSS Module suffixes', () => {
+  const css = mobileStyles()
+  assert.ok(css.includes('[class$="_composerSeat"]'), 'composer uses suffix selector')
+  assert.ok(css.includes('[class$="_detailsColumn"]') || css.includes('[class*="_detailsColumn"]'), 'details column uses suffix')
+  assert.ok(!css.includes('[class*="composerSeat"]') || css.includes('[class$="_composerSeat"]'), 'hashed prefix alone is not required')
+  const code = mobileNavSource()
+  assert.ok(code.includes('_sessionItem') || code.includes('$="_sessionItem"'), 'session click uses suffix')
+})
