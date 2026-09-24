@@ -112,6 +112,7 @@ graph LR
 * Generates a two-tier certificate structure: **`dsh-lanmode Local Root CA`** (10-year validity) $\rightarrow$ **`Server Certificate`** (with SAN for `dsh.local`, LAN IPs, and localhost).
 * Download `GET /dsh-lanmode/ca.crt`: install the profile once on your iPhone, iPad, or Android to enjoy persistent trusted HTTPS. Voice input via [`dsh-voice`](https://github.com/GooDAnDReaDY/dsh-voice) works flawlessly.
 * The saved certificate is reused across restarts. A newly issued certificate also lists sslip.io and nip.io names for each address.
+* Those names belong on the certificate only. The bridge does not listen on sslip.io or nip.io host names.
 * `tlsSites` adds extra certificate and key files for specific host names. A request for that name uses its own certificate. IP addresses, localhost, and unknown names stay on the default certificate. An empty list does not enable name selection.
 
 ### 5. 🔔 Background Web Notifications (turn/end)

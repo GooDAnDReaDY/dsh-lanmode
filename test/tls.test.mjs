@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import os from 'node:os'
 import test from 'node:test'
 
-import { dnsAliases, localAddresses, stillGood } from '../lib/tls.js'
+import { certificateHosts, dnsAliases, localAddresses, stillGood } from '../lib/tls.js'
 
 /** Подменить список интерфейсов на время одной проверки. */
 function withInterfaces(fake, body) {
@@ -70,10 +70,23 @@ test('каждый IP получает имена sslip.io и nip.io', () => {
   assert.deepEqual(dnsAliases('192.168.1.10'), ['192.168.1.10.sslip.io', '192.168.1.10.nip.io'])
   assert.deepEqual(dnsAliases('::1'), ['--1.sslip.io', '--1.nip.io'])
   assert.deepEqual(dnsAliases('localhost'), [])
-  const hosts = withInterfaces({ enp1s0: [REAL_NIC] }, localAddresses)
+  const local = withInterfaces({ enp1s0: [REAL_NIC] }, localAddresses)
+  assert.equal(local.includes('192.168.1.10.sslip.io'), false)
+  assert.equal(local.includes('192.168.1.10.nip.io'), false)
+  const hosts = withInterfaces({ enp1s0: [REAL_NIC] }, certificateHosts)
   assert.ok(hosts.includes('192.168.1.10.sslip.io'))
   assert.ok(hosts.includes('192.168.1.10.nip.io'))
   assert.ok(hosts.includes('127.0.0.1.sslip.io'))
   assert.ok(hosts.includes('--1.sslip.io'))
   assert.equal(hosts.includes('localhost.sslip.io'), false)
+})
+
+test('Issue #305: bind addresses skip certificate DNS aliases', async () => {
+  const { bindAddresses } = await import('../lib/bind.js')
+  const addresses = withInterfaces(
+    { enp1s0: [REAL_NIC] },
+    () => bindAddresses({ directHost: '0.0.0.0', directPort: 3080 }, 3080).hosts,
+  )
+  assert.ok(addresses.includes('192.168.1.10'))
+  assert.equal(addresses.some((host) => host.endsWith('.sslip.io') || host.endsWith('.nip.io')), false)
 })

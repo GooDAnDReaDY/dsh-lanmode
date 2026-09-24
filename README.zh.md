@@ -110,6 +110,7 @@ graph LR
 * 两级证书：**`dsh-lanmode Local Root CA`**（10 年）签发 **服务器证书**（SAN 包含 `dsh.local`、局域网 IP 和 localhost）。
 * 下载 `GET /dsh-lanmode/ca.crt`：在 iPhone、iPad 或 Android 上安装一次，即可长期信任 HTTPS。[`dsh-voice`](https://github.com/GooDAnDReaDY/dsh-voice) 语音输入可以正常使用。
 * 已保存的证书会在重启后继续使用。新签发的证书还会为每个地址带上 sslip.io 和 nip.io 名称。
+* 这些名称只写进证书。桥不会在 sslip.io 或 nip.io 主机名上监听。
 * `tlsSites` 为指定主机名增加证书和密钥文件。该主机名的请求使用自己的证书。IP、localhost 和未知名称仍用默认证书。空列表不会启用按名称选择。
 
 ### 5. 🔔 后台网页通知（turn/end）

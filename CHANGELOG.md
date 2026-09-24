@@ -2,6 +2,11 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.5
+
+### Fixed
+- **Direct listener no longer binds sslip.io or nip.io names (#305)**: those names stay on the certificate SAN. The bridge listens only on real host addresses, so startup no longer logs ENOTFOUND or address-in-use for DNS aliases.
+
 ## 0.8.4
 
 ### Added
