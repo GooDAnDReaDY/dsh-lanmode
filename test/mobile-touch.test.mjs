@@ -93,3 +93,12 @@ test('Issue #168: mobile styles use semantic CSS Module suffixes', () => {
   const code = mobileNavSource()
   assert.ok(code.includes('_sessionItem') || code.includes('$="_sessionItem"'), 'session click uses suffix')
 })
+
+test('Issue #169: FAB remembers position and hides with an open sidebar', () => {
+  const code = mobileNavSource()
+  assert.ok(code.includes('dsh_lanmode_fab_pos'), 'position key is stored')
+  assert.ok(code.includes('localStorage'), 'uses localStorage')
+  assert.ok(code.includes('pointerdown'), 'supports drag')
+  assert.ok(code.includes('isPortraitMobile') || code.includes('innerHeight'), 'portrait gate')
+  assert.ok(code.includes('sidebarLooksOpen') || code.includes('applyFabVisibility'), 'hides when sidebar open')
+})
