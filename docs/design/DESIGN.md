@@ -414,3 +414,15 @@ Direct bridge проксирует HTTP через `pipe` (включая SSE) �
 Проверено 2026-09-24 после #191.
 
 Allowlist отвергает пустые и битые адреса, сопоставляет IPv4-mapped IPv6 с IPv4 CIDR и не пускает чужие IPv6. Границы CIDR включены в тесты.
+
+## Nginx Proxy Notes
+
+Проверено 2026-09-24 после #218.
+
+Эталонный Nginx для WebSocket и SSE: `@docs/deployment/nginx.md` (`proxy_buffering off`, длинные таймауты, upgrade).
+
+## Bind Address
+
+Проверено 2026-09-24 после #180.
+
+Адрес прослушивания — `directHost` (`0.0.0.0` для всех интерфейсов). Отдельный `cordis.patch.yml` для бинда не используется. См. `@docs/deployment/bind-address.md`.
