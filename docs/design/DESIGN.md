@@ -354,3 +354,15 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #266.
 
 В памяти сервера ключом сессии служит `sha256(token)`, исходный токен остаётся только в HttpOnly-куке клиента. Утечка дампа сессий не даёт готовых cookie-значений.
+
+## Adaptive Remote-Only Compression
+
+Проверено 2026-09-24 после #245.
+
+При `adaptiveCompression` (по умолчанию true) bridge сжимает ответы gzip/brotli только для нелокальных клиентов. Loopback и локальный LAN пропускают сжатие, чтобы не тратить CPU хоста.
+
+## Relative Launch-Token Handoff
+
+Проверено 2026-09-24 после #273.
+
+`handoffLocation` возвращает только относительный путь `/?token=...`, без host/scheme upstream. Браузер дополняет публичный Origin за прокси, без mixed content.
