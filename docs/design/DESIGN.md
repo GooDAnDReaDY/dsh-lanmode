@@ -402,3 +402,9 @@ Direct bridge проксирует HTTP через `pipe` (включая SSE) �
 Проверено 2026-09-24 после #233.
 
 Клиент выставляет `ctx.connection.isLoopback = true`, а бандл connection по-прежнему переписывается в `isLoopback: true`, чтобы удалённый UI не прятал открытие путей и файлов.
+
+## Network Change Session Refresh
+
+Проверено 2026-09-24 после #212.
+
+При событии `online` (смена Wi-Fi/LTE) клиент вызывает `connection.refresh()`, как и при возврате вкладки на передний план.
