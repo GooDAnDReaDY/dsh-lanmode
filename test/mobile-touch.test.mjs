@@ -125,10 +125,10 @@ test('Issue #214: mobile nav watches late frames with MutationObserver', () => {
   assert.ok(src.includes('APP_FRAME_SELECTOR') || src.includes('_app'))
 })
 
-test('Issue #175: mobile CSS hides heavy desktop plugin surfaces', () => {
+test('Issue #175: mobile nav closes details for heavy plugins without hiding them in CSS', () => {
   const css = mobileStyles()
-  assert.ok(css.includes('data-dsh-plugin*="terminal"'))
-  assert.ok(css.includes('git-graph'))
+  assert.ok(!css.includes('terminal'))
+  assert.ok(!css.includes('git-graph'))
   const nav = mobileNavSource()
   assert.ok(nav.includes('hideHeavyDesktop'))
   assert.ok(nav.includes('closeDetails'))

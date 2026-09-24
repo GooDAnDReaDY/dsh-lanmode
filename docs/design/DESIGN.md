@@ -479,7 +479,7 @@ Shim до загрузки бандлов ставит `__DSH_TRANSPORT__.ownsHo
 
 Проверено 2026-09-24 после #175.
 
-На узком экране панели с `data-dsh-plugin`, содержащим terminal, ssh, git-graph или skill-tree, скрываются. Если ядро отдало `ctx.layout`, мобильный адаптер вызывает `closeDetails()`.
+Чужие плагины не прячутся через CSS. Если ядро отдало `ctx.layout`, мобильный адаптер вызывает `closeDetails()`, когда монтируется тяжёлая панель (terminal, ssh, git-graph, skill-tree).
 
 ## PWA Reopen
 
