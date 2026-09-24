@@ -173,7 +173,7 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
   cursor = 0
   states[0] = true // open = true
   // Устанавливаем snapshot искусственно, так как fetch асинхронный
-  states[12] = { status: 'ready', value: {
+  states[14] = { status: 'ready', value: {
     mode: 'direct',
     directPort: 3088,
     tls: 'files',
