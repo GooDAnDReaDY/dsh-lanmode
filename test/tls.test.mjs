@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import os from 'node:os'
 import test from 'node:test'
 
-import { localAddresses, stillGood } from '../lib/tls.js'
+import { dnsAliases, localAddresses, stillGood } from '../lib/tls.js'
 
 /** Подменить список интерфейсов на время одной проверки. */
 function withInterfaces(fake, body) {
@@ -64,4 +64,16 @@ test('истёкший срок по-прежнему требует перев�
     names: hosts,
   }
   assert.equal(stillGood(expiring, hosts, Date.now()), false)
+})
+
+test('каждый IP получает имена sslip.io и nip.io', () => {
+  assert.deepEqual(dnsAliases('192.168.1.10'), ['192.168.1.10.sslip.io', '192.168.1.10.nip.io'])
+  assert.deepEqual(dnsAliases('::1'), ['--1.sslip.io', '--1.nip.io'])
+  assert.deepEqual(dnsAliases('localhost'), [])
+  const hosts = withInterfaces({ enp1s0: [REAL_NIC] }, localAddresses)
+  assert.ok(hosts.includes('192.168.1.10.sslip.io'))
+  assert.ok(hosts.includes('192.168.1.10.nip.io'))
+  assert.ok(hosts.includes('127.0.0.1.sslip.io'))
+  assert.ok(hosts.includes('--1.sslip.io'))
+  assert.equal(hosts.includes('localhost.sslip.io'), false)
 })
