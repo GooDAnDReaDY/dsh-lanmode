@@ -342,3 +342,9 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #248.
 
 `authPassword` может храниться как plaintext (совместимость) или как `scrypt$N$r$p$salt$hash` (`N=16384,r=8,p=1`). Проверка использует `timingSafeEqual` / scrypt. Операторы могут заранее захешировать значение через `hashAuthPassword()`.
+
+## Login Anti-Enumeration
+
+Проверено 2026-09-24 после #275.
+
+Ответ логина всегда `Invalid username or password`. Сравнение имени — через `timingSafeEqual`, а неизвестный логин и неверный пароль оба выполняют один проход scrypt, чтобы выровнять стоимость ответа.
