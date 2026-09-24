@@ -129,6 +129,7 @@ graph LR
 ### 8. 📱 Connected Devices & Session Management
 * Live client presence tracking and device OS/browser discovery (iOS, Android, Windows, macOS, Linux).
 * Per-device token revocation and emergency "Revoke All Others" kill switch in the settings card.
+* Bridge routes that list or revoke devices require administrator access. Guests receive 403.
 
 ### 9. 🌐 Multi-Interface & Mesh Detection
 * Automatic identification of local LAN, Tailscale (100.x.y.z), WireGuard, and VPN network adapters with quick-select UI pills.
