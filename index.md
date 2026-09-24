@@ -21,3 +21,5 @@ LAN access plugin for DeepSeek Harness: direct bridge, mDNS, local TLS, PWA, dev
 ## Client runtime
 
 `lib/client.js` is the single host entry (`exports['./client']`). The factory body is `lib/client-parts/`, injected by `lib/index.js` before the module loads. Bridge local routes live in `lib/bridge-local.js`. Checked 2026-09-24.
+
+- Cloudflare Tunnel: @docs/deployment/cloudflare-tunnel.md

@@ -366,3 +366,33 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #273.
 
 `handoffLocation` возвращает только относительный путь `/?token=...`, без host/scheme upstream. Браузер дополняет публичный Origin за прокси, без mixed content.
+
+## Password Change Session Revocation
+
+Проверено 2026-09-24 после #259.
+
+PATCH `/dsh-lanmode/api/config` с `authPassword` / `authPasswordRef` вызывает `revokeSessionsForUser` для текущего `authUser`, сохраняя только сессию текущего запроса.
+
+## Local QR Generation
+
+Проверено 2026-09-24 после #263.
+
+`lib/qr.js` генерирует SVG локально (ISO/IEC 18004) без внешних HTTP-сервисов. Секреты TOTP / handoff URL не уходят на chart APIs.
+
+## Streaming Reverse Proxy
+
+Проверено 2026-09-24 после #264.
+
+Direct bridge проксирует HTTP через `pipe` (включая SSE) и WebSocket через pipe сокетов, без полной буферизации тела ответа. Hop-by-hop заголовки фильтруются.
+
+## Login Theme Tokens
+
+Проверено 2026-09-24 после #287.
+
+Страница входа берёт цвета из `--dsw-alias-*` токенов ядра DSH, с безопасными fallback-значениями. Тема System/Light/Dark подхватывается без жёстко зашитой палитры плагина.
+
+## Cloudflare Tunnel Guide
+
+Проверено 2026-09-24 после #249.
+
+Эталонное развёртывание через Cloudflare Tunnel описано в `@docs/deployment/cloudflare-tunnel.md` (quick/named, allowlist, PIN, WAN auth).
