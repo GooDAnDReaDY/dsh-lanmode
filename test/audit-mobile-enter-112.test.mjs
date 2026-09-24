@@ -39,6 +39,7 @@ test('Issue #112: mobileNavSource не перехватывает Enter на д�
   const mobileContext = {
     window: {
       innerWidth: 414,
+      innerHeight: 896,
       matchMedia: (query) => ({ matches: query.includes('coarse') ? true : false }),
       addEventListener: (evt) => {
         if (evt === 'touchstart' || evt === 'touchend') touchListenerAdded = true
@@ -48,11 +49,19 @@ test('Issue #112: mobileNavSource не перехватывает Enter на д�
     document: {
       addEventListener: () => {},
       getElementById: () => null,
+      querySelector: () => null,
       readyState: 'complete',
       body: { appendChild: () => {} },
-      createElement: () => ({ setAttribute: () => {}, style: {} }),
+      createElement: () => ({
+        setAttribute: () => {},
+        style: {},
+        addEventListener: () => {},
+        setPointerCapture: () => {},
+      }),
     },
     sessionStorage: { getItem: () => null },
+    localStorage: { getItem: () => null, setItem: () => {} },
+    setInterval: () => 0,
   }
 
   vm.runInNewContext(src, mobileContext)
