@@ -36,3 +36,10 @@ test('Issue #234: settings view falls back to schema and document', () => {
   assert.deepEqual(mirrored.document, { b: 2 })
   assert.equal(helpers.settingsView({ value: {} }), null)
 })
+
+test('Issue #246: locale preference is a trimmed string from string or event', () => {
+  const helpers = loadHelpers()
+  assert.equal(helpers.localePreference(' zh '), 'zh')
+  assert.equal(helpers.localePreference({ preference: 'en' }), 'en')
+  assert.equal(helpers.localePreference({}), null)
+})

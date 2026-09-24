@@ -438,3 +438,9 @@ Allowlist отвергает пустые и битые адреса, сопос
 Проверено 2026-09-24 после #234.
 
 Если `settings.describe` не содержит `view`, клиент собирает зеркало из `schema` и `document` и передаёт его в `configForms.describe`, когда этот метод есть.
+
+## Remote Locale Persistence
+
+Проверено 2026-09-24 после #246.
+
+Клиент подписан на `locale.subscribe`. Новое значение уходит в `settings.mutate` как `locale.preference`, чтобы язык переживал перезагрузку удалённой сессии.
