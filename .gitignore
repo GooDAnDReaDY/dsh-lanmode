@@ -29,7 +29,6 @@ Thumbs.db
 *.swp
 
 # internal docs & planning (issue #135)
-AGENTS.md
-index.md
+# AGENTS.md and index.md are tracked in Gitea and excluded from npm by package.json files.
 docs/plans/
 docs/testing/

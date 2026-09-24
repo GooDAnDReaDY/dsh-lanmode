@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -8,8 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(__dirname, '..')
 
 test('Issue #138: lib/client.js and lib/shim.js use DSH theme tokens without raw hardcoded colors', () => {
-  const clientPath = resolve(rootDir, 'lib/client.js')
-  const clientCode = fs.readFileSync(clientPath, 'utf8')
+  const clientCode = clientRuntimeSource()
 
   // Check that dangerous raw color patterns are absent in standalone CSS/styles
   assert.equal(

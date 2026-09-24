@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -92,7 +93,7 @@ test('mobile layer: устранение оверинжиниринга и бл�
 })
 
 test('client.js: интервалы опроса устройств и туннеля активны только при открытой карточке', () => {
-  const clientCode = fs.readFileSync(path.join(import.meta.dirname, '..', 'lib', 'client.js'), 'utf8')
+  const clientCode = clientRuntimeSource()
   assert.ok(clientCode.includes('if (!open) return\n        refreshDevices()'), 'refreshDevices должен запускаться только если open == true')
   assert.ok(clientCode.includes('if (!open) return\n        refreshTunnel()'), 'refreshTunnel должен запускаться только если open == true')
 })

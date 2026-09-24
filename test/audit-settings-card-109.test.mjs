@@ -1,10 +1,11 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
 
 test('Issue #109: LanModeCard предоставляет доступ ко всем 25 полям схемы и сохраняет их', async () => {
-  const clientCode = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const clientCode = clientRuntimeSource()
   let loaded = null
   const context = vm.createContext({
     window: {
@@ -173,7 +174,7 @@ test('Issue #109: LanModeCard предоставляет доступ ко вс�
   cursor = 0
   states[0] = true // open = true
   // Устанавливаем snapshot искусственно, так как fetch асинхронный
-  states[12] = { status: 'ready', value: {
+  states[14] = { status: 'ready', value: {
     mode: 'direct',
     directPort: 3088,
     tls: 'files',

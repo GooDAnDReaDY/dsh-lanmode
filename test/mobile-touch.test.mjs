@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -70,12 +71,12 @@ test('Блок 2: #44 Плавающая кнопка FAB для открыти�
 test('Блок 2: #72 Принудительно десктопный вид (force desktop)', () => {
   const code = mobileNavSource()
   assert.ok(code.includes('dsh_force_desktop'), 'должен проверять ключ dsh_force_desktop в sessionStorage')
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('dsh_force_desktop'), 'в карточке настроек должен быть toggle dsh_force_desktop')
 })
 
 test('Блок 2: #73 Виброотклик на turn/end и approval/asked', () => {
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('navigator.vibrate'), 'должен вызываться navigator.vibrate')
 })
 

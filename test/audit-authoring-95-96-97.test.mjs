@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from "node:test"
 import assert from "node:assert/strict"
 import fs from "node:fs"
@@ -5,7 +6,7 @@ import vm from "node:vm"
 import { resolveSecret, makeCredentialRef } from "../lib/secret.js"
 
 test("Issue #97: client.js экспортирует inject со службами и оборачивает слушатели в ctx.effect", () => {
-  const clientCode = fs.readFileSync(new URL("../lib/client.js", import.meta.url), "utf8")
+  const clientCode = clientRuntimeSource()
   let loaded = null
   let windowListeners = []
   let docListeners = []
@@ -142,7 +143,7 @@ test("Issue #96: Config поддерживает lanPinRef и tunnelTokenRef; re
 })
 
 test("Issue #95: LanModeCard привязывается к HTTP API и отображает форму конфигурации", async () => {
-  const clientCode = fs.readFileSync(new URL("../lib/client.js", import.meta.url), "utf8")
+  const clientCode = clientRuntimeSource()
   let loaded = null
   let fetchCount = 0
   let fetchUrl = ""

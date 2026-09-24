@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -22,13 +23,13 @@ test('Блок 4: #65 WebSocket TCP Keep-Alive в bridge.js', () => {
 })
 
 test('Блок 4: #66 Быстрое авто-переподключение WebSocket при возврате во вкладку', () => {
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('visibilitychange'), 'должно обрабатываться событие visibilitychange')
   assert.ok(client.includes('dsh-lanmode-reconnect'), 'должен диспетчеризоваться эвент реконнекта')
 })
 
 test('Блок 4: #67 Индикатор задержки сети и RTT пинга в клиенте', () => {
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('rtt'), 'должно отслеживаться состояние rtt')
   assert.ok(client.includes('performance.now()'), 'должен замеряться round-trip time через performance.now()')
   assert.ok(client.includes('Ping') || client.includes('rttLabel') || client.includes('Пинг:'), 'ping indicator in UI')

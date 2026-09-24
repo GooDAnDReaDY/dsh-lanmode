@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -130,7 +131,7 @@ test('Issue #114: WebSocket аутентификация и проверка о�
 })
 
 test('Issue #114: ErrorBoundary в client.js и токены стилей clinebot', () => {
-  const clientCode = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const clientCode = clientRuntimeSource()
   assert.ok(clientCode.includes('class ErrorBoundary extends React.Component'))
   assert.ok(clientCode.includes('.lm-section-card'))
   assert.ok(clientCode.includes('.lm-form-box'))

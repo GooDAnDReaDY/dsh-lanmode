@@ -1,10 +1,11 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
 
 test('Issue #136: resolveSnapshot handles null, missing getSnapshot, and valid scope', async () => {
-  const clientCode = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const clientCode = clientRuntimeSource()
   let loaded = null
   const context = vm.createContext({
     window: {
@@ -74,7 +75,7 @@ test('Issue #136: resolveSnapshot handles null, missing getSnapshot, and valid s
 })
 
 test('Issue #136: client.js does not contain the old masked fallback { status: "ready" }', () => {
-  const clientCode = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const clientCode = clientRuntimeSource()
   assert.equal(
     clientCode.includes("{ status: 'ready', value: scope.get ? scope.get() : {} }"),
     false,

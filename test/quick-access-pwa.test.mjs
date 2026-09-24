@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -15,14 +16,14 @@ test('Блок 3: #35 Генерация компактного ASCII QR-код�
 })
 
 test('Блок 3: #33 & #34 Регистрация QuickQrPopover и слота sidebar.footer.action в client.js', () => {
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('sidebar.footer.action'), 'должен регистрироваться слот sidebar.footer.action')
   assert.ok(client.includes('QuickQrPopover'), 'должен объявляться компонент QuickQrPopover')
   assert.ok(client.includes('lm-modal-backdrop'), 'должен рендерить модальное окно с QR')
 })
 
 test('Блок 3: #36 Индикатор подключенного смартфона на десктопе', () => {
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('Mobile Ready') || client.includes('phoneConnected') || client.includes('Смартфон на связи'), 'should contain smartphone status indicator')
 })
 
@@ -36,7 +37,7 @@ test('Блок 3: #39/74 Расширенный манифест PWA и Splash S
 
 test('Issue #89: Отложенная регистрация слотов через ctx.slots.inject (settings.plugin.item, sidebar.footer.action)', async () => {
   const vm = await import('node:vm')
-  const clientCode = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const clientCode = clientRuntimeSource()
 
   assert.ok(clientCode.includes('registerSlotWhenReady'), 'должен использовать вспомогательную функцию отложенной регистрации')
   assert.ok(clientCode.includes('@goodandready/dsh-lanmode:qr'), 'слот списка sidebar.footer.action должен иметь уникальный id')
@@ -126,7 +127,7 @@ test('Issue #89: Отложенная регистрация слотов чер
 
 test('Issue #92: LanModeCard корректно рендерится в раскрытом состоянии (open = true, copyLanUrl defined)', async () => {
   const vm = await import('node:vm')
-  const clientCode = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const clientCode = clientRuntimeSource()
 
   assert.ok(clientCode.includes('var copyLanUrl ='), 'copyLanUrl должен быть объявлен в компоненте')
 
