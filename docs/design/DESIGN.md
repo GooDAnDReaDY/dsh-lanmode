@@ -366,3 +366,9 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #273.
 
 `handoffLocation` возвращает только относительный путь `/?token=...`, без host/scheme upstream. Браузер дополняет публичный Origin за прокси, без mixed content.
+
+## Password Change Session Revocation
+
+Проверено 2026-09-24 после #259.
+
+PATCH `/dsh-lanmode/api/config` с `authPassword` / `authPasswordRef` вызывает `revokeSessionsForUser` для текущего `authUser`, сохраняя только сессию текущего запроса.
