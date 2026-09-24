@@ -3,6 +3,7 @@ import assert from "node:assert/strict"
 import http from "node:http"
 import { startDirectBridge } from "../lib/bridge.js"
 import { generateQRSvg, generateCachedQRSvg, clearQRCache } from "../lib/qr.js"
+import { qrResponseCacheControl } from "../lib/bridge-local.js"
 import { parseAllow } from "../lib/access.js"
 
 test("Issue #117: Upstream HTTP Agent Keep-Alive reuse in bridge.js", async (t) => {
@@ -69,4 +70,10 @@ test("Issue #117: /dsh-lanmode/qr route returns ETag and handles 304 Not Modifie
   const svg = generateCachedQRSvg("http://dsh.local:3088/", { size: 320 })
   assert.ok(svg.length > 0)
   assert.match(svg, /<svg /)
+})
+
+test("live QR revalidates so a new harness token is drawn", () => {
+  assert.equal(qrResponseCacheControl(""), "no-cache")
+  assert.equal(qrResponseCacheControl(null), "no-cache")
+  assert.equal(qrResponseCacheControl("http://dsh.local:3088/?token=old"), "public, max-age=3600")
 })
