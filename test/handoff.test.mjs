@@ -115,3 +115,14 @@ test('выключенная подстановка возвращает пре�
     assert.equal((await fetchRaw(port, '/')).status, 401)
   })
 })
+
+test('Issue #273: handoff Location is always relative for proxy-safe launch tokens', () => {
+  const at = handoffLocation('https://internal.lan:3080/?token=stale', 'fresh-token')
+  assert.equal(at.startsWith('/'), true)
+  assert.equal(/^https?:/i.test(at), false)
+  assert.ok(!at.includes('internal.lan'))
+  assert.ok(!at.includes('3080'))
+  const params = new URL('http://dsh.invalid' + at).searchParams
+  assert.equal(params.get('token'), 'fresh-token')
+  assert.equal(params.get(RETRY_MARK), '1')
+})
