@@ -336,3 +336,9 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #277.
 
 Параметр `?notice=` на странице входа принимает только константные идентификаторы (`password-changed`, `session-expired`, `logged-out`). Текст берётся из статической карты и пишется через `textContent`, без отражения сырого URL.
+
+## Auth Password scrypt Digests
+
+Проверено 2026-09-24 после #248.
+
+`authPassword` может храниться как plaintext (совместимость) или как `scrypt$N$r$p$salt$hash` (`N=16384,r=8,p=1`). Проверка использует `timingSafeEqual` / scrypt. Операторы могут заранее захешировать значение через `hashAuthPassword()`.
