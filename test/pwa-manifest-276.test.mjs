@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defaultManifest } from '../lib/pwa-manifest.js'
+import { isPublicPluginPath } from '../lib/route-guard.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 
@@ -13,6 +14,7 @@ test('Issue #276: webmanifest paths are public and registered', () => {
   assert.ok(pwa.includes('/manifest.webmanifest'))
   assert.ok(pwa.includes('/dsh-lanmode/manifest.webmanifest'))
   const bridge = readFileSync(path.join(here, '../lib/bridge-local.js'), 'utf8')
-  assert.ok(bridge.includes('/manifest.webmanifest'))
-  assert.ok(bridge.includes('manifest.webmanifest'))
+  assert.ok(bridge.includes('isPublicPluginPath'))
+  assert.equal(isPublicPluginPath('/manifest.webmanifest'), true)
+  assert.equal(isPublicPluginPath('/dsh-lanmode/manifest.webmanifest'), true)
 })
