@@ -390,3 +390,9 @@ Direct bridge проксирует HTTP через `pipe` (включая SSE) �
 Проверено 2026-09-24 после #287.
 
 Страница входа берёт цвета из `--dsw-alias-*` токенов ядра DSH, с безопасными fallback-значениями. Тема System/Light/Dark подхватывается без жёстко зашитой палитры плагина.
+
+## Cloudflare Tunnel Guide
+
+Проверено 2026-09-24 после #249.
+
+Эталонное развёртывание через Cloudflare Tunnel описано в `@docs/deployment/cloudflare-tunnel.md` (quick/named, allowlist, PIN, WAN auth).
