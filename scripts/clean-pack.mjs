@@ -34,9 +34,9 @@ function walk(dir) {
     if (!bad) continue
     fs.unlinkSync(full)
     removed += 1
-    console.log('removed', path.relative(root, full))
+    console.error('removed', path.relative(root, full))
   }
 }
 
 walk(root)
-console.log(`clean-pack: removed ${removed} junk file(s)`)
+console.error(`clean-pack: removed ${removed} junk file(s)`)
