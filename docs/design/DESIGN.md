@@ -426,3 +426,9 @@ Allowlist отвергает пустые и битые адреса, сопос
 Проверено 2026-09-24 после #180.
 
 Адрес прослушивания — `directHost` (`0.0.0.0` для всех интерфейсов). Отдельный `cordis.patch.yml` для бинда не используется. См. `@docs/deployment/bind-address.md`.
+
+## Welcome Notice On Remote Sessions
+
+Проверено 2026-09-24 после #235.
+
+Если `settings.describe` возвращает `ui-onboarding.welcomeNoticeVersion`, клиент помечает слот `settings.onboarding` как `acknowledged`, чтобы окно внутреннего теста не открывалось на каждом обновлении.
