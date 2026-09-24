@@ -84,3 +84,29 @@ test('mobile stylesheet is owned by dsh-lanmode', () => {
   const css = mobileStyles()
   assert.ok(css.includes('data-dsh-plugin="dsh-lanmode"'), 'style tag must declare the plugin owner')
 })
+
+test('Issue #168: mobile styles use semantic CSS Module suffixes', () => {
+  const css = mobileStyles()
+  assert.ok(css.includes('[class$="_composerSeat"]'), 'composer uses suffix selector')
+  assert.ok(css.includes('[class$="_detailsColumn"]') || css.includes('[class*="_detailsColumn"]'), 'details column uses suffix')
+  assert.ok(!css.includes('[class*="composerSeat"]') || css.includes('[class$="_composerSeat"]'), 'hashed prefix alone is not required')
+  const code = mobileNavSource()
+  assert.ok(code.includes('_sessionItem') || code.includes('$="_sessionItem"'), 'session click uses suffix')
+})
+
+test('Issue #169: FAB remembers position and hides with an open sidebar', () => {
+  const code = mobileNavSource()
+  assert.ok(code.includes('dsh_lanmode_fab_pos'), 'position key is stored')
+  assert.ok(code.includes('localStorage'), 'uses localStorage')
+  assert.ok(code.includes('pointerdown'), 'supports drag')
+  assert.ok(code.includes('isPortraitMobile') || code.includes('innerHeight'), 'portrait gate')
+  assert.ok(code.includes('sidebarLooksOpen') || code.includes('applyFabVisibility'), 'hides when sidebar open')
+})
+
+test('Issue #173: programmatic focus without a gesture is blurred on mobile', () => {
+  const code = mobileNavSource()
+  assert.ok(code.includes('focusin'), 'listens for focusin')
+  assert.ok(code.includes('lastUserGestureAt'), 'tracks user gestures')
+  assert.ok(code.includes('.blur()'), 'blurs unsolicited focus')
+  assert.ok(!/HTMLElement\.prototype\.focus\s*=/.test(code), 'does not patch focus')
+})
