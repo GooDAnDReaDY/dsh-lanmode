@@ -270,3 +270,9 @@ GET `/dsh-lanmode/qr` без параметра `url` рисует текущи�
 Проверено 2026-09-24 по `lib/devices.js` после #181.
 
 Список устройств показывает короткое имя из User-Agent: модель Android или версия iOS/iPadOS и браузер, например `Pixel 8 · Chrome` или `iOS 17 · Safari`. Пользовательский nickname по-прежнему перекрывает это имя.
+
+## Certificate Trust Assistant
+
+Проверено 2026-09-24 по `lib/routes/diagnostics.js` и `lib/client-parts/08-qr.js` после #253.
+
+Всплывающее окно QR показывает отпечаток SHA-256 с `/dsh-lanmode/health?format=json`, ссылки на `.crt`, `.der` и `.mobileconfig`, а также кнопки копирования команд установки для Windows, macOS и Linux. Команды рассчитаны на уже скачанный `dsh-lanmode-root-ca.crt`.
