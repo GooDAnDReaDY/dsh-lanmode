@@ -306,3 +306,9 @@ GET `/dsh-lanmode/qr` без параметра `url` рисует текущи�
 Проверено 2026-09-24 после #276.
 
 Манифест отдаётся без сессии по `/dsh-lanmode/manifest.json`, `/dsh-lanmode/manifest.webmanifest` и `/manifest.webmanifest`. Эти пути входят в публичный белый список парольного шлюза и не открывают WebSocket upgrade.
+
+## Fullscreen Right Panel On Mobile
+
+Проверено 2026-09-24 после #204.
+
+На узком экране панель `[data-sidebar-right-panel='fullscreen']` сдвигается вниз на `--dsh-mobile-header-h`, чтобы кнопка закрытия не перекрывалась мобильной шапкой.
