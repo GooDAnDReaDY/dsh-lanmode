@@ -324,3 +324,9 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #214.
 
 Мобильный адаптер наблюдает DOM через `MutationObserver` и помечает поздно появившиеся фреймы `data-dsh-mobile-ready`, повторно применяя FAB/адаптеры к асинхронно смонтированным чатам.
+
+## Trusted Proxy CIDRs
+
+Проверено 2026-09-24 после #269.
+
+`clientIp` читает `X-Forwarded-For` / `CF-Connecting-IP` только если непосредственный peer входит в `trustedProxyCidrs` (по умолчанию loopback). Прямые LAN/WAN клиенты не могут подделать IP через заголовок.
