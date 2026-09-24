@@ -1,3 +1,4 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import http from 'node:http'
@@ -196,7 +197,7 @@ test('Блок 7: Проверка кода клиентских файлов sh
   assert.ok(shim.includes('x-dsh-auth-required'), 'shim.js перехватывает x-dsh-auth-required')
   assert.ok(shim.includes("window.location.href = '/'"), 'shim.js перенаправляет на / при 401')
 
-  const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
+  const client = clientRuntimeSource()
   assert.ok(client.includes('passwordAuth'), 'client.js содержит passwordAuth')
   assert.ok(client.includes('authUser'), 'client.js содержит authUser')
   assert.ok(client.includes('authPassword'), 'client.js содержит authPassword')

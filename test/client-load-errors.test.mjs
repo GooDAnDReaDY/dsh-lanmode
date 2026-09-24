@@ -1,8 +1,9 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const src = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+const src = clientRuntimeSource()
 const start = src.indexOf('function loadOutcome')
 const end = src.indexOf('function takeJson')
 const loadOutcome = new Function(src.slice(start, end) + '\nreturn loadOutcome;')()

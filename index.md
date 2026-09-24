@@ -17,3 +17,7 @@ LAN access plugin for DeepSeek Harness: direct bridge, mDNS, local TLS, PWA, dev
 | Package contents | `npm pack --dry-run` | Must stay inside `package.json` `files` |
 
 `deploy.sh` prints this delivery fact and does not change a running server. A separate OPT deploy script is not confirmed because this repository has no OPT checkout.
+
+## Client runtime
+
+`lib/client.js` is the single host entry (`exports['./client']`). The factory body is `lib/client-parts/`, injected by `lib/index.js` before the module loads. Bridge local routes live in `lib/bridge-local.js`. Checked 2026-09-24.

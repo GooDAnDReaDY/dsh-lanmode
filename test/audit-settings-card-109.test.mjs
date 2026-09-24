@@ -1,10 +1,11 @@
+import { clientRuntimeSource } from './client-bundle.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
 
 test('Issue #109: LanModeCard предоставляет доступ ко всем 25 полям схемы и сохраняет их', async () => {
-  const clientCode = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const clientCode = clientRuntimeSource()
   let loaded = null
   const context = vm.createContext({
     window: {
