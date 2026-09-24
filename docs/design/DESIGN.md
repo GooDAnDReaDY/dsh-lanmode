@@ -426,3 +426,33 @@ Allowlist отвергает пустые и битые адреса, сопос
 Проверено 2026-09-24 после #180.
 
 Адрес прослушивания — `directHost` (`0.0.0.0` для всех интерфейсов). Отдельный `cordis.patch.yml` для бинда не используется. См. `@docs/deployment/bind-address.md`.
+
+## Welcome Notice On Remote Sessions
+
+Проверено 2026-09-24 после #235.
+
+Если `settings.describe` возвращает `ui-onboarding.welcomeNoticeVersion`, клиент помечает слот `settings.onboarding` как `acknowledged`, чтобы окно внутреннего теста не открывалось на каждом обновлении.
+
+## Settings Describe Mirror
+
+Проверено 2026-09-24 после #234.
+
+Если `settings.describe` не содержит `view`, клиент собирает зеркало из `schema` и `document` и передаёт его в `configForms.describe`, когда этот метод есть.
+
+## Remote Locale Persistence
+
+Проверено 2026-09-24 после #246.
+
+Клиент подписан на `locale.subscribe`. Новое значение уходит в `settings.mutate` как `locale.preference`, чтобы язык переживал перезагрузку удалённой сессии.
+
+## Open-Path Payload Shapes
+
+Проверено 2026-09-24 после #281.
+
+`extractOpenPath` читает путь из `payload.path`, `payload.args.path` или первого `payload.args.*.path`, чтобы клиент понимал оба поколения RPC.
+
+## Core Auth Cookie Merge
+
+Проверено 2026-09-24 после #261.
+
+Если у состояния есть кэш `dshAuthCookie` (пара `dsh-auth-*` из Set-Cookie ядра), bridge добавляет её во входящий Cookie только когда у клиента такой пары ещё нет.
