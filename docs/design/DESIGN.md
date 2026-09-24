@@ -336,3 +336,33 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #277.
 
 Параметр `?notice=` на странице входа принимает только константные идентификаторы (`password-changed`, `session-expired`, `logged-out`). Текст берётся из статической карты и пишется через `textContent`, без отражения сырого URL.
+
+## Auth Password scrypt Digests
+
+Проверено 2026-09-24 после #248.
+
+`authPassword` может храниться как plaintext (совместимость) или как `scrypt$N$r$p$salt$hash` (`N=16384,r=8,p=1`). Проверка использует `timingSafeEqual` / scrypt. Операторы могут заранее захешировать значение через `hashAuthPassword()`.
+
+## Login Anti-Enumeration
+
+Проверено 2026-09-24 после #275.
+
+Ответ логина всегда `Invalid username or password`. Сравнение имени — через `timingSafeEqual`, а неизвестный логин и неверный пароль оба выполняют один проход scrypt, чтобы выровнять стоимость ответа.
+
+## Digested Session Tokens
+
+Проверено 2026-09-24 после #266.
+
+В памяти сервера ключом сессии служит `sha256(token)`, исходный токен остаётся только в HttpOnly-куке клиента. Утечка дампа сессий не даёт готовых cookie-значений.
+
+## Adaptive Remote-Only Compression
+
+Проверено 2026-09-24 после #245.
+
+При `adaptiveCompression` (по умолчанию true) bridge сжимает ответы gzip/brotli только для нелокальных клиентов. Loopback и локальный LAN пропускают сжатие, чтобы не тратить CPU хоста.
+
+## Relative Launch-Token Handoff
+
+Проверено 2026-09-24 после #273.
+
+`handoffLocation` возвращает только относительный путь `/?token=...`, без host/scheme upstream. Браузер дополняет публичный Origin за прокси, без mixed content.
