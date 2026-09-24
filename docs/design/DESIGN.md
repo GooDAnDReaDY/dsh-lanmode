@@ -378,3 +378,9 @@ PATCH `/dsh-lanmode/api/config` с `authPassword` / `authPasswordRef` вызыв
 Проверено 2026-09-24 после #263.
 
 `lib/qr.js` генерирует SVG локально (ISO/IEC 18004) без внешних HTTP-сервисов. Секреты TOTP / handoff URL не уходят на chart APIs.
+
+## Streaming Reverse Proxy
+
+Проверено 2026-09-24 после #264.
+
+Direct bridge проксирует HTTP через `pipe` (включая SSE) и WebSocket через pipe сокетов, без полной буферизации тела ответа. Hop-by-hop заголовки фильтруются.
