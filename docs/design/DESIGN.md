@@ -276,3 +276,9 @@ GET `/dsh-lanmode/qr` без параметра `url` рисует текущи�
 Проверено 2026-09-24 по `lib/routes/diagnostics.js` и `lib/client-parts/08-qr.js` после #253.
 
 Всплывающее окно QR показывает отпечаток SHA-256 с `/dsh-lanmode/health?format=json`, ссылки на `.crt`, `.der` и `.mobileconfig`, а также кнопки копирования команд установки для Windows, macOS и Linux. Команды рассчитаны на уже скачанный `dsh-lanmode-root-ca.crt`.
+
+## Mobile Design Document
+
+Проверено 2026-09-24 после #188.
+
+Подробный мобильный контракт лежит в `docs/design/MOBILE_DESIGN.md`: тач-таргеты 44–48px, контраст ≥ 4.5:1, safe-area, суффиксные селекторы и запрет декоративных анимаций.
