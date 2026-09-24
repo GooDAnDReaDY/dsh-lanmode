@@ -13,8 +13,12 @@ test('Issue #141: isAdministrativeRoute correctly identifies all protected route
   assert.equal(isAdministrativeRoute('/dsh-lanmode/devices/revoke'), true)
   assert.equal(isAdministrativeRoute('/dsh-lanmode/devices/kill-all'), true)
   assert.equal(isAdministrativeRoute('/dsh-lanmode/api/devices/revoke-others'), true)
+  assert.equal(isAdministrativeRoute('/dsh-lanmode/api/devices'), true)
+  assert.equal(isAdministrativeRoute('/dsh-lanmode/api/devices/revoke'), true)
   assert.equal(isAdministrativeRoute('/dsh-lanmode/tunnel/toggle'), true)
   assert.equal(isAdministrativeRoute('/dsh-lanmode/devices'), true)
+  assert.equal(isAdministrativeRoute('/api/dsh-lanmode/update'), true)
+  assert.equal(isAdministrativeRoute('/dsh-lanmode/api/config'), true)
   assert.equal(isAdministrativeRoute('/api/settings'), true)
   assert.equal(isAdministrativeRoute('/api/settings/profile'), true)
   assert.equal(isAdministrativeRoute('/api/plugins'), true)
@@ -64,8 +68,12 @@ test('Issue #141: Guest role receives 403 on ALL administrative routes through b
       '/dsh-lanmode/devices/revoke',
       '/dsh-lanmode/devices/kill-all',
       '/dsh-lanmode/api/devices/revoke-others',
+      '/dsh-lanmode/api/devices',
+      '/dsh-lanmode/api/devices/revoke',
       '/dsh-lanmode/tunnel/toggle',
       '/dsh-lanmode/devices',
+      '/api/dsh-lanmode/update',
+      '/dsh-lanmode/api/config',
       '/api/settings',
       '/api/plugins',
     ]

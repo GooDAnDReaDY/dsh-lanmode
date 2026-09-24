@@ -97,6 +97,7 @@ graph LR
 
 ### 2. 📲 PWA & Mobile Standalone Mode
 * Route `/dsh-lanmode/manifest.json` and meta tags `viewport-fit=cover`, `apple-mobile-web-app-capable`, `theme-color`.
+* Mobile layout styles are injected with `data-dsh-plugin="dsh-lanmode"`, so the harness can tell them apart from other plugins.
 * Adding DSH to your Home Screen on iOS/Android launches it as a standalone app without browser URL bars and with notch-aware safe areas.
 
 ### 3. 🌐 Automatic mDNS (`dsh.local`)
@@ -123,12 +124,14 @@ graph LR
 * **`lanPin` / `lanPinRef`**: Optional PIN protection for privileged operations. When enabled, LAN guests can chat freely, but changing system settings, installing plugins, or mutating credentials requires PIN verification.
 * **Brute-Force Rate Limiting**: PIN authentication enforces automatic rate limiting (HTTP 429 status after 5 consecutive failed attempts per IP) with temporary lockout.
 * **Subnet Role Separation**: Distinct `adminAllow` and `guestAllow` CIDR rules. Subnets designated under `guestAllow` are strictly prohibited from mutating system settings, revoking sessions, or toggling WAN tunnels (`403 Forbidden`).
-* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
+* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`, `/dsh-lanmode/api/config`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
+* Login, settings, device revoke, and tunnel toggle stop reading a body after 64 KiB and answer 413. The action is not applied.
 * **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
 
 ### 8. 📱 Connected Devices & Session Management
 * Live client presence tracking and device OS/browser discovery (iOS, Android, Windows, macOS, Linux).
 * Per-device token revocation and emergency "Revoke All Others" kill switch in the settings card.
+* Bridge routes that list or revoke devices require administrator access. Guests receive 403.
 
 ### 9. 🌐 Multi-Interface & Mesh Detection
 * Automatic identification of local LAN, Tailscale (100.x.y.z), WireGuard, and VPN network adapters with quick-select UI pills.
@@ -150,7 +153,7 @@ graph LR
 ### 13. 🔄 In-App One-Click Plugin Updates
 * Built-in updater service and settings card UI (`/api/dsh-lanmode/update`):
   * Real-time display of the currently installed version and availability of new releases from the npm registry;
-  * Security perimeter requiring loopback origin or admin session credentials, origin/host match, anti-CSRF headers, and the mandatory `x-dsh-plugin-update: 1` verification header;
+  * Security perimeter: mandatory `x-dsh-plugin-update: 1` header, same-origin check, and the admin gate. Password authentication requires a valid session even from loopback. Without it, loopback or an admin-role address is accepted. Guests are rejected;
   * One-click upgrade of `@goodandready/dsh-lanmode` directly from the DSH settings card with zero terminal commands required.
 
 ---
