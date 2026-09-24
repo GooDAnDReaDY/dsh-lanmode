@@ -330,3 +330,9 @@ LAN PIN проверяется через `timingSafeEqual` для plaintext и 
 Проверено 2026-09-24 после #269.
 
 `clientIp` читает `X-Forwarded-For` / `CF-Connecting-IP` только если непосредственный peer входит в `trustedProxyCidrs` (по умолчанию loopback). Прямые LAN/WAN клиенты не могут подделать IP через заголовок.
+
+## Login Notice Allowlist
+
+Проверено 2026-09-24 после #277.
+
+Параметр `?notice=` на странице входа принимает только константные идентификаторы (`password-changed`, `session-expired`, `logged-out`). Текст берётся из статической карты и пишется через `textContent`, без отражения сырого URL.
