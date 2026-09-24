@@ -276,3 +276,33 @@ GET `/dsh-lanmode/qr` без параметра `url` рисует текущи�
 Проверено 2026-09-24 по `lib/routes/diagnostics.js` и `lib/client-parts/08-qr.js` после #253.
 
 Всплывающее окно QR показывает отпечаток SHA-256 с `/dsh-lanmode/health?format=json`, ссылки на `.crt`, `.der` и `.mobileconfig`, а также кнопки копирования команд установки для Windows, macOS и Linux. Команды рассчитаны на уже скачанный `dsh-lanmode-root-ca.crt`.
+
+## Mobile Design Document
+
+Проверено 2026-09-24 после #188.
+
+Подробный мобильный контракт лежит в `docs/design/MOBILE_DESIGN.md`: тач-таргеты 44–48px, контраст ≥ 4.5:1, safe-area, суффиксные селекторы и запрет декоративных анимаций.
+
+## License Gate
+
+Проверено 2026-09-24 после #190.
+
+Перед релизом скрипт `npm run check:licenses` проверяет, что лицензия пакета остаётся разрешительной (MIT и аналоги) и что в объявленных зависимостях и lockfile нет GPL/AGPL/LGPL/SSPL.
+
+## Pack Clean Gate
+
+Проверено 2026-09-24 после #194.
+
+`prepack` удаляет локальный мусор (`.tgz`, `.map`, `.tmp`). Отдельная команда `npm run pack:check` запускает `npm pack --dry-run --ignore-scripts` и сверяет состав: без `docs/`, `AGENTS.md`, `index.md`, `deploy.sh`, каждый файл не больше 256 КиБ, суммарный размер не больше 512 КиБ. Бюджет 250 КиБ остаётся целевым ориентиром, но текущий README+client набор его превышает.
+
+## Login Instance Host
+
+Проверено 2026-09-24 после #274.
+
+Настройка `publicHost` показывает на странице входа плашку `Instance: …`. Если поле пустое, берётся Host из запроса. Значение экранируется перед вставкой в HTML.
+
+## PWA Manifest Paths
+
+Проверено 2026-09-24 после #276.
+
+Манифест отдаётся без сессии по `/dsh-lanmode/manifest.json`, `/dsh-lanmode/manifest.webmanifest` и `/manifest.webmanifest`. Эти пути входят в публичный белый список парольного шлюза и не открывают WebSocket upgrade.
