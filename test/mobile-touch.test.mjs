@@ -78,3 +78,8 @@ test('Блок 2: #73 Виброотклик на turn/end и approval/asked', (
   const client = readFileSync(path.join(here, '..', 'lib', 'client.js'), 'utf8')
   assert.ok(client.includes('navigator.vibrate'), 'должен вызываться navigator.vibrate')
 })
+
+test('mobile stylesheet is owned by dsh-lanmode', () => {
+  const css = mobileStyles()
+  assert.ok(css.includes('data-dsh-plugin="dsh-lanmode"'), 'style tag must declare the plugin owner')
+})

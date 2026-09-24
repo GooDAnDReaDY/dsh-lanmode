@@ -97,6 +97,7 @@ graph LR
 
 ### 2. 📲 PWA и Standalone-режим
 * Роут `/dsh-lanmode/manifest.json` и метатеги `viewport-fit=cover`, `apple-mobile-web-app-capable`, `theme-color`.
+* Мобильные стили вставляются с `data-dsh-plugin="dsh-lanmode"`, чтобы harness отличал их от стилей других плагинов.
 * При добавлении сайта «На экран Домой» на iOS/Android интерфейс открывается на весь экран без адресной строки браузера и с правильными отступами под «чёлку».
 
 ### 3. 🌐 Автоматический mDNS (`dsh.local`)

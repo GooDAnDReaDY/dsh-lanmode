@@ -97,6 +97,7 @@ graph LR
 
 ### 2. 📲 PWA & Mobile Standalone Mode
 * Route `/dsh-lanmode/manifest.json` and meta tags `viewport-fit=cover`, `apple-mobile-web-app-capable`, `theme-color`.
+* Mobile layout styles are injected with `data-dsh-plugin="dsh-lanmode"`, so the harness can tell them apart from other plugins.
 * Adding DSH to your Home Screen on iOS/Android launches it as a standalone app without browser URL bars and with notch-aware safe areas.
 
 ### 3. 🌐 Automatic mDNS (`dsh.local`)
