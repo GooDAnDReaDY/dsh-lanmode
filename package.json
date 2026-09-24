@@ -41,7 +41,11 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check:licenses": "node scripts/check-licenses.mjs"
+    "check:licenses": "node scripts/check-licenses.mjs",
+    "clean:pack": "node scripts/clean-pack.mjs",
+    "verify:pack": "node scripts/verify-pack.mjs",
+    "prepack": "node scripts/clean-pack.mjs",
+    "pack:check": "node scripts/clean-pack.mjs && node scripts/verify-pack.mjs"
   },
   "dsh": {
     "bundle": {
