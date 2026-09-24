@@ -97,7 +97,13 @@ graph LR
 
 ### 2. 📲 PWA & Mobile Standalone Mode
 * Route `/dsh-lanmode/manifest.json` and meta tags `viewport-fit=cover`, `apple-mobile-web-app-capable`, `theme-color`.
+* Mobile layout styles are injected with `data-dsh-plugin="dsh-lanmode"`, so the harness can tell them apart from other plugins.
 * Adding DSH to your Home Screen on iOS/Android launches it as a standalone app without browser URL bars and with notch-aware safe areas.
+* `GET /dsh-lanmode/manifest.webmanifest` is public, so the home-screen install does not depend on a session.
+* A saved launch token can reopen that bookmark. Clearing site data drops the token.
+* Scan `/dsh-lanmode/pair-accept?token=` to pair a phone without setting a cookie. Empty tokens and tokens longer than 512 characters are rejected.
+* On a phone, the QR action sits on the same footer row as settings. A long press on a session row opens its menu. The model menu stays pinned to the bottom of the screen. Wide desktop panels close on a narrow screen; other plugins remain visible.
+* Chat links and file opens whose path ends in zip, exe, dmg, pkg, msi, 7z, rar, gz, bz2, iso, bin, or apk download instead of opening in the page.
 
 ### 3. 🌐 Automatic mDNS (`dsh.local`)
 * Built-in lightweight UDP 5353 responder: announces **`dsh.local`** across your local network. No need to memorize shifting IP addresses.
@@ -105,6 +111,9 @@ graph LR
 ### 4. 🔐 Local Root CA for Permanent Trusted HTTPS
 * Generates a two-tier certificate structure: **`dsh-lanmode Local Root CA`** (10-year validity) $\rightarrow$ **`Server Certificate`** (with SAN for `dsh.local`, LAN IPs, and localhost).
 * Download `GET /dsh-lanmode/ca.crt`: install the profile once on your iPhone, iPad, or Android to enjoy persistent trusted HTTPS. Voice input via [`dsh-voice`](https://github.com/GooDAnDReaDY/dsh-voice) works flawlessly.
+* The saved certificate is reused across restarts. A newly issued certificate also lists sslip.io and nip.io names for each address.
+* Those names belong on the certificate only. The bridge does not listen on sslip.io or nip.io host names.
+* `tlsSites` adds extra certificate and key files for specific host names. A request for that name uses its own certificate. IP addresses, localhost, and unknown names stay on the default certificate. An empty list does not enable name selection.
 
 ### 5. 🔔 Background Web Notifications (turn/end)
 * Hooks into `turn/end` and `approval/asked` session events.
@@ -123,12 +132,26 @@ graph LR
 * **`lanPin` / `lanPinRef`**: Optional PIN protection for privileged operations. When enabled, LAN guests can chat freely, but changing system settings, installing plugins, or mutating credentials requires PIN verification.
 * **Brute-Force Rate Limiting**: PIN authentication enforces automatic rate limiting (HTTP 429 status after 5 consecutive failed attempts per IP) with temporary lockout.
 * **Subnet Role Separation**: Distinct `adminAllow` and `guestAllow` CIDR rules. Subnets designated under `guestAllow` are strictly prohibited from mutating system settings, revoking sessions, or toggling WAN tunnels (`403 Forbidden`).
-* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
+* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`, `/dsh-lanmode/api/config`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
+* Login, settings, device revoke, and tunnel toggle stop reading a body after 64 KiB and answer 413. The action is not applied.
 * **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
+* Passwords are stored as scrypt digests. Session tokens are stored as SHA-256 digests, not as the raw token. Changing the password revokes that user's other sessions immediately.
+* Login takes the same time when the username is unknown as when the password is wrong.
+* The LAN PIN is stretched with PBKDF2. Five failures lock that address for 15 minutes.
+* Set the first password, password reference, or `passwordAuth: true` from the machine itself. A remote address receives 403 and the configuration is left unchanged.
+* While password authentication stays on, a settings update cannot clear both the password and the password reference. Turning password authentication off is still allowed.
+* `POST /dsh-lanmode/bans` with `{ "ip" }` bans an address. That address then receives plain `403 Forbidden` before the login page. Loopback and the administrator's own address cannot be banned. The list is kept beside the device registry.
+* `disabledUsers` names accounts whose sessions are dropped within 5 seconds.
+* Forwarded client addresses (`X-Forwarded-For`, `CF-Connecting-IP`) are trusted only from peers listed in `trustedProxyCidrs`. Direct peers cannot spoof their address.
+* If a signed-in API call returns 401 with `x-dsh-auth-required: 1`, the page asks for the password again without navigating away, so the current draft stays.
+* The login card shows the host name you are signing into.
 
 ### 8. 📱 Connected Devices & Session Management
 * Live client presence tracking and device OS/browser discovery (iOS, Android, Windows, macOS, Linux).
 * Per-device token revocation and emergency "Revoke All Others" kill switch in the settings card.
+* Bridge routes that list or revoke devices require administrator access. Guests receive 403.
+* Each device row can show a short name taken from the User-Agent.
+* If the device list, tunnel status, update check, or latency request fails, the card shows that failure instead of an empty success.
 
 ### 9. 🌐 Multi-Interface & Mesh Detection
 * Automatic identification of local LAN, Tailscale (100.x.y.z), WireGuard, and VPN network adapters with quick-select UI pills.
@@ -141,7 +164,9 @@ graph LR
 ### 11. 🚀 Connection Pooling & SSE Streaming Isolation
 * Upstream connections to DeepSeek Harness are segregated into two independent pools:
   * **Standard HTTP Pool**: Keep-alive enabled with up to 100 reusable sockets for rapid loading of WebUI assets, static scripts, and REST endpoints. Protected by a queue timeout (15s default) returning HTTP 503 rather than stalling indefinitely if saturated.
-  * **Dedicated Streaming Pool**: Independent unpooled socket handling for long-lived Server-Sent Events (SSE), token streaming (`/api/chat/stream`), and live notifications. 100+ concurrent streaming clients can run without exhausting or starving WebUI static and API traffic.
+  * **Dedicated Streaming Pool**: Independent unpooled socket handling for long-lived Server-Sent Events (SSE), token streaming (`/api/chat/stream`), and live notifications. 100+ concurrent streaming clients can run without exhausting or starving WebUI static and API traffic. Response bodies are piped through; they are not buffered into one blob.
+* Local LAN clients skip gzip and brotli. Remote clients can still receive compressed responses when `adaptiveCompression` is on (the default).
+* If the harness port is not configured, the bridge probes `127.0.0.1` on 3080, then 3081, then 3082. An explicit port is used as given.
 
 ### 12. ☁️ Cloudflare WAN Tunnels & Tunnel PIN
 * Built-in zero-config Quick Tunnels and Named Tunnels for remote WAN access without port forwarding.
@@ -150,7 +175,7 @@ graph LR
 ### 13. 🔄 In-App One-Click Plugin Updates
 * Built-in updater service and settings card UI (`/api/dsh-lanmode/update`):
   * Real-time display of the currently installed version and availability of new releases from the npm registry;
-  * Security perimeter requiring loopback origin or admin session credentials, origin/host match, anti-CSRF headers, and the mandatory `x-dsh-plugin-update: 1` verification header;
+  * Security perimeter: mandatory `x-dsh-plugin-update: 1` header, same-origin check, and the admin gate. Password authentication requires a valid session even from loopback. Without it, loopback or an admin-role address is accepted. Guests are rejected;
   * One-click upgrade of `@goodandready/dsh-lanmode` directly from the DSH settings card with zero terminal commands required.
 
 ---
@@ -187,6 +212,13 @@ Edit your profile's `cordis.patch.yml` to override defaults:
     allow:                   # Default: ['127.0.0.0/8'] (loopback only)
       - 192.168.0.0/16
       - 10.0.0.0/8
+    passwordAuth: false      # Require a username and password
+    authPasswordRef: ""      # Credential name for the password; do not put the password here
+    publicHost: ""           # Host name shown on the login card
+    disabledUsers: []        # Usernames whose sessions are revoked
+    trustedProxyCidrs: []    # Peers allowed to set X-Forwarded-For
+    tlsSites: []             # Extra {host, cert, key} certificates by server name
+    adaptiveCompression: true
 ```
 
 ---

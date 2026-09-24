@@ -2,6 +2,39 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.5
+
+### Fixed
+- **Direct listener no longer binds sslip.io or nip.io names (#305)**: those names stay on the certificate SAN. The bridge listens only on real host addresses, so startup no longer logs ENOTFOUND or address-in-use for DNS aliases.
+
+## 0.8.4
+
+### Added
+- Named TLS certificates (`tlsSites`) are selected by the requested server name. Unknown names and IP addresses keep the default certificate.
+- A phone can be paired with `/dsh-lanmode/pair-accept?token=` without setting a cookie. The link redirects to the app path and then to `/?token=`.
+- When an API answer is 401 and carries `x-dsh-auth-required: 1`, the page asks for the password again and keeps the current draft.
+- Links and file opens for zip, exe, dmg, pkg, msi, 7z, rar, gz, bz2, iso, bin, and apk download instead of opening in the page.
+- An administrator can ban an address with `POST /dsh-lanmode/bans`. A banned address receives plain `403 Forbidden` before the login page. Loopback and the caller's own address cannot be banned.
+- The first password, password reference, or switch to password authentication is accepted only from loopback.
+- Password authentication cannot be left on with both the password and the password reference empty.
+- Credential lookups are reused for 30 seconds after a hit and 5 seconds after a miss.
+- Usernames listed in `disabledUsers` lose their sessions on a 5 second sweep.
+- The login card shows the host being signed into. A new certificate includes sslip.io and nip.io names. The saved certificate is kept across restarts.
+- The public web app manifest is served for install, and a saved launch token can reopen a home-screen bookmark.
+
+### Changed
+- Passwords are stored as scrypt digests. Session tokens are stored as SHA-256 digests. Other sessions for that user are revoked when the password changes.
+- Login timing does not reveal whether the username exists. The LAN PIN uses PBKDF2 and a 15 minute lockout.
+- `X-Forwarded-For` and `CF-Connecting-IP` are honored only when the peer is in `trustedProxyCidrs`.
+- Local clients skip response compression. Remote clients can still receive compressed responses.
+- On a phone, the QR action shares the footer row with settings, a long press opens the session menu, and the model menu stays at the bottom of the screen. Heavy desktop panels close; other plugins stay visible.
+
+### Fixed
+- The bridge probes loopback ports 3080, 3081, and 3082 when the harness port is not configured. An explicit port is never probed.
+- Gated plugin routes that share a prefix with a public path stay gated.
+- The harness token for a local desktop is returned only to loopback.
+- Launch-token redirects stay on a relative Location.
+
 ## 0.8.3
 
 ### Fixed
