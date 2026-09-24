@@ -396,3 +396,9 @@ Direct bridge проксирует HTTP через `pipe` (включая SSE) �
 Проверено 2026-09-24 после #249.
 
 Эталонное развёртывание через Cloudflare Tunnel описано в `@docs/deployment/cloudflare-tunnel.md` (quick/named, allowlist, PIN, WAN auth).
+
+## Remote isLoopback
+
+Проверено 2026-09-24 после #233.
+
+Клиент выставляет `ctx.connection.isLoopback = true`, а бандл connection по-прежнему переписывается в `isLoopback: true`, чтобы удалённый UI не прятал открытие путей и файлов.
