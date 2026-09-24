@@ -150,7 +150,7 @@ graph LR
 ### 13. 🔄 In-App One-Click Plugin Updates
 * Built-in updater service and settings card UI (`/api/dsh-lanmode/update`):
   * Real-time display of the currently installed version and availability of new releases from the npm registry;
-  * Security perimeter requiring loopback origin or admin session credentials, origin/host match, anti-CSRF headers, and the mandatory `x-dsh-plugin-update: 1` verification header;
+  * Security perimeter: mandatory `x-dsh-plugin-update: 1` header, same-origin check, and the admin gate. Password authentication requires a valid session even from loopback. Without it, loopback or an admin-role address is accepted. Guests are rejected;
   * One-click upgrade of `@goodandready/dsh-lanmode` directly from the DSH settings card with zero terminal commands required.
 
 ---

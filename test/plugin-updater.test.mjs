@@ -77,16 +77,63 @@ test('Issue #134: isTrustedUpdateRequest security verification', () => {
     true,
   )
 
-  // 6. Non-loopback rejected when no admin credentials
+  // 6. Non-loopback rejected when no admin role is supplied
   assert.equal(
     isTrustedUpdateRequest(makeReq({
       remote: '192.168.1.50',
       headers: {
         'x-dsh-plugin-update': '1',
-        origin: 'http://192.168.1.111:3080',
-        host: '192.168.1.111:3080',
+        origin: 'http://192.168.1.50:3080',
+        host: '192.168.1.50:3080',
       },
     })),
+    false,
+  )
+
+  // 7. Non-loopback admin role is accepted when password auth is off.
+  //    verifyAdminAccess reports ok, not allowed.
+  assert.equal(
+    isTrustedUpdateRequest(makeReq({
+      remote: '192.168.1.50',
+      headers: {
+        'x-dsh-plugin-update': '1',
+        'sec-fetch-site': 'same-origin',
+        origin: 'http://192.168.1.50:3080',
+        host: '192.168.1.50:3080',
+      },
+    }), { role: 'admin', config: { passwordAuth: false } }),
+    true,
+  )
+
+  // 8. Loopback still needs a session when password authentication is on
+  assert.equal(
+    isTrustedUpdateRequest(makeReq({
+      remote: '127.0.0.1',
+      headers: {
+        'x-dsh-plugin-update': '1',
+        'sec-fetch-site': 'same-origin',
+        origin: 'http://127.0.0.1:3080',
+        host: '127.0.0.1:3080',
+      },
+    }), {
+      role: 'admin',
+      config: { passwordAuth: true },
+      state: { passwordAuth: true, authManager: { extractToken: () => '', validateSession: () => null } },
+    }),
+    false,
+  )
+
+  // 9. Guest is rejected even from loopback
+  assert.equal(
+    isTrustedUpdateRequest(makeReq({
+      remote: '127.0.0.1',
+      headers: {
+        'x-dsh-plugin-update': '1',
+        'sec-fetch-site': 'same-origin',
+        origin: 'http://127.0.0.1:3080',
+        host: '127.0.0.1:3080',
+      },
+    }), { role: 'guest' }),
     false,
   )
 })
