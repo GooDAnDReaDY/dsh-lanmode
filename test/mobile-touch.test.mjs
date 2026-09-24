@@ -102,3 +102,11 @@ test('Issue #169: FAB remembers position and hides with an open sidebar', () => 
   assert.ok(code.includes('isPortraitMobile') || code.includes('innerHeight'), 'portrait gate')
   assert.ok(code.includes('sidebarLooksOpen') || code.includes('applyFabVisibility'), 'hides when sidebar open')
 })
+
+test('Issue #173: programmatic focus without a gesture is blurred on mobile', () => {
+  const code = mobileNavSource()
+  assert.ok(code.includes('focusin'), 'listens for focusin')
+  assert.ok(code.includes('lastUserGestureAt'), 'tracks user gestures')
+  assert.ok(code.includes('.blur()'), 'blurs unsolicited focus')
+  assert.ok(!/HTMLElement\.prototype\.focus\s*=/.test(code), 'does not patch focus')
+})
