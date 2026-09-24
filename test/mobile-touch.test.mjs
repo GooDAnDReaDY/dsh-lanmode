@@ -133,3 +133,11 @@ test('Issue #175: mobile nav closes details for heavy plugins without hiding the
   assert.ok(nav.includes('hideHeavyDesktop'))
   assert.ok(nav.includes('closeDetails'))
 })
+
+
+test('Issue #174: model menu becomes a bottom sheet on a narrow screen', () => {
+  const css = mobileStyles()
+  assert.ok(css.includes('_triggerEffort'))
+  assert.ok(css.includes('border-radius: 16px 16px 0 0'))
+  assert.ok(css.includes('safe-area-inset-bottom'))
+})
