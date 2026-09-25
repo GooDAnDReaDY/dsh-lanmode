@@ -7,6 +7,14 @@ import test from 'node:test'
 import { checkAssumptions, summarize } from '../lib/assumptions.js'
 import { startDirectBridge } from '../lib/bridge.js'
 
+async function getFreePort() {
+  const s = http.createServer()
+  await new Promise((r) => s.listen(0, '127.0.0.1', r))
+  const port = s.address().port
+  await new Promise((r) => s.close(r))
+  return port
+}
+
 test('Issue #164: checkAssumptions() не падает в дрейф при статусе 303 от ядра', async () => {
   const fakeWebServer = {
     port: 3080,
@@ -36,9 +44,9 @@ test('Issue #164: bridge отдаёт 502 с err.code при недоступн�
   const logs = []
   const log = (msg) => logs.push(msg)
 
-  // Порт 39999 никем не слушается — гарантированный ECONNREFUSED
-  const deadPort = 39999
-  const bridgePort = 39998
+  // Динамические свободные порты без риска коллизий при параллельном запуске тестов
+  const deadPort = await getFreePort()
+  const bridgePort = await getFreePort()
 
   const context = {
     webServer: { port: deadPort },
