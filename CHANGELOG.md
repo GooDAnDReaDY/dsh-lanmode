@@ -2,6 +2,29 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.7
+
+### Fixed
+- **Sanitize initialError and defaultUser against XSS injection (#308)**: escapes user-provided values in `renderLoginPage` HTML generation to prevent reflected XSS.
+- **Support options object and resolve DEP0187 in DeviceRegistry (#309)**: safely handles `{ filePath, saveDelayMs }` options argument and avoids `DEP0187` DeprecationWarning in Node.js 22/24.
+- **Prevent Cloudflare header spoofing from untrusted remote IPs (#310)**: checks peer IP against `trustedProxyCidrs` before accepting `cf-ray` / `cf-connecting-ip` headers.
+- **Enforce 405 Method Not Allowed on diagnostics endpoints (#311)**: rejects non-GET/HEAD HTTP methods on `/dsh-lanmode/health`, `/ca.crt`, `/ca.der`, `/qr`, and `/probe`.
+- **Eliminate hardcoded ports in integration tests (#312)**: allocates dynamic ephemeral ports in test suites to prevent parallel test port collisions and race conditions.
+- **Use ctx.logger instead of direct console in index.js (#313)**: standardizes runtime logging with Cordis plugin lifecycle logger.
+
+### Added
+- **Server-side renderLoginPage notice support (#314)**: integrates `resolveLoginNotice` into SSR `renderLoginPage` for immediate status alert rendering.
+
+## 0.8.6
+
+### Added
+- **Browser directory picker patch (#241)**: disables host OS native directory chooser on remote/headless server and mounts `@deepseek-ai/dsh-host-directory-picker-browse` with `@deepseek-ai/dsh-client-ui-directory-picker-browse` for seamless in-app workspace selection.
+- **DeepSeek App mobile header styling (#203)**: adds glassmorphism backdrop blur, rounded brand badge, and smooth micro-interactions matching the native DeepSeek mobile experience.
+
+### Fixed
+- **DNS rebinding protection in isTrustedSameOrigin (#307)**: validates authority against local and LAN hostnames so foreign Host headers cannot bypass origin checks.
+- **Auto-mint core browserAuth cookies (#232)**: resolves core `browserAuth` secret and automatically signs loopback and client authority cookies to eliminate 401 Unauthorized errors on `/api` through tunnels and reverse proxies.
+
 ## 0.8.5
 
 ### Fixed

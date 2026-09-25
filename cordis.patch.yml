@@ -19,6 +19,11 @@
 #
 # Default config below is fail-closed: localhost-only, loopback allowlist.
 # To enable network access, set directHost and allow in your profile.
+
+# #241: Disable OS native directory chooser on remote/headless server
+- id: directory-picker
+  disabled: true
+
 - insert:
     - id: dsh-lanmode
       name: '@goodandready/dsh-lanmode'
@@ -28,3 +33,12 @@
         directPort: 3088
         allow:
           - '127.0.0.0/8'
+
+    # #241: Mount in-app browser directory picker backend and client UI dialog
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+      config:
+        maxEntries: 1000
+
+    - id: ui-directory-picker-browse
+      name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
