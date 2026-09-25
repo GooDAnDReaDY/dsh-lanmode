@@ -6,6 +6,14 @@ import { registerMobileQrTool } from '../lib/mobile-tool.js'
 import { AuthManager } from '../lib/auth.js'
 import { resetPinRateLimit } from '../lib/privileged.js'
 
+async function getFreePort() {
+  const s = http.createServer()
+  await new Promise((r) => s.listen(0, '127.0.0.1', r))
+  const port = s.address().port
+  await new Promise((r) => s.close(r))
+  return port
+}
+
 test('Issue #154: LAN PIN challenge, brute-force rate limit, and privilegedExtra in bridge.js', async () => {
   resetPinRateLimit()
   let upstreamCalled = false
@@ -17,7 +25,7 @@ test('Issue #154: LAN PIN challenge, brute-force rate limit, and privilegedExtra
   await new Promise((r) => upstream.listen(0, '127.0.0.1', r))
   const upstreamPort = upstream.address().port
 
-  const bridgePort = 31980
+  const bridgePort = await getFreePort()
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
     {
@@ -85,7 +93,7 @@ test('Issue #154: Correct PIN allows privileged requests through bridge', async 
   await new Promise((r) => upstream.listen(0, '127.0.0.1', r))
   const upstreamPort = upstream.address().port
 
-  const bridgePort = 31981
+  const bridgePort = await getFreePort()
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
     {
@@ -154,7 +162,7 @@ test('Issue #156: tunnelPin enforces PIN for Cloudflare WAN tunnel requests', as
   await new Promise((r) => upstream.listen(0, '127.0.0.1', r))
   const upstreamPort = upstream.address().port
 
-  const bridgePort = 31982
+  const bridgePort = await getFreePort()
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
     {
@@ -207,7 +215,7 @@ test('Issue #157: passwordAuth protects interfaces and telemetry endpoints', asy
     sessionDays: 1,
   })
 
-  const bridgePort = 31983
+  const bridgePort = await getFreePort()
   const stop = startDirectBridge(
     { webServer: { port: upstreamPort } },
     {
