@@ -2,6 +2,16 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.6
+
+### Added
+- **Browser directory picker patch (#241)**: disables host OS native directory chooser on remote/headless server and mounts `@deepseek-ai/dsh-host-directory-picker-browse` with `@deepseek-ai/dsh-client-ui-directory-picker-browse` for seamless in-app workspace selection.
+- **DeepSeek App mobile header styling (#203)**: adds glassmorphism backdrop blur, rounded brand badge, and smooth micro-interactions matching the native DeepSeek mobile experience.
+
+### Fixed
+- **DNS rebinding protection in isTrustedSameOrigin (#307)**: validates authority against local and LAN hostnames so foreign Host headers cannot bypass origin checks.
+- **Auto-mint core browserAuth cookies (#232)**: resolves core `browserAuth` secret and automatically signs loopback and client authority cookies to eliminate 401 Unauthorized errors on `/api` through tunnels and reverse proxies.
+
 ## 0.8.5
 
 ### Fixed
