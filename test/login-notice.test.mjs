@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { resolveLoginNotice, LOGIN_NOTICE_MESSAGES } from '../lib/login-page.js'
+import { resolveLoginNotice, LOGIN_NOTICE_MESSAGES, renderLoginPage } from '../lib/login-page.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const src = readFileSync(path.join(here, '..', 'lib', 'login-page.js'), 'utf8')
@@ -21,4 +21,13 @@ test('Issue #277: login page assigns notice via textContent not innerHTML', () =
   assert.ok(src.includes("noticeMsg.textContent"))
   assert.ok(!src.includes('noticeMsg.innerHTML'))
   assert.ok(src.includes("get('notice')"))
+})
+
+test('Issue #314: renderLoginPage renders server-side notice when options.notice is provided', () => {
+  const htmlWithNotice = renderLoginPage({ notice: 'password-changed' })
+  assert.ok(htmlWithNotice.includes('style="display:flex"'))
+  assert.ok(htmlWithNotice.includes('Your password was changed. Please sign in again.'))
+
+  const htmlWithoutNotice = renderLoginPage({})
+  assert.ok(htmlWithoutNotice.includes('style="display:none"'))
 })
