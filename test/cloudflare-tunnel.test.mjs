@@ -44,3 +44,14 @@ test('Блок 8: Регистрация эндпоинтов /tunnel и /tunnel
   assert.ok(indexSource.includes('/dsh-lanmode/tunnel'), 'должен быть зарегистрирован путь /dsh-lanmode/tunnel')
   assert.ok(indexSource.includes('/dsh-lanmode/tunnel/toggle'), 'должен быть путь /dsh-lanmode/tunnel/toggle')
 })
+
+test('Issue #310: isCloudflareRequest rejects spoofed cf-* headers from untrusted remote IPs', () => {
+  const headers = { 'cf-ray': 'fake-ray-123' }
+  // Untrusted LAN IP -> false
+  assert.equal(isCloudflareRequest(headers, '192.168.1.55'), false, 'LAN peer cannot spoof cf-ray')
+  // Loopback peer (real local cloudflared) -> true
+  assert.equal(isCloudflareRequest(headers, '127.0.0.1'), true, 'loopback peer is trusted')
+  assert.equal(isCloudflareRequest(headers, '::1'), true, 'IPv6 loopback peer is trusted')
+  // Custom trusted proxy CIDR -> true
+  assert.equal(isCloudflareRequest(headers, '10.0.0.5', ['10.0.0.0/24']), true, 'custom trusted CIDR accepted')
+})
