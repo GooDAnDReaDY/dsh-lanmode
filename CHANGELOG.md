@@ -2,6 +2,16 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.8
+
+### Fixed
+- **Protect GET /dsh-lanmode/tunnel endpoint against unauthenticated disclosure (#316)**: enforces `resolveClientRole` and `verifyAdminAccess` so WAN tunnel state and public URLs are never disclosed to unauthenticated guests.
+- **Prevent logout CSRF on /dsh-lanmode/auth/logout (#317)**: enforces `POST` method requirement and `isTrustedSameOrigin` anti-CSRF check before destroying user sessions.
+- **Pass state and config options to isTrustedSameOrigin in device routes (#318)**: ensures `config.allowedHosts` and dynamic state are respected during origin validation in `/dsh-lanmode/devices`.
+- **Enforce 405 Method Not Allowed and RFC 9110 Allow headers across all routes (#319)**: validates request methods and sets standard `Allow` response headers on manifest, devices, config, and session endpoints.
+- **Replace empty catch blocks in resolveBrowserAuthSecret (#320)**: provides diagnosable debug logging for credential stores and satisfies preflight static quality gates.
+- **Wrap client locale and slot registrations in ctx.effect (#321)**: manages Cordis plugin lifecycle cleanly to prevent registration leaks on client context reload.
+
 ## 0.8.7
 
 ### Fixed
