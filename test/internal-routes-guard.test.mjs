@@ -1,6 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import http from 'node:http'
+import path from 'node:path'
+import os from 'node:os'
 import { verifyAdminAccess, isTrustedSameOrigin } from '../lib/access.js'
 import { AuthManager, makeSessionCookie } from '../lib/auth.js'
 import { DeviceRegistry } from '../lib/devices.js'
@@ -56,7 +58,8 @@ test('Issue #142: verifyAdminAccess unit checks', () => {
 
 test('Issue #142 & #132: Direct webServer route invocation without session fails closed', async () => {
   const authManager = new AuthManager()
-  const deviceRegistry = new DeviceRegistry()
+  const tmpDev = path.join(os.tmpdir(), `dsh-guard-${Date.now()}-${Math.random().toString(36).slice(2)}.json`)
+  const deviceRegistry = new DeviceRegistry(tmpDev)
   const state = {
     authManager,
     deviceRegistry,
