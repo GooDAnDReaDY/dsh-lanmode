@@ -2,6 +2,15 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.9
+
+### Fixed
+- **Prevent DSH process crash on /dsh-lanmode/qr endpoint (#322, #GH-2)**: resolves undefined `cached.svg` property causing uncaught `TypeError` in `Buffer.byteLength`, adds defensive `try/catch` guard for oversized QR text, computes RFC-compliant ETag, and enforces `GET, HEAD` methods with 405 response.
+- **Restrict /dsh-lanmode/api/interfaces and /api/telemetry to administrators (#323)**: enforces `denyUnlessAdmin` access control to prevent internal network topology and socket pool disclosure to unauthenticated guests, and restricts methods to `GET, HEAD`.
+- **Enforce 405 Method Not Allowed and RFC 9110 Allow headers across bridge endpoints (#324)**: standardizes method rejection and adds missing `Allow` response headers across bridge routes (`/pair-accept`, `/bans`, `/loopback-token`, `/sw.js`, `/ca.mobileconfig`, `/api/devices*`).
+- **Replace empty catch block in 09-apply.js settings subscription (#325)**: replaces empty `catch (_) {}` in locale subscription callback with diagnosable handler to satisfy preflight quality gate.
+- **Validate request payload shape in /dsh-lanmode/devices/revoke (#326)**: validates device ID requirement on revoke requests and returns 400 Bad Request on empty or malformed payloads.
+
 ## 0.8.8
 
 ### Fixed
