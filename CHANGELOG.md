@@ -2,6 +2,17 @@
 
 Notable changes to `@goodandready/dsh-lanmode`.
 
+## 0.8.10
+
+### Fixed
+- **Isolate test storage from live production data (#330)**: respects `process.env.DSH_HOME` across device registry, ban storage, and certificate helpers; runs all test suites against isolated temporary storage, completely eliminating live `~/.dsh` file pollution during tests.
+- **Block administrative RPC and plugin configuration endpoints for guest role (#327)**: blocks dot-notated RPC methods (`/api/settings.*`, `/api/credentials.*`, `/api/plugins.*`, `/api/agentPreset.*`, `/api/host.*`) and neighboring plugin configuration endpoints (`/dsh-*/config`, `save-key`, `accounts`, `export`, `import`, `vault`, `update`) for guest role; enforces that `unlockPrivileged: true` never unlocks privileged APIs for guests.
+- **Block cross-site mutating requests before bridge proxying (#328)**: rejects `Sec-Fetch-Site: cross-site` and untrusted `Origin` headers on state-mutating requests (`POST`, `PUT`, `PATCH`, `DELETE`) with 403 before proxying upstream; forwards real remote client IP via `X-Forwarded-For` and `X-Forwarded-Proto`.
+- **Declare optional credentials service inject and prevent listener startup crash (#329)**: declares `{ webServer: { required: true }, credentials: { required: false } }` in plugin `inject`, safely wraps credentials resolution to eliminate the Cordis injection trap, logs full error stacks, and implements exponential backoff retry on listener startup failure.
+- **Condense startup warnings and gate ASCII QR in journal logs (#333)**: gates multi-line console ASCII QR rendering behind `DEBUG` / `DSH_LANMODE_DEBUG_QR` flags, condenses privileged exposure warnings into a single clear line, and cleans dangling JSDoc.
+- **Remove minimumReleaseAge=0 and validate package lock PID in self-updater (#334)**: eliminates `--config.minimumReleaseAge=0` in child `dsh plugin add` arguments, checks `package.json.lock` PID before launching updates (returning 409 Conflict if active), and cleans up stale lock files on timeout/exit.
+- **Clean up stale release worktrees and prunable directories (#332)**: removed orphaned detached worktrees and verified all changes merged to `main`.
+
 ## 0.8.9
 
 ### Fixed
