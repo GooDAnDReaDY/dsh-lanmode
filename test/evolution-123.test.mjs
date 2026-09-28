@@ -4,6 +4,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import http from 'node:http'
+import os from 'node:os'
+
+const tmpFile = (name) => path.join(os.tmpdir(), `dsh-ev-test-${Date.now()}-${Math.random().toString(36).slice(2)}-${name}.json`)
 
 import { generateAppleMobileConfig } from '../lib/tls.js'
 import { DeviceRegistry } from '../lib/devices.js'
@@ -49,7 +52,7 @@ test('Issue #123 Standard 2: Clean npm package files configuration', () => {
 })
 
 test('Issue #123 Feature 1: Connected Devices registry & revoke-others', () => {
-  const reg = new DeviceRegistry()
+  const reg = new DeviceRegistry(tmpFile('ev1'))
   reg.devices.clear()
   reg.touch('dev-1', { headers: { 'user-agent': 'iPhone iOS 17' }, socket: { remoteAddress: '192.168.1.50' } })
   reg.touch('dev-2', { headers: { 'user-agent': 'MacBook Safari' }, socket: { remoteAddress: '192.168.1.60' } })
@@ -130,7 +133,7 @@ test('Issue #123 Feature 5: Telemetry and Device REST Endpoints over Direct Brid
   await new Promise((resolve) => upstream.listen(0, '127.0.0.1', resolve))
   const upstreamPort = upstream.address().port
 
-  const reg = new DeviceRegistry()
+  const reg = new DeviceRegistry(tmpFile('ev2'))
   reg.devices.clear()
   reg.touch('dev-test', { headers: { 'user-agent': 'Safari Mobile' }, socket: { remoteAddress: '192.168.1.10' } })
 

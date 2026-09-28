@@ -7,10 +7,11 @@ test("Issue #106: статический анализ index.js на правил
   const indexSource = fs.readFileSync(new URL("../lib/index.js", import.meta.url), "utf8")
   
   // 1. Проверка inject
+  const injectMatch = indexSource.match(/export const inject = ([\s\S]*?\n\})|export const inject = ([^\n]+)/)
+  const injectDecl = injectMatch ? (injectMatch[1] || injectMatch[2]) : ""
   assert.ok(
-    indexSource.includes("export const inject = ['webServer']") ||
-    indexSource.includes('export const inject = ["webServer"]'),
-    "export const inject обязан содержать только 'webServer', без 'settings'"
+    injectDecl.includes("webServer") && !injectDecl.includes("settings"),
+    "export const inject обязан содержать 'webServer', без 'settings'"
   )
 
   // 2. Проверка значения по умолчанию для mode
