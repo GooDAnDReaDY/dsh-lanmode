@@ -17,7 +17,7 @@ test('DeviceRegistry: debounced persistence batches touch calls', async () => {
     let writeCount = 0
     const origWriteFileSync = fs.writeFileSync
     fs.writeFileSync = function (...args) {
-      if (args[0] === filePath) writeCount++
+      if (args[0] === filePath || (typeof args[0] === 'string' && args[0].startsWith(filePath))) writeCount++
       return origWriteFileSync.apply(this, args)
     }
 
