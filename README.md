@@ -226,3 +226,11 @@ Edit your profile's `cordis.patch.yml` to override defaults:
 ## 📄 License
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)
+
+### 🛡️ Security Note for Downstream Plugins
+
+When `dsh-lanmode` is enabled, HTTP and WebSocket requests arriving at harness and neighboring plugin endpoints are proxied through loopback (`127.0.0.1`). The bridge passes standard proxy headers:
+- `X-Forwarded-For`: the actual remote client IP address on the local network
+- `X-Forwarded-Proto`: `http` or `https`
+
+**Important:** Plugins must not consider a loopback connection (`req.socket.remoteAddress === '127.0.0.1'`) as definitive proof of local console access if `dsh-lanmode` is active. Instead, inspect `X-Forwarded-For` or use proper role/session verification.
