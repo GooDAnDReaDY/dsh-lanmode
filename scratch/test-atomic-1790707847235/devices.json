@@ -1,0 +1,16 @@
+[
+  {
+    "id": "dev-1",
+    "name": "Unknown OS",
+    "nickname": "",
+    "os": "Unknown OS",
+    "browser": "Unknown Browser",
+    "platform": "unknown",
+    "icon": "server",
+    "userAgent": "Mozilla/5.0",
+    "ip": "",
+    "createdAt": 1790707847235,
+    "lastSeenAt": 1790707847235,
+    "revoked": false
+  }
+]
