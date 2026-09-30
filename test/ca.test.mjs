@@ -4,7 +4,17 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
-import { readRootCA, inspect, checkOpenSsl } from '../lib/tls.js'
+import { execFile } from 'node:child_process'
+import { readRootCA, inspect } from '../lib/tls.js'
+
+function checkOpenSsl() {
+  return new Promise((resolve) => {
+    execFile('openssl', ['version'], (err, stdout) => {
+      if (err) resolve({ available: false, error: String(err.message || err) })
+      else resolve({ available: true, version: String(stdout).trim() })
+    })
+  })
+}
 
 test('проверка доступности openssl', async () => {
   const info = await checkOpenSsl()
