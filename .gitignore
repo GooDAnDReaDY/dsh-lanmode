@@ -32,3 +32,6 @@ Thumbs.db
 # AGENTS.md and index.md are tracked in Gitea and excluded from npm by package.json files.
 docs/plans/
 docs/testing/
+
+scratch/
+package-lock.json
