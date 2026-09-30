@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
+import os from 'node:os'
 import { EventEmitter } from 'node:events'
 import { CloudflareTunnel } from '../lib/tunnel.js'
 import { DeviceRegistry } from '../lib/devices.js'
@@ -38,8 +39,7 @@ test('Issue #343: CloudflareTunnel lifecycle isolation and clean timeout managem
 })
 
 test('Issue #344: DeviceRegistry and BanList use atomic file writes', () => {
-  const tmpDir = path.join(process.cwd(), 'scratch', 'test-atomic-' + Date.now())
-  fs.mkdirSync(tmpDir, { recursive: true })
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-lanmode-test-atomic-'))
 
   try {
     // 1. DeviceRegistry atomic save

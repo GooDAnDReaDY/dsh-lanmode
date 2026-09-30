@@ -3,7 +3,14 @@ import assert from 'node:assert/strict'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { assertGuarded, pluginPathsInSource, unknownPluginPaths } from '../lib/route-guard.js'
+import { assertGuarded, unknownPluginPaths } from '../lib/route-guard.js'
+
+function pluginPathsInSource(source) {
+  const found = new Set()
+  const re = /['"`](\/dsh-lanmode\/[A-Za-z0-9._~/-]+)['"`]/g
+  for (const match of String(source || '').matchAll(re)) found.add(match[1])
+  return [...found]
+}
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 
