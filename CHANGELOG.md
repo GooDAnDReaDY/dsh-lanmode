@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.19
+
+### Configuration & Live Lifecycle
+- **Schema & Semantic Validation on PATCH Config (#363)**: Validates enums (`mode`, `tls`, `tunnel`), port ranges (`directPort: 1..65535`), session days (`authSessionDays >= 1`), stream timeouts (`streamTimeoutMs >= 0`), strict booleans, and CIDR strings via `parseRule()`. Rejects invalid payloads atomically with HTTP 400 Bad Request without mutating in-memory state.
+- **Durable Profile Persistence via Cordis Loader (#364)**: Integrates `persistConfigDurable()` with Cordis Loader entry tree (`fiber.entry.parent.tree.write()`) and fiber updates. Configuration changes are committed durably to the profile patch; failures return HTTP 500 without reporting false success.
+- **Live Role Propagation without Listener Restart (#365)**: Replaced static rule closures with dynamic state getters (`getRules`, `getAdminRules`, `getGuestRules`, `getTrustedProxyCidrs`). Runtime updates to `adminAllow` and `guestAllow` take effect immediately on active HTTP and WebSocket surfaces without dropping connections or restarting the TCP listener. Returns `restart: false` when only permissions change, and `restart: true` only when socket binding parameters (port, host, TLS) change.
+- **Async Credentials Resolution & Boundary Enforcement (#329)**: Removed direct regex reading of `~/.dsh/.credentials.yaml`. Made `resolveBrowserAuthSecret(ctx)` async, safely awaiting `creds.readRecord('client-connection', 'browser-session')`. Declared `credentials` as optional dependency in plugin `inject`, logging `failed.stack` and using backoff retry upon startup errors.
 ## 0.8.18
 
 ### Security & Hardening
