@@ -5,7 +5,7 @@ import path from 'node:path'
 import os from 'node:os'
 import { EventEmitter } from 'node:events'
 import { CloudflareTunnel } from '../lib/tunnel.js'
-import { DeviceRegistry } from '../lib/devices.js'
+import { DeviceRegistry, hashToken } from '../lib/devices.js'
 import { BanList, writeBanFile, readBanFile } from '../lib/bans.js'
 import { handleUpgrade } from '../lib/bridge-ws.js'
 import { mobileNavSource } from '../lib/mobile-nav.js'
@@ -51,7 +51,7 @@ test('Issue #344: DeviceRegistry and BanList use atomic file writes', () => {
     assert.ok(fs.existsSync(devFile), 'devices.json must exist')
     const loaded = JSON.parse(fs.readFileSync(devFile, 'utf8'))
     assert.equal(loaded.length, 1)
-    assert.equal(loaded[0].id, 'dev-1')
+    assert.equal(loaded[0].id, hashToken('dev-1'))
 
     // 2. BanList atomic write
     const banFile = path.join(tmpDir, 'bans.json')

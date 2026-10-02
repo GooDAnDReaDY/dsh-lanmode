@@ -28,7 +28,7 @@ test('Issue #282: resolved secrets are reused until the TTL ends', async () => {
   clearSecretCache()
 })
 
-test('Issue #282: a missing ref is cached briefly and an empty ref is not', async () => {
+test('Issue #282: a missing ref is cached briefly and an empty ref is not (Issue #361)', async () => {
   clearSecretCache()
   let calls = 0
   const ctx = {
@@ -39,8 +39,8 @@ test('Issue #282: a missing ref is cached briefly and an empty ref is not', asyn
       },
     },
   }
-  assert.equal(await resolveSecret(ctx, 'CACHE_PROBE_MISS', '', 0), 'CACHE_PROBE_MISS')
-  assert.equal(await resolveSecret(ctx, 'CACHE_PROBE_MISS', '', 1_000), 'CACHE_PROBE_MISS')
+  assert.equal(await resolveSecret(ctx, 'CACHE_PROBE_MISS', '', 0), '')
+  assert.equal(await resolveSecret(ctx, 'CACHE_PROBE_MISS', '', 1_000), '')
   assert.equal(calls, 1)
   await resolveSecret(ctx, 'CACHE_PROBE_MISS', '', SECRET_NEGATIVE_TTL_MS)
   assert.equal(calls, 2)
