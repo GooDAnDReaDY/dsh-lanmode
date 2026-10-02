@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.8.18
+
+### Security & Hardening
+- **TLS ReferenceError in raiseListener (#354)**: Fixed crash in HTTPS listener initialization when loading certificate and key from unwrapped configuration.
+- **Fail-closed guard on wildcard bind (#360)**: Halts listener raise and rejects binding `0.0.0.0` when neither allow list nor password authentication is configured.
+- **Unresolved credential ref handling (#361)**: Supports string and object credential resolver APIs, safely falling back to empty value instead of exposing unresolved reference keys.
+- **Settings card password mask protection (#362)**: Ignores masked `***` values for `authPassword`, `lanPin`, and `tunnelToken` during `PATCH /dsh-lanmode/api/config` to prevent overwriting secrets.
+- **LAN PIN protection on configuration endpoints (#366)**: Enforces LAN PIN validation and attempt rate-limiting on state-mutating config requests.
+- **WebSocket upgrade security gate (#367)**: Enforces ban list, guest role restrictions, LAN PIN, and origin validation during HTTP Upgrade before duplex stream proxying.
+- **Core auth token protection in QR endpoint (#368)**: Restricts inclusion of core harness authentication tokens in `/dsh-lanmode/qr` to authenticated admin sessions and strict loopback callers.
+- **Enforce loopback-only on bridge bootstrap (#238)**: Blocks external callers from reaching `/auth/bootstrap` through the bridge with 403 Forbidden.
+- **Hashed token storage in DeviceRegistry (#266)**: Stores SHA-256 digests of authentication tokens with strict `0o600` file permissions instead of raw tokens.
+- **Active WebSocket termination on session revocation (#54)**: Immediately terminates active duplex client and upstream sockets when a session or device is revoked.
+- **Permanent revocation records against LRU eviction (#369)**: Retains revoked device tokens in a dedicated non-evicting set to prevent revoking token revival under device limit pressure.
+
+## 0.8.17
+
+### Fixed
+- **Repository metadata**: Updated repository URL format in package metadata.
+
+## 0.8.16
+
+### Fixed
+- **Stability and configuration unwrapping (#354, #355, #357)**: Safely unwraps volatile Cordis configuration boxes, cleans dead exports, and enforces repository hygiene.
+
+## 0.8.15
+
+### Fixed
+- **Settings contract alignment**: Synchronized configuration schema with DSH core.
+
+## 0.8.14
+
+### Fixed
+- **Settings form serving (#352)**: Serves settings form under entry ID for DSH 0.1.7-rc.2 and 0.2.0 compatibility.
+
 ## 0.8.13
 
 ### Fixed
