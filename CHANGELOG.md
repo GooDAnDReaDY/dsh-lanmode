@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.20
+
+### Tunnel & Process Lifecycle
+- **Fail-safe CloudflareTunnel Process Error Handling (#372)**: Registered default error listener on child process `EventEmitter` preventing host crashes when `cloudflared` is missing (`ENOENT`) or fails. Added `try/catch` guard to `/dsh-lanmode/tunnel/toggle` route handler returning HTTP 500 JSON without server failure. Attached tunnel logger in main plugin index.
+- **Full HTTPS Origin Contract for Cloudflare Tunnel (#373)**: Enhanced `buildArgs()` to support `scheme: 'https'`, `--origin-server-name` (defaults to `dsh.local`), and `--origin-ca-pool` pointing to the locally generated Root CA certificate (`state.caCertPath`), eliminating `--no-tls-verify` while ensuring trusted loopback origin validation.
+- **Process Lifecycle Isolation & Timeout Management (#343)**: Isolated event handlers (`onOutput`, `exit`, `error`) to current child process instance (`if (this.proc !== currentProc) return`), preventing stale dying processes from corrupting subsequent tunnel instances. Guaranteed `stop()` cancels `_startTimeout`, sends `SIGTERM`, and escalates to `SIGKILL` after 3 seconds.
+
 ## 0.8.19
 
 ### Configuration & Live Lifecycle
