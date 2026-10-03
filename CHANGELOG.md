@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.24
+
+### Test Isolation & Static Verification Gates
+- **Clean-Pack Isolation & Race Condition Fix (#376)**: Added isolated fixture directory support (process.env.CLEAN_PACK_DIR / cleanPack(root)) in scripts/clean-pack.mjs and refactored test/clean-pack-194.test.mjs to work within a dedicated temporary directory (fs.mkdtempSync), eliminating repository root file collisions. Handled concurrent unlinking gracefully (ENOENT). Replaced offset-based port allocations in performance tests with dynamic ephemeral binds (listen(0)).
+- **CI Quality Gate & Static Verification Enforcement (#377)**: Configured ESLint with strict no-undef: error rule across all runtime, bridge, and client files. Added npm run check:static (scripts/lint.mjs) combining Node.js syntax checks and ESLint verification across 181 files. Added automated Gitea Actions workflow (.gitea/workflows/ci.yml) executing static analysis, license verification, unit testing, and package file integrity on pull requests and pushes. Fixed libuv process group signal trap in lib/tunnel.js by guarding proc.pid > 0.
+
 ## 0.8.23
 
 ### Client Localization & Quick QR WAN Switch
