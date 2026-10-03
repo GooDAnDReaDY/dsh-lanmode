@@ -195,7 +195,8 @@ test('Блок 6: bridge.js — блокировка неавторизован�
 test('Блок 7: Проверка кода клиентских файлов shim.js и client.js', () => {
   const shim = readFileSync(path.join(here, '..', 'lib', 'shim.js'), 'utf8')
   assert.ok(shim.includes('x-dsh-auth-required'), 'shim.js перехватывает x-dsh-auth-required')
-  assert.ok(shim.includes("window.location.href = '/'"), 'shim.js перенаправляет на / при 401')
+  assert.ok(!shim.includes("window.location.href = '/'"), 'shim.js сохраняет контекст без hard redirect (#240)')
+  assert.ok(shim.includes('dsh:auth-required'), 'shim.js уведомляет Live Re-auth overlay (#240)')
 
   const client = clientRuntimeSource()
   assert.ok(client.includes('passwordAuth'), 'client.js содержит passwordAuth')
