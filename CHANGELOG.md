@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.22
+
+### Client PIN Challenge, Headers, QR & Live Re-auth
+- **Request & Header Preservation on PIN Retry (#374)**: Preserved all request headers (`Headers` instance, plain object, tuples, or `Request.headers`) upon PIN challenge retry in `lib/shim.js`. Cloned `Request` before initial dispatch preventing body consumption errors on retries.
+- **Canonical Listener QR Descriptor & Interface Categorization (#375)**: Integrated canonical listener scheme and port from health and interfaces endpoints into Quick QR in `lib/client-parts/08-qr.js`, formatting IPv6 addresses in brackets. Supported custom `mdnsName` and returned dual keys (`category`/`type` and `name`/`label`) in `lib/network-interfaces.js` and `lib/bridge-local.js`.
+- **Queued Unlock Manager & Safe Cancel (#201)**: Centralized pending 403 authorization challenges in `_pendingOps` queue in `lib/shim.js`. Submitting PIN replays all queued requests; cancelling resolves all pending promises with the original 403 response without leaving requests hanging indefinitely.
+- **Lossless Session Expiry Handling (#240)**: Eliminated premature hard redirect `window.location.href = '/'` on HTTP 401 in `lib/shim.js`. Dispatched `dsh:auth-required` to trigger the Live Re-auth overlay, preserving user draft prompts and session context.
 ## 0.8.21
 
 ### Updater, Lifecycle & Persistence
