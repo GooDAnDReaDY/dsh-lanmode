@@ -4,7 +4,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+const defaultRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+const targetRoot = path.resolve(process.env.CLEAN_PACK_DIR || process.argv[2] || defaultRoot)
+
 const junkNames = new Set([
   '.DS_Store',
   'Thumbs.db',
@@ -13,30 +15,42 @@ const junkNames = new Set([
 ])
 const junkSuffixes = ['.tgz', '.tar', '.tar.gz', '.map', '.tmp', '.bak']
 
-let removed = 0
+export function cleanPack(root = targetRoot) {
+  let removed = 0
 
-function walk(dir) {
-  let entries
-  try {
-    entries = fs.readdirSync(dir, { withFileTypes: true })
-  } catch (_) {
-    return
-  }
-  for (const entry of entries) {
-    if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === '.worktrees') continue
-    const full = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      walk(full)
-      continue
+  function walk(dir) {
+    let entries
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch (_) {
+      return
     }
-    const lower = entry.name.toLowerCase()
-    const bad = junkNames.has(entry.name) || junkSuffixes.some((suffix) => lower.endsWith(suffix))
-    if (!bad) continue
-    fs.unlinkSync(full)
-    removed += 1
-    console.error('removed', path.relative(root, full))
+    for (const entry of entries) {
+      if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === '.worktrees') continue
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        walk(full)
+        continue
+      }
+      const lower = entry.name.toLowerCase()
+      const bad = junkNames.has(entry.name) || junkSuffixes.some((suffix) => lower.endsWith(suffix))
+      if (!bad) continue
+      try {
+        fs.unlinkSync(full)
+        removed += 1
+        console.error('removed', path.relative(root, full))
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err
+      }
+    }
   }
+
+  walk(root)
+  return removed
 }
 
-walk(root)
-console.error(`clean-pack: removed ${removed} junk file(s)`)
+const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+if (isDirectRun) {
+  const count = cleanPack(targetRoot)
+  console.error(`clean-pack: removed ${count} junk file(s)`)
+}

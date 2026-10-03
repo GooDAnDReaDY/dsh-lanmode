@@ -1,0 +1,41 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          git -c credential.helper='!f() { echo username=oauth2; echo password="$GIT_TOKEN"; }; f' \
+            clone "http://gitea:3000/${{ github.repository }}.git" .
+          git checkout "${{ github.sha }}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Static checks & Lint
+        run: npm run check:static
+
+      - name: License check
+        run: npm run check:licenses
+
+      - name: Tests
+        run: npm test
+
+      - name: Package contents
+        run: npm run pack:check

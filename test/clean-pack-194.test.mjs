@@ -10,15 +10,16 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const clean = path.join(here, '..', 'scripts/clean-pack.mjs')
 const verify = path.join(here, '..', 'scripts/verify-pack.mjs')
 
-test('Issue #194: clean-pack removes junk archives', () => {
-  const junk = path.join(here, '..', '_tmp-pack-junk.tgz')
+test('Issue #194: clean-pack removes junk archives from isolated fixture', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-clean-pack-fixture-'))
+  const junk = path.join(tmpDir, '_tmp-pack-junk.tgz')
   fs.writeFileSync(junk, 'junk')
   try {
-    const run = spawnSync(process.execPath, [clean], { encoding: 'utf8' })
+    const run = spawnSync(process.execPath, [clean, tmpDir], { encoding: 'utf8' })
     assert.equal(run.status, 0, run.stderr || run.stdout)
     assert.equal(fs.existsSync(junk), false)
   } finally {
-    if (fs.existsSync(junk)) fs.unlinkSync(junk)
+    fs.rmSync(tmpDir, { recursive: true, force: true })
   }
 })
 
