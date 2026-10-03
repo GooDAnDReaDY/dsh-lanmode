@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.21
+
+### Updater, Lifecycle & Persistence
+- **Plugin Updater Action Split (#371)**: Differentiated `action: 'check'` and `action: 'update'` in `lib/plugin-updater.js`. Read request body with `readLimitedBody`. Action `check` performs read-only status query without triggering installation. Action `update` validates profile lock before running `installExact`. Status returns `name: options.packageName` and `checkedAt` timestamp. Successful updates return `success: true`.
+- **Hardened Device Registry Persistence (#370)**: Preserved in-memory dirty state upon file write errors in `lib/devices.js`. Rolled back in-memory nickname changes if disk flush fails. Ensured `revoke`, `revokeAll`, and `revokeAllExcept` accurately return boolean write status. Endpoints in `lib/routes/devices.js` and `lib/bridge-local.js` return HTTP 500 when disk persistence fails instead of false 200 OK.
+- **Fixed `isPasswordAuth()` Evaluation in Ban Route (#256)**: Evaluated boolean function call `typeof isPasswordAuth === 'function' ? isPasswordAuth() : Boolean(isPasswordAuth)` in `lib/bridge-local.js` `handleBanRoute`, preventing spurious 401 Unauthorized for passwordless local admins.
+- **Named Tunnels Readiness Detection & Hostname Support (#47)**: Added `NAMED_READY_REGEX` to detect Cloudflare named tunnel connection readiness from logs (`Registered tunnel connection`, `Connection ... registered`, `Updated to new configuration`) without waiting for 30s quick URL timeout. Added custom `hostname` support across constructor, routes, and state reporting.
+- **WAN Tunnel Auto-start & Clean Disposal (#48)**: Added config-driven WAN tunnel startup effect in `lib/index.js` when `config.tunnel !== 'off'`, with credentials resolution and clean disposal on context unload and dynamic config updates.
+
 ## 0.8.20
 
 ### Tunnel & Process Lifecycle
