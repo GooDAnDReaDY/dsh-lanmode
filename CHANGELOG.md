@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.23
+
+### Client Localization & Quick QR WAN Switch
+- **Full Client Localization Dictionary Registration (#1)**: Registered complete 153-key dictionaries (`en`, `zh`) via `ctx.locale.register(NS, { en: I18N.en, zh: I18N.zh })` inside `ctx.effect(...)` with proper disposer return. Corrected `getLocale()` to prioritize user-selected DSH interface locale (`window.__DSH_LOCALE__`, `ctx.locale.getSnapshot()`, `document.documentElement.lang`) over browser `navigator.language`. Wired external translation fallback (`env.boundT = ctx.locale.bind(NS)`) enabling `@goodandready/dsh-russian-lang` to provide Russian UI without modifying plugin source code. Injected `t` into all registered slots.
+- **Quick QR LAN / WAN Mode Selector Switch (#49)**: Added interactive segmented toggle between `LAN` and `WAN` modes in the Quick QR popover (`lib/client-parts/08-qr.js`). Exposed `tunnel` status and public URL in `hostReport(state)` (`/dsh-lanmode/health?format=json`). Disables the WAN option with a descriptive hint when the tunnel is inactive. When active, switching to WAN updates the target URL, QR code, and copy/share actions to the Cloudflare public URL.
+
 ## 0.8.22
 
 ### Client PIN Challenge, Headers, QR & Live Re-auth
