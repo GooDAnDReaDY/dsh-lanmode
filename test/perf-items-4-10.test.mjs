@@ -58,7 +58,10 @@ test("Issue #119: bridge.js skips compression when content-length < 1024", async
     get: () => undefined,
   }
 
-  const bridgePort = upstreamPort + 1000
+  const tempServer = http.createServer()
+  await new Promise((resolve) => tempServer.listen(0, "127.0.0.1", resolve))
+  const bridgePort = tempServer.address().port
+  await new Promise((resolve) => tempServer.close(resolve))
   const stopBridge = startDirectBridge(ctx, {
     hosts: ["127.0.0.1"],
     port: bridgePort,
