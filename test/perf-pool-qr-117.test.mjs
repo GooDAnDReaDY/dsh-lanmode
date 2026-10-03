@@ -25,7 +25,10 @@ test("Issue #117: Upstream HTTP Agent Keep-Alive reuse in bridge.js", async (t) 
   }
 
   const logs = []
-  const bridgePort = upstreamPort + 1000
+  const tempServer = http.createServer()
+  await new Promise((resolve) => tempServer.listen(0, "127.0.0.1", resolve))
+  const bridgePort = tempServer.address().port
+  await new Promise((resolve) => tempServer.close(resolve))
   const { rules } = parseAllow(["127.0.0.1/32", "::1/128"])
   const stopBridge = startDirectBridge(ctx, {
     hosts: ["127.0.0.1"],

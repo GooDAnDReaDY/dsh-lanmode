@@ -41,6 +41,8 @@
   },
   "scripts": {
     "test": "node --import ./test/_setup.mjs --test test/*.test.mjs",
+    "lint": "eslint lib/ scripts/ test/",
+    "check:static": "node scripts/lint.mjs",
     "check:licenses": "node scripts/check-licenses.mjs",
     "clean:pack": "node scripts/clean-pack.mjs",
     "verify:pack": "node scripts/verify-pack.mjs",
@@ -64,6 +66,7 @@
     "@deepseek-ai/dsh-host-webserver": "^0.1.7-rc.2 || ^0.2.0-rc.1"
   },
   "devDependencies": {
-    "@deepseek-ai/schemastery": "^3.18.4"
+    "@deepseek-ai/schemastery": "^3.18.4",
+    "eslint": "^10.12.0"
   }
 }
