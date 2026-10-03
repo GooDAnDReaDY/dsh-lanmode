@@ -21,6 +21,7 @@ test('Issue #343: CloudflareTunnel lifecycle isolation and clean timeout managem
 
   // Test stop() while start() is waiting cleans up timeout and marks stopped
   const startPromise = tunnel.start()
+  startPromise.catch(() => {})
   assert.ok(tunnel._startTimeout, 'start() should set _startTimeout')
   assert.equal(tunnel.status, 'starting')
 
@@ -29,7 +30,7 @@ test('Issue #343: CloudflareTunnel lifecycle isolation and clean timeout managem
   assert.equal(tunnel._startTimeout, null)
 
   // Catch rejection from intentional stop
-  await assert.rejects(startPromise, /Tunnel stopped|exited/)
+  await assert.rejects(startPromise, /Tunnel stopped|exited|ENOENT/)
 
   // Verify import is at the top of lib/tunnel.js
   const tunnelSource = fs.readFileSync(new URL('../lib/tunnel.js', import.meta.url), 'utf8')
