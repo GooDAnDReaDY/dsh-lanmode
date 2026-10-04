@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.29
+
+### Dynamic Secret Resolution & Credential Reference Preservation (#365)
+- **Resolved lanPinRef Preservation (#365)**: `updateLiveState` in `lib/config-validator.js` now preserves the active resolved PIN secret when configuration updates occur without altering `lanPinRef`, preventing unrelated saves (such as UI preference changes) from dropping PIN protection or reverting to raw fallback values.
+- **Dynamic Credential Rotation (#365)**: `onConfigUpdated` in `lib/index.js` now dynamically resolves newly updated `lanPinRef` secrets via `resolveSecret`, immediately propagating rotated credentials to the active HTTP and WebSocket bridge without listener restart.
+- **Fail-Closed Patch Validation (#365)**: In `lib/routes/config.js`, incoming configuration patches with `lanPinRef` are verified against the credentials provider prior to durable persistence. If a reference cannot be resolved and no valid fallback is provided, the request is rejected with HTTP 400, preventing silent security degradation and deceptive save success.
+- **Regression Test Suite (#365)**: Added tests covering resolved `lanPinRef` preservation across unrelated configuration updates, dynamic credentials rotation, and rejection of unresolvable credential references.
+
 ## 0.8.28
 
 ### Security Policy Rotation, Profile Rollback & Card Ready Contract
