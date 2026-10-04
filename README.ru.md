@@ -21,16 +21,6 @@
   <a href="README.zh.md"><b>🇨🇳 中文说明</b></a>
 </p>
 
-<table align="center">
-  <tr>
-    <td align="center">
-      ⭐ <strong>Если вам нравится этот плагин, поставьте ему звезду на GitHub</strong> — это покажет мне, что плагин вам полезен, и будет мотивировать меня развивать его дальше.
-      <br><br>
-      🐛 <strong>Если вы нашли баг или хотите предложить новый функционал</strong>, создайте issue на GitHub на любом языке — я рассмотрю ваше предложение и реализую полезные идеи в одной из следующих версий плагина.
-    </td>
-  </tr>
-</table>
-
 </div>
 
 ---
@@ -46,42 +36,6 @@
 5. 🛡️ **Защита API ядра**: ядро DSH разрешает методы настроек и ключей (`/api/settings.*`, `/api/credentials.*`, `/api/models.*`) только клиентам с петли `127.0.0.1`.
 
 `dsh-lanmode` полностью решает эти проблемы через внедрение полифиллов в `index.html`, запуск прямого моста, авто-mDNS, Root CA и клиентскую карточку настроек.
-
-```mermaid
-graph LR
-    subgraph RemoteDevices [Устройства в LAN: телефон / планшет / ноутбук]
-        Client[📱 Смартфон / 💻 Ноутбук: dsh.local:3088] -->|mDNS & HTTPS| Bridge[Прямой мост dsh-lanmode]
-    end
-
-    subgraph ShimsLayer [Слой полифиллов & PWA]
-        Bridge --> Shim1[🔓 Снятие запрета Loopback: Настройки и Модели]
-        Bridge --> Shim2[🆔 Полифилл crypto.randomUUID]
-        Bridge --> Shim3[📋 Фолбек копирования navigator.clipboard]
-        Bridge --> Shim4[🔐 Local Root CA & TLS: микрофон для dsh-voice]
-        Bridge --> Shim5[📱 PWA Manifest & Safe-Area Viewport]
-        Bridge --> Shim6[🔔 Фоновые Web Notifications на turn/end]
-    end
-
-    subgraph HostBackend [Бэкенд хоста DSH]
-        Bridge --> HeaderRewrite[Подмена заголовков Host/Origin на loopback]
-        HeaderRewrite --> PrivilegedAPI[Привилегированные API настроек и ключей]
-    end
-
-    subgraph Output [Результат]
-        Shim1 --> FullWeb[✅ 100% Рабочий интерфейс в LAN и на смартфонах]
-        Shim2 --> FullWeb
-        Shim3 --> FullWeb
-        Shim4 --> FullWeb
-        Shim5 --> FullWeb
-        Shim6 --> FullWeb
-        PrivilegedAPI --> FullWeb
-    end
-
-    style RemoteDevices fill:#1e1e2e,stroke:#89b4fa,stroke-width:2px,color:#cdd6f4
-    style ShimsLayer fill:#181825,stroke:#cba6f7,stroke-width:2px,color:#cdd6f4
-    style HostBackend fill:#11111b,stroke:#a6e3a1,stroke-width:2px,color:#cdd6f4
-    style Output fill:#181825,stroke:#f38ba8,stroke-width:2px,color:#cdd6f4
-```
 
 ---
 

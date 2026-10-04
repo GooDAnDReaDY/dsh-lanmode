@@ -21,16 +21,6 @@
   <a href="README.zh.md"><b>🇨🇳 中文说明</b></a>
 </p>
 
-<table align="center">
-  <tr>
-    <td align="center">
-      ⭐ <strong>If you like this plugin, please star it on GitHub</strong> — it shows me that the plugin is useful to you and motivates me to keep developing it.
-      <br><br>
-      🐛 <strong>If you find a bug or would like to request a feature</strong>, open a GitHub issue in any language — I will review your proposal and implement useful suggestions in a future plugin version.
-    </td>
-  </tr>
-</table>
-
 </div>
 
 ---
@@ -46,42 +36,6 @@ By default, modern web browsers and the **DeepSeek Harness** frontend deliberate
 5. 🛡️ **Loopback-Only Core API Fencing**: Core DSH methods (`/api/settings.*`, `/api/credentials.*`, `/api/models.*`) strictly reject requests not originating from loopback `127.0.0.1`.
 
 `dsh-lanmode` completely resolves all these limitations through non-invasive `webServer.tapIndex` HTML shims, a smart direct bridge, mDNS, Root CA generation, and an interactive settings card.
-
-```mermaid
-graph LR
-    subgraph RemoteDevices [LAN Clients: Phone / Tablet / Laptop]
-        Client[📱 Mobile Safari / 💻 Laptop: dsh.local:3088] -->|mDNS & HTTPS| Bridge[dsh-lanmode Smart Direct Bridge]
-    end
-
-    subgraph ShimsLayer [tapIndex Injected Client Shims & PWA]
-        Bridge --> Shim1[🔓 Loopback Hostname Bypass: Unlocks Settings & Models]
-        Bridge --> Shim2[🆔 RFC 4122 crypto.randomUUID Polyfill]
-        Bridge --> Shim3[📋 Fallback navigator.clipboard Polyfill]
-        Bridge --> Shim4[🔐 Local Root CA & TLS: Unlocks WebRTC Microphone]
-        Bridge --> Shim5[📱 PWA Manifest & Safe-Area Viewport]
-        Bridge --> Shim6[🔔 Background Web Notifications on turn/end]
-    end
-
-    subgraph HostBackend [DSH Host Core]
-        Bridge --> HeaderRewrite[Loopback Host/Origin Header Rewriter]
-        HeaderRewrite --> PrivilegedAPI[Core Settings, Credentials & Models API]
-    end
-
-    subgraph Output [Result]
-        Shim1 --> FullWeb[✅ 100% Fully Functional Web UI Across Entire LAN]
-        Shim2 --> FullWeb
-        Shim3 --> FullWeb
-        Shim4 --> FullWeb
-        Shim5 --> FullWeb
-        Shim6 --> FullWeb
-        PrivilegedAPI --> FullWeb
-    end
-
-    style RemoteDevices fill:#1e1e2e,stroke:#89b4fa,stroke-width:2px,color:#cdd6f4
-    style ShimsLayer fill:#181825,stroke:#cba6f7,stroke-width:2px,color:#cdd6f4
-    style HostBackend fill:#11111b,stroke:#a6e3a1,stroke-width:2px,color:#cdd6f4
-    style Output fill:#181825,stroke:#f38ba8,stroke-width:2px,color:#cdd6f4
-```
 
 ---
 
