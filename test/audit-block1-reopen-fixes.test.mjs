@@ -608,7 +608,7 @@ test('Issue #365 Reopen: PATCH /dsh-lanmode/api/config rejects unresolvable lanP
   Object.assign(reqUnresolvable, {
     method: 'PATCH',
     url: '/dsh-lanmode/api/config',
-    headers: { host: 'localhost', 'content-type': 'application/json' },
+    headers: { host: 'localhost', 'content-type': 'application/json', 'x-dsh-lan-pin': '5555' },
     socket: { remoteAddress: '127.0.0.1' },
   })
 
