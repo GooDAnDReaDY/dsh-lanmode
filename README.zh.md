@@ -89,9 +89,10 @@ graph LR
 
 ## ✨ 功能说明
 
-### 1. 📱 `/mobileqr` 命令与即时二维码
-* 注册工具 `/mobileqr`：生成带当前局域网地址和会话令牌的 SVG 二维码（`https://dsh.local:3088/?token=...`）。用手机相机对准屏幕即可连接。
-* 设置卡片和 `/dsh-lanmode/health` 也能打开二维码。
+### 1. 📱 Quick QR 弹出层、`/mobileqr` 命令与手机配对
+* **快捷 Quick QR 入口**：侧边栏底部（`sidebar.footer` / `sidebar.rail`）常驻手机图标，点击弹出交互式纯 SVG 二维码，支持 LAN / WAN 模式一键切换和地址复制。
+* **终端与 Agent 聊天工具**：在 Agent 对话中注册 `/mobileqr` 工具即时生成二维码，且在 `dsh web` 启动时于终端 stdout 输出 ASCII 二维码。
+* **诊断与健康检查**：通过 `/dsh-lanmode/qr` 和 `/dsh-lanmode/health` 均可获取矢量二维码。用手机摄像头扫码即可直接访问。
 
 ### 2. 📲 PWA 与移动端独立窗口
 * 路由 `/dsh-lanmode/manifest.json`，以及 `viewport-fit=cover`、`apple-mobile-web-app-capable`、`theme-color` 元标签。
@@ -133,9 +134,9 @@ graph LR
 * **管理与诊断端点保护**：内部路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel/toggle`、`/dsh-lanmode/api/interfaces`、`/dsh-lanmode/api/telemetry`、`/dsh-lanmode/api/config`）默认拒绝。绕过本地桥或从不受信任的网络访问时，需要有效的管理员凭据或受信任的回环来源。
 * 登录、设置、设备吊销和隧道开关在请求体超过 64 KiB 时停止读取并返回 413，操作不会生效。
 * **CSRF**：会改变状态的 POST 拒绝跨站请求（`Sec-Fetch-Site: cross-site`），并核对 Origin。
-* 密码以 scrypt 摘要保存。会话令牌以 SHA-256 摘要保存，不保存原始令牌。更改密码会立即吊销该用户的其他会话。
-* 用户名不存在和密码错误时，登录耗时相同。
-* 局域网 PIN 使用 PBKDF2。同一地址连续失败 5 次后锁定 15 分钟。
+* **密码存储与验证**：密码支持纯文本格式（配置向后兼容）和强大的 scrypt 摘要（`scrypt$16384$8$1$salt$hash`，通过 `hashAuthPassword()` 生成）。凭据验证使用恒定时间比较（`timingSafeEqual`），未知用户名与错误密码耗时一致，防止用户名枚举。修改密码会立即吊销该用户的其他活跃会话。
+* **局域网 PIN 保护**：局域网 PIN 支持纯文本与 PBKDF2 摘要（`pbkdf2$sha512$100000$salt$hash`，通过 `hashPin()` 生成）。防爆破保护在连续 5 次失败后将该 IP 临时锁定 15 分钟。
+* **会话与设备令牌**：活跃会话通过 SHA-256 摘要（`hashToken`）校验，确保令牌密文不以明文保存在持久化设备注册表文件（`dsh-lanmode-devices.json`）中。
 * 第一次设置密码、密码引用或 `passwordAuth: true` 只能在本机完成。远程地址得到 403，配置保持不变。
 * 密码认证保持开启时，不能把密码和密码引用同时清空。关闭密码认证仍然允许。
 * `POST /dsh-lanmode/bans`，正文 `{ "ip" }`，用于封禁地址。该地址在登录页之前收到纯文本 `403 Forbidden`。不能封禁 loopback 和管理员自己的地址。名单保存在设备登记旁边。
@@ -167,8 +168,8 @@ graph LR
 * 未配置 harness 端口时，桥依次探测 `127.0.0.1` 的 3080、3081、3082。显式端口按原值使用。
 
 ### 12. ☁️ Cloudflare WAN 隧道与隧道 PIN
-* 内置零配置 Quick Tunnel 和 Named Tunnel，无需端口转发即可从广域网访问。
-* `tunnelPin: true` 时，来自广域网的请求必须通过 PIN。
+* **零配置 Quick Tunnel 与持久 Named Tunnel**：通过 Cloudflare 实现远程广域网访问，无需端口映射或公网 IP。支持临时 Quick Tunnel（`trycloudflare.com`）和通过 `tunnelToken` / `tunnelTokenRef` 配置的命名隧道，具备快速就绪检测机制。
+* **强制隧道 PIN 门禁**：通过 Cloudflare 隧道进入的请求可强制要求输入局域网 PIN（`tunnelPin: true`，默认开启），有效阻断未授权的公网直接访问。
 
 ### 13. 🔄 界面内一键更新
 * 更新服务和设置卡片（`/api/dsh-lanmode/update`）：
