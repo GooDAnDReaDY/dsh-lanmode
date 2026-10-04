@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.26
+
+### Dynamic Configuration, Live TLS Reload & Backlog Triage
+- **Dynamic Configuration & TLS Material Reload (#394)**: Fixed frozen configuration bug where volatile TLS certificate and private key paths set via the card or DSH loader never took effect until a full process restart. Implemented `setupDynamicConfig` in `lib/config-validator.js` subscribing to Cordis `loader/volatile-update`, `settings/document-updated`, and `config` events, as well as querying the Cordis `settings` service for deferred initialization.
+- **In-Place Certificate Renewal Detection (#394)**: Added certificate file stat fingerprint (`stat.mtimeMs:stat.size`) into the bridge listener synchronization key (`directKey`), allowing automatic TLS context reload and listener re-arming when certificates are renewed in place on disk (e.g. certbot/acme) without changing path names.
+- **Attachment Points Verification Refactoring (#394)**: Extracted background attachment point verifier to `lib/assumptions.js` (`registerAttachmentPointsVerifier`), preserving `lib/index.js` line count at 572 lines (strictly <= 600 lines architectural limit).
+- **Automated Verification Suite (#394)**: Added `test/audit-issue-394-dynamic-config.test.mjs` verifying payload extraction, settings service querying, volatile update handling, in-place rotation detection, and clean listener teardown.
+- **Backlog Triage & Repository Scope Cleanup (#331)**: Performed exhaustive audit and triage of all 44 open out-of-scope issues (messengers/bots, files/.docx parsing, enterprise IAM/RBAC/TOTP duplication, E2EE relay, Android APK), posted detailed rationale comments on Gitea, and closed them, focusing repository backlog exclusively on LAN bridge functionality.
+
 ## 0.8.25
 
 ### Documentation, Design Contract & Broken Link Fixes
