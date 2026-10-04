@@ -1,9 +1,5 @@
 # 📦 @goodandready/dsh-lanmode
 
-**Alpha.5 compatibility hotfix:** async browser plugin initialization now
-retains its awaited lifecycle. See [compatibility and tests](docs/testing/alpha5-compatibility.md)
-and [0.6.11 patch notes](docs/releases/0.6.11.md).
-
 <div align="center">
 
 <h3>Local Area Network (LAN) Access Enabler, mDNS (dsh.local), PWA, Root CA, QR Code, Background Notifications & Auto-TLS for DeepSeek Harness</h3>
@@ -91,9 +87,10 @@ graph LR
 
 ## ✨ Full Feature Breakdown
 
-### 1. 📱 `/mobileqr` Command & Instant QR Code Access
-* Registers tool `/mobileqr`: generates a clean SVG QR code with the active LAN URL and session token (`https://dsh.local:3088/?token=...`). Point your phone camera at the screen to connect immediately.
-* QR codes are also accessible in the Settings card and on `/dsh-lanmode/health`.
+### 1. 📱 Quick QR Popover, `/mobileqr` Command & Mobile Pairing
+* **Quick QR Access**: Dedicated phone icon in the sidebar footer (`sidebar.footer` / `sidebar.rail`) opens an interactive popover with local vector SVG QR code, instant LAN / WAN switch, and one-click URL copying.
+* **Terminal & Agent Access**: Registers tool `/mobileqr` in agent chat for instant QR generation, and outputs an ASCII QR code to terminal stdout on `dsh web` startup.
+* **Diagnostic & Health**: Clean SVG QR code is also accessible via `/dsh-lanmode/qr` and on `/dsh-lanmode/health`. Point your phone camera at the screen to connect immediately.
 
 ### 2. 📲 PWA & Mobile Standalone Mode
 * Route `/dsh-lanmode/manifest.json` and meta tags `viewport-fit=cover`, `apple-mobile-web-app-capable`, `theme-color`.
@@ -135,9 +132,9 @@ graph LR
 * **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`, `/dsh-lanmode/api/config`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
 * Login, settings, device revoke, and tunnel toggle stop reading a body after 64 KiB and answer 413. The action is not applied.
 * **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
-* Passwords are stored as scrypt digests. Session tokens are stored as SHA-256 digests, not as the raw token. Changing the password revokes that user's other sessions immediately.
-* Login takes the same time when the username is unknown as when the password is wrong.
-* The LAN PIN is stretched with PBKDF2. Five failures lock that address for 15 minutes.
+* **Password Storage & Verification**: Passwords support both plaintext strings (for configuration compatibility) and robust scrypt digests (`scrypt$16384$8$1$salt$hash`) generated via `hashAuthPassword()`. Credential verification runs in constant time (`timingSafeEqual`), with unknown usernames incurring an identical dummy scrypt cost to equalize response latency against user enumeration. Changing the password revokes other active sessions for that user immediately.
+* **LAN PIN Protection**: The LAN PIN supports both plaintext PIN strings and PBKDF2 digests (`pbkdf2$sha512$100000$salt$hash`) generated via `hashPin()`. Brute-force rate limiting enforces a 15-minute temporary lockout for that IP address after 5 consecutive failed attempts.
+* **Session & Device Tokens**: Active sessions are validated via SHA-256 digests (`hashToken`), ensuring token secrets are not exposed as plaintext in serialized storage files (`dsh-lanmode-devices.json`).
 * Set the first password, password reference, or `passwordAuth: true` from the machine itself. A remote address receives 403 and the configuration is left unchanged.
 * While password authentication stays on, a settings update cannot clear both the password and the password reference. Turning password authentication off is still allowed.
 * `POST /dsh-lanmode/bans` with `{ "ip" }` bans an address. That address then receives plain `403 Forbidden` before the login page. Loopback and the administrator's own address cannot be banned. The list is kept beside the device registry.
@@ -169,8 +166,8 @@ graph LR
 * If the harness port is not configured, the bridge probes `127.0.0.1` on 3080, then 3081, then 3082. An explicit port is used as given.
 
 ### 12. ☁️ Cloudflare WAN Tunnels & Tunnel PIN
-* Built-in zero-config Quick Tunnels and Named Tunnels for remote WAN access without port forwarding.
-* Mandatory WAN PIN challenge (`tunnelPin: true`) preventing unauthorized external access.
+* **Zero-Config Quick Tunnels & Persistent Named Tunnels**: Remote WAN access via Cloudflare without port forwarding or public static IP. Supports temporary Quick Tunnels (`trycloudflare.com`) and persistent Named Tunnels configured with `tunnelToken` or `tunnelTokenRef`, complete with fast readiness detection from connection logs.
+* **Mandatory Tunnel PIN Guard**: Inbound requests through Cloudflare WAN tunnels can be required to pass the LAN PIN challenge (`tunnelPin: true`, enabled by default) before gaining access.
 
 ### 13. 🔄 In-App One-Click Plugin Updates
 * Built-in updater service and settings card UI (`/api/dsh-lanmode/update`):

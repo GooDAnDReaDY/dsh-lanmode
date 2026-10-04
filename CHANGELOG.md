@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.8.26
+
+### Dynamic Configuration, Live TLS Reload & Backlog Triage
+- **Dynamic Configuration & TLS Material Reload (#394)**: Fixed frozen configuration bug where volatile TLS certificate and private key paths set via the card or DSH loader never took effect until a full process restart. Implemented `setupDynamicConfig` in `lib/config-validator.js` subscribing to Cordis `loader/volatile-update`, `settings/document-updated`, and `config` events, as well as querying the Cordis `settings` service for deferred initialization.
+- **In-Place Certificate Renewal Detection (#394)**: Added certificate file stat fingerprint (`stat.mtimeMs:stat.size`) into the bridge listener synchronization key (`directKey`), allowing automatic TLS context reload and listener re-arming when certificates are renewed in place on disk (e.g. certbot/acme) without changing path names.
+- **Attachment Points Verification Refactoring (#394)**: Extracted background attachment point verifier to `lib/assumptions.js` (`registerAttachmentPointsVerifier`), preserving `lib/index.js` line count at 572 lines (strictly <= 600 lines architectural limit).
+- **Automated Verification Suite (#394)**: Added `test/audit-issue-394-dynamic-config.test.mjs` verifying payload extraction, settings service querying, volatile update handling, in-place rotation detection, and clean listener teardown.
+- **Backlog Triage & Repository Scope Cleanup (#331)**: Performed exhaustive audit and triage of all 44 open out-of-scope issues (messengers/bots, files/.docx parsing, enterprise IAM/RBAC/TOTP duplication, E2EE relay, Android APK), posted detailed rationale comments on Gitea, and closed them, focusing repository backlog exclusively on LAN bridge functionality.
+
+## 0.8.25
+
+### Documentation, Design Contract & Broken Link Fixes
+- **Broken Markdown Link Elimination (#378)**: Removed obsolete 0.6.11 alpha.5 hotfix notice and dead links to docs/testing/alpha5-compatibility.md from README.md and README.ru.md. Updated docs/releases/0.6.11.md. Verified that public README files contain zero relative links to the npm-excluded docs/ folder.
+- **Version Alignment (#378)**: Synchronized active version across package.json, docs/design/DESIGN.md (v0.8.25), and index.md. Added detailed Block 1–8 architectural design notes to DESIGN.md.
+- **Authentication & Security Contract Documentation (#378)**: Accurately documented plaintext compatibility + scrypt digests, constant-time verification with dummy scrypt cost equalization, PBKDF2 PIN stretching with 15-minute brute-force lockout, and SHA-256 session/device token digest storage at rest across English, Russian, and Chinese READMEs.
+- **Cloudflare WAN Tunnels & Quick QR Workflow (#378)**: Documented zero-config Quick Tunnels, persistent Named Tunnels with connection readiness detection, mandatory tunnelPin: true gate, and the interactive Quick QR popover in the sidebar footer (sidebar.footer / sidebar.rail).
+- **Automated Documentation Verification Gate (#378)**: Added test/audit-block8-docs-design.test.mjs verifying link integrity, public README boundaries, version alignment, auth/tunnel documentation accuracy, and package manifest integrity.
+
+## 0.8.24
+
+### Test Isolation & Static Verification Gates
+- **Clean-Pack Isolation & Race Condition Fix (#376)**: Added isolated fixture directory support (process.env.CLEAN_PACK_DIR / cleanPack(root)) in scripts/clean-pack.mjs and refactored test/clean-pack-194.test.mjs to work within a dedicated temporary directory (fs.mkdtempSync), eliminating repository root file collisions. Handled concurrent unlinking gracefully (ENOENT). Replaced offset-based port allocations in performance tests with dynamic ephemeral binds (listen(0)).
+- **CI Quality Gate & Static Verification Enforcement (#377)**: Configured ESLint with strict no-undef: error rule across all runtime, bridge, and client files. Added npm run check:static (scripts/lint.mjs) combining Node.js syntax checks and ESLint verification across 181 files. Added automated Gitea Actions workflow (.gitea/workflows/ci.yml) executing static analysis, license verification, unit testing, and package file integrity on pull requests and pushes. Fixed libuv process group signal trap in lib/tunnel.js by guarding proc.pid > 0.
+
 ## 0.8.23
 
 ### Client Localization & Quick QR WAN Switch
