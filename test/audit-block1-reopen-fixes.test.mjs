@@ -346,3 +346,182 @@ test('Issue #401: Client card save response logic distinguishes success from HTT
   assert.equal(r200.saveErr, '')
   assert.equal(r200.saveMsg, 'Settings saved successfully.')
 })
+
+
+// -----------------------------------------------------------------------------
+// Issue #364 Reopen: fiber.entry.options.config rollback on tree.write() failure
+// -----------------------------------------------------------------------------
+test('Issue #364: persistConfigDurable rolls back fiber.entry.options.config if tree.write() throws', async () => {
+  const originalConfig = { mdns: true, directPort: 3088, passwordAuth: false }
+  const rejectedCandidate = { mdns: false, directPort: 3088, passwordAuth: false }
+
+  const entry = {
+    options: {
+      config: { ...originalConfig },
+    },
+    parent: {
+      tree: {
+        write() {
+          throw new Error('Synthetic disk write error')
+        },
+      },
+    },
+  }
+
+  const mockCtx = {
+    fiber: {
+      entry,
+    },
+  }
+
+  const result = await persistConfigDurable(mockCtx, rejectedCandidate)
+  assert.equal(result.ok, false)
+  assert.match(result.error, /Loader entry tree write failed: Synthetic disk write error/)
+  assert.deepEqual(entry.options.config, originalConfig, 'Entry config must roll back to originalConfig on write failure')
+})
+
+// -----------------------------------------------------------------------------
+// Issue #365 Reopen: Dynamic LAN PIN & Unlock policy enforcement on running bridge
+// -----------------------------------------------------------------------------
+test('Issue #365: Bridge dynamically applies updated LAN PIN and unlockPrivileged without restart', async () => {
+  const upstream = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'application/json' })
+    res.end(JSON.stringify({ ok: true }))
+  })
+  await new Promise((r) => upstream.listen(0, '127.0.0.1', r))
+  const upstreamPort = upstream.address().port
+
+  const bridgePort = await freePort()
+  const initialPin = '1234'
+  const state = {
+    unlockPrivileged: true,
+    lanPin: true,
+    lanPinValue: initialPin,
+    rules: parseAllow(['127.0.0.0/8']).rules,
+    adminRules: [],
+    guestRules: [],
+  }
+
+  const stopBridge = startDirectBridge({ webServer: { port: upstreamPort } }, {
+    state,
+    hosts: ['127.0.0.1'],
+    port: bridgePort,
+    log: () => {},
+    allow: ['127.0.0.0/8'],
+    upstreamPort,
+    get unlockPrivileged() { return state.unlockPrivileged },
+    get lanPin() { return state.lanPinValue },
+  })
+
+  await new Promise((r) => setTimeout(r, 50))
+
+  try {
+    // 1. Initially, PIN 1234 unlocks privileged call /api/settings.describe
+    const resInitialValid = await requestJson(bridgePort, 'GET', '/api/settings.describe', null, {
+      'x-dsh-lan-pin': '1234',
+    })
+    assert.equal(resInitialValid.status, 200, 'Initial PIN 1234 must succeed')
+
+    // PIN 5678 fails
+    const resInitialWrong = await requestJson(bridgePort, 'GET', '/api/settings.describe', null, {
+      'x-dsh-lan-pin': '5678',
+    })
+    assert.equal(resInitialWrong.status, 403, 'Wrong PIN 5678 must be 403')
+
+    // 2. Rotate PIN dynamically: 1234 -> 5678
+    updateLiveState(state, {}, {
+      allow: ['127.0.0.0/8'],
+      lanPin: '5678',
+      unlockPrivileged: true,
+    })
+    assert.equal(state.lanPinValue, '5678')
+
+    // Old PIN 1234 now fails immediately
+    const resRotatedOld = await requestJson(bridgePort, 'GET', '/api/settings.describe', null, {
+      'x-dsh-lan-pin': '1234',
+    })
+    assert.equal(resRotatedOld.status, 403, 'Old PIN 1234 must be 403 after rotation')
+
+    // New PIN 5678 now succeeds immediately
+    const resRotatedNew = await requestJson(bridgePort, 'GET', '/api/settings.describe', null, {
+      'x-dsh-lan-pin': '5678',
+    })
+    assert.equal(resRotatedNew.status, 200, 'New PIN 5678 must succeed after rotation')
+
+    // 3. Dynamically lock privileged calls (unlockPrivileged: false)
+    updateLiveState(state, {}, {
+      allow: ['127.0.0.0/8'],
+      lanPin: '5678',
+      unlockPrivileged: false,
+    })
+    assert.equal(state.unlockPrivileged, false)
+
+    // Even with valid PIN 5678, privileged call is refused
+    const resLocked = await requestJson(bridgePort, 'GET', '/api/settings.describe', null, {
+      'x-dsh-lan-pin': '5678',
+    })
+    assert.equal(resLocked.status, 403, 'Privileged calls must be refused when unlockPrivileged is false')
+  } finally {
+    await stopBridge()
+    upstream.close()
+  }
+})
+
+// -----------------------------------------------------------------------------
+// Issue #401 Reopen: Strict JSON and Ready contract validation in settings card
+// -----------------------------------------------------------------------------
+test('Issue #401: Client card rejects malformed JSON, empty payload and error status on HTTP 200', () => {
+  function handleSaveResult(result) {
+    let saveMsg = ''
+    let saveErr = ''
+    const ok = result.ok
+    const data = result.data
+    const hasReady = data && (data.status === 'ready' || data.ok === true || data.status === 'ok')
+    const hasErr = !ok || !data || data.error || (data.errors && data.errors.length > 0) || data.status === 'error' || data.ok === false || !hasReady
+    if (hasErr) {
+      let errMsg = ''
+      if (!data) {
+        errMsg = 'Invalid or empty server response'
+      } else if (data.errors && data.errors.length > 0) {
+        errMsg = data.errors.map((e) => e.key + ': ' + e.error).join('; ')
+      } else if (data.error) {
+        errMsg = String(data.error)
+      } else if (data.status === 'error') {
+        errMsg = String(data.message || 'Server reported error')
+      } else if (!ok) {
+        errMsg = 'HTTP ' + result.status
+      } else {
+        errMsg = 'Unexpected response format'
+      }
+      saveErr = 'Error saving settings: ' + errMsg
+    } else {
+      saveMsg = 'Settings saved successfully.'
+    }
+    return { saveMsg, saveErr }
+  }
+
+  // 1. HTTP 200 with malformed JSON (data is null)
+  const rNull = handleSaveResult({ ok: true, status: 200, data: null })
+  assert.equal(rNull.saveMsg, '')
+  assert.equal(rNull.saveErr, 'Error saving settings: Invalid or empty server response')
+
+  // 2. HTTP 200 with empty object {}
+  const rEmpty = handleSaveResult({ ok: true, status: 200, data: {} })
+  assert.equal(rEmpty.saveMsg, '')
+  assert.equal(rEmpty.saveErr, 'Error saving settings: Unexpected response format')
+
+  // 3. HTTP 200 with { status: "error", message: "disk full" }
+  const rStatusErr = handleSaveResult({ ok: true, status: 200, data: { status: 'error', message: 'disk full' } })
+  assert.equal(rStatusErr.saveMsg, '')
+  assert.equal(rStatusErr.saveErr, 'Error saving settings: disk full')
+
+  // 4. HTTP 200 with { ok: false, error: "Validation failure" }
+  const rOkFalse = handleSaveResult({ ok: true, status: 200, data: { ok: false, error: 'Validation failure' } })
+  assert.equal(rOkFalse.saveMsg, '')
+  assert.equal(rOkFalse.saveErr, 'Error saving settings: Validation failure')
+
+  // 5. HTTP 200 with valid { status: "ready", value: {} }
+  const rReady = handleSaveResult({ ok: true, status: 200, data: { status: 'ready', value: {} } })
+  assert.equal(rReady.saveErr, '')
+  assert.equal(rReady.saveMsg, 'Settings saved successfully.')
+})
