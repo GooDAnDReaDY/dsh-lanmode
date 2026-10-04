@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.27
+
+### Configuration Save Lifecycle, Dynamic Bridge State & Card Error Handling
+- **Nested Schemastery Validation (#363)**: Enforced rigorous type validation across all `tlsSites` items (`host`, `cert`, `key` strings) and per-key `Config.dict[key]` validation on incoming configuration patches, rejecting malformed structures before processing.
+- **Persistence Atomicity & Durable Provider Check (#364)**: `effective` configuration and `onConfigUpdated` are now mutated only after durable persistence succeeds via Cordis registry tree, fiber, loader, or settings service. If persistence fails (HTTP 500), `effective` remains untouched.
+- **Getter Safety & Live Dynamic Policy Enforcement (#365)**: Refactored `updateLiveState` with property descriptor checks to safely update runtime state without triggering `TypeError` on getter properties (`passwordAuth`, `authUser`, `publicHost`). Bridge dynamically queries live state on each incoming request to immediately enforce password authentication without process restarts.
+- **Dynamic Partial Configuration Merging (#394)**: Merged incoming partial patches on top of `effective` before evaluating Schemastery schemas in `setupDynamicConfig`, preventing unmentioned settings from reverting to defaults.
+- **Card Save Error Reporting (#401)**: Enhanced `saveSettings` in the client settings card to inspect HTTP status codes and API error messages, preventing false-positive "Saved" status when server returns 400, 403, or 500.
+- **Automated Verification Suite (#363, #364, #365, #394, #401)**: Added `test/audit-block1-reopen-fixes.test.mjs` covering nested schema validation, durable persistence atomicity, dynamic auth toggle, partial merge integrity, and client card error parsing.
+
 ## 0.8.26
 
 ### Dynamic Configuration, Live TLS Reload & Backlog Triage

@@ -2,7 +2,7 @@
 
 LAN access plugin for DeepSeek Harness: direct bridge, mDNS, local TLS, PWA, device sessions, and the settings card.
 
-- Status check: 2026-10-04, package version in `package.json` is `0.8.26`. Later commits on a working branch are not a release until the version changes.
+- Status check: 2026-10-04, package version in `package.json` is `0.8.27`. Later commits on a working branch are not a release until the version changes.
 - DEV: `/mnt/external/Project/DEV/dhsplugins/dsh-lanmode`
 - OPT: none. The plugin is not a standalone service.
 - Install: `dsh plugin --profile <profile> add @goodandready/dsh-lanmode`
