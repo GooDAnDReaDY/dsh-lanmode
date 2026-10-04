@@ -23,16 +23,6 @@
   <a href="README.zh.md"><b>🇨🇳 中文说明</b></a>
 </p>
 
-<table align="center">
-  <tr>
-    <td align="center">
-      ⭐ <strong>如果这个插件对你有用，请在 GitHub 上加星</strong> — 这会让我知道它有价值，并促使我继续维护。
-      <br><br>
-      🐛 <strong>发现缺陷或想要新功能</strong>，可以用任何语言在 GitHub 提交 issue。我会查看建议，并把有用的想法放进后续版本。
-    </td>
-  </tr>
-</table>
-
 </div>
 
 ---
@@ -48,42 +38,6 @@
 5. 🛡️ **核心 API 只接受回环**：核心方法（`/api/settings.*`、`/api/credentials.*`、`/api/models.*`）拒绝不是来自 `127.0.0.1` 的请求。
 
 `dsh-lanmode` 用非侵入的 `webServer.tapIndex` HTML 垫片、直连桥、mDNS、根证书和设置卡片解决这些限制。
-
-```mermaid
-graph LR
-    subgraph RemoteDevices [LAN Clients: Phone / Tablet / Laptop]
-        Client[📱 Mobile Safari / 💻 Laptop: dsh.local:3088] -->|mDNS & HTTPS| Bridge[dsh-lanmode Smart Direct Bridge]
-    end
-
-    subgraph ShimsLayer [tapIndex Injected Client Shims & PWA]
-        Bridge --> Shim1[🔓 Loopback Hostname Bypass: Unlocks Settings & Models]
-        Bridge --> Shim2[🆔 RFC 4122 crypto.randomUUID Polyfill]
-        Bridge --> Shim3[📋 Fallback navigator.clipboard Polyfill]
-        Bridge --> Shim4[🔐 Local Root CA & TLS: Unlocks WebRTC Microphone]
-        Bridge --> Shim5[📱 PWA Manifest & Safe-Area Viewport]
-        Bridge --> Shim6[🔔 Background Web Notifications on turn/end]
-    end
-
-    subgraph HostBackend [DSH Host Core]
-        Bridge --> HeaderRewrite[Loopback Host/Origin Header Rewriter]
-        HeaderRewrite --> PrivilegedAPI[Core Settings, Credentials & Models API]
-    end
-
-    subgraph Output [Result]
-        Shim1 --> FullWeb[✅ 100% Fully Functional Web UI Across Entire LAN]
-        Shim2 --> FullWeb
-        Shim3 --> FullWeb
-        Shim4 --> FullWeb
-        Shim5 --> FullWeb
-        Shim6 --> FullWeb
-        PrivilegedAPI --> FullWeb
-    end
-
-    style RemoteDevices fill:#1e1e2e,stroke:#89b4fa,stroke-width:2px,color:#cdd6f4
-    style ShimsLayer fill:#181825,stroke:#cba6f7,stroke-width:2px,color:#cdd6f4
-    style HostBackend fill:#11111b,stroke:#a6e3a1,stroke-width:2px,color:#cdd6f4
-    style Output fill:#181825,stroke:#f38ba8,stroke-width:2px,color:#cdd6f4
-```
 
 ---
 
