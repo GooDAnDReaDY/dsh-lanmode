@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.31
+
+### Hardened Fail-Safe Storage, PIN Rate Limiting & WebSocket Revocation Desync (#415, #366, #367, #54)
+- **Fail-Safe Storage Recovery (#415)**: Added atomic `.bak` snapshot persistence and automatic fallback in `lib/bans.js` and `lib/devices.js`. Corrupted or malformed storage files are safely recovered without resetting active bans or registered device roster, and write operations prevent duplicate SHA-256 hashing.
+- **Unified LAN PIN Policy & Rate Limiting (#366)**: Enforced LAN PIN validation and progressive rate limiting (HTTP 429 when locked) on configuration mutations (`PATCH /dsh-lanmode/api/config`), Cloudflare tunnel toggles (`/dsh-lanmode/tunnel/toggle`), and plugin updater (`/api/dsh-lanmode/update`).
+- **Cloudflare WAN WebSocket Upgrade Protection (#367)**: `handleUpgrade` in `lib/bridge-ws.js` now verifies `tunnelPin` policy and trusted Cloudflare proxy headers on all WebSocket connection upgrades, rejecting unauthenticated WAN upgrades with HTTP 403.
+- **Immediate WebSocket Revocation Desync Fix (#54)**: Active duplex WebSockets are now registered with both raw tokens and SHA-256 digests. Sockets are immediately destroyed upon individual session revocation, user password change (`revokeSessionsForUser`), or complete device reset (`revokeAll`).
+
 ## 0.8.30
 
 ### Dynamic Bootstrap Flags & Session Duration Synchronization (#412)
