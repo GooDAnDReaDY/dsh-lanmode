@@ -5,7 +5,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import http from 'node:http'
 import net from 'node:net'
-import { once } from 'node:events'
+import { EventEmitter, once } from 'node:events'
 import {
   validateConfigPatch,
   persistConfigDurable,
@@ -524,4 +524,108 @@ test('Issue #401: Client card rejects malformed JSON, empty payload and error st
   const rReady = handleSaveResult({ ok: true, status: 200, data: { status: 'ready', value: {} } })
   assert.equal(rReady.saveErr, '')
   assert.equal(rReady.saveMsg, 'Settings saved successfully.')
+})
+
+// -----------------------------------------------------------------------------
+// Issue #365 Reopen: Resolved lanPinRef preservation on unrelated save & rotation
+// -----------------------------------------------------------------------------
+test('Issue #365 Reopen: Unrelated save preserves resolved lanPinRef and does not strip PIN or switch to raw fallback', () => {
+  // 1. Ref-only mode: initial state has resolved PIN 1234
+  const state1 = {
+    lanPin: true,
+    lanPinValue: '1234',
+    rules: [],
+    adminRules: [],
+    guestRules: [],
+  }
+  const config1 = {
+    lanPin: '',
+    lanPinRef: 'AUDIT_PIN_A',
+  }
+  // Unrelated save: clipboard toggled
+  updateLiveState(state1, config1, { clipboard: false })
+  assert.equal(state1.lanPinValue, '1234', 'lanPinValue must remain 1234 and not be wiped to null on unrelated save')
+  assert.equal(state1.lanPin, true, 'lanPin must remain true')
+
+  // 2. Ref with raw fallback: initial state has resolved PIN 1234, fallback is 9999
+  const state2 = {
+    lanPin: true,
+    lanPinValue: '1234',
+    rules: [],
+    adminRules: [],
+    guestRules: [],
+  }
+  const config2 = {
+    lanPin: '9999',
+    lanPinRef: 'AUDIT_PIN_A',
+  }
+  // Unrelated save: mobileEnterSends toggled
+  updateLiveState(state2, config2, { mobileEnterSends: true })
+  assert.equal(state2.lanPinValue, '1234', 'lanPinValue must remain resolved 1234 and not switch to fallback 9999')
+  assert.equal(state2.lanPin, true, 'lanPin must remain true')
+})
+
+test('Issue #365 Reopen: PATCH /dsh-lanmode/api/config rejects unresolvable lanPinRef when provider fails and no fallback exists', async () => {
+  const routes = new Map()
+  const mockWebServer = {
+    register(route) {
+      routes.set(route.path, route.handler)
+      return () => routes.delete(route.path)
+    },
+  }
+  const mockCtx = {
+    effect: (fn) => fn(),
+    webServer: mockWebServer,
+    credentials: {
+      async resolve(ref) {
+        if (ref === 'KNOWN_REF') return '5555'
+        return null
+      },
+    },
+    get(name) {
+      if (name === 'credentials') return this.credentials
+      return undefined
+    },
+  }
+
+  const effective = {
+    mode: 'direct',
+    directPort: 3088,
+    lanPin: '',
+    lanPinRef: 'KNOWN_REF',
+  }
+  const state = {
+    lanPin: true,
+    lanPinValue: '5555',
+  }
+
+  registerConfigApi(mockCtx, effective, () => {}, { state })
+  const handler = routes.get('/dsh-lanmode/api/config')
+  assert.ok(handler, 'Config API handler must be registered')
+
+  // 1. Attempt to PATCH with an unresolvable ref and empty fallback -> must return 400
+  const reqUnresolvable = new EventEmitter()
+  Object.assign(reqUnresolvable, {
+    method: 'PATCH',
+    url: '/dsh-lanmode/api/config',
+    headers: { host: 'localhost', 'content-type': 'application/json' },
+    socket: { remoteAddress: '127.0.0.1' },
+  })
+
+  const resUnresolvable = await new Promise((resolve) => {
+    const res = {
+      writeHead(status) { this.status = status },
+      end(body) { resolve({ status: this.status, body: JSON.parse(body || '{}') }) },
+    }
+    handler(reqUnresolvable, res)
+    queueMicrotask(() => {
+      reqUnresolvable.emit('data', Buffer.from(JSON.stringify({ lanPinRef: 'UNKNOWN_REF' })))
+      reqUnresolvable.emit('end')
+    })
+  })
+
+  assert.equal(resUnresolvable.status, 400, 'Unresolvable lanPinRef must be rejected with 400')
+  assert.match(resUnresolvable.body.error, /Failed to resolve credential reference/)
+  assert.equal(effective.lanPinRef, 'KNOWN_REF', 'effective.lanPinRef must not mutate on rejected patch')
+  assert.equal(state.lanPinValue, '5555', 'state.lanPinValue must remain protected')
 })
