@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.25
+
+### Documentation, Design Contract & Broken Link Fixes
+- **Broken Markdown Link Elimination (#378)**: Removed obsolete 0.6.11 alpha.5 hotfix notice and dead links to docs/testing/alpha5-compatibility.md from README.md and README.ru.md. Updated docs/releases/0.6.11.md. Verified that public README files contain zero relative links to the npm-excluded docs/ folder.
+- **Version Alignment (#378)**: Synchronized active version across package.json, docs/design/DESIGN.md (v0.8.25), and index.md. Added detailed Block 1–8 architectural design notes to DESIGN.md.
+- **Authentication & Security Contract Documentation (#378)**: Accurately documented plaintext compatibility + scrypt digests, constant-time verification with dummy scrypt cost equalization, PBKDF2 PIN stretching with 15-minute brute-force lockout, and SHA-256 session/device token digest storage at rest across English, Russian, and Chinese READMEs.
+- **Cloudflare WAN Tunnels & Quick QR Workflow (#378)**: Documented zero-config Quick Tunnels, persistent Named Tunnels with connection readiness detection, mandatory tunnelPin: true gate, and the interactive Quick QR popover in the sidebar footer (sidebar.footer / sidebar.rail).
+- **Automated Documentation Verification Gate (#378)**: Added test/audit-block8-docs-design.test.mjs verifying link integrity, public README boundaries, version alignment, auth/tunnel documentation accuracy, and package manifest integrity.
+
 ## 0.8.24
 
 ### Test Isolation & Static Verification Gates
