@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.28
+
+### Security Policy Rotation, Profile Rollback & Card Ready Contract
+- **Entry Options Rollback on Failed Durable Write (#364)**: `persistConfigDurable` now restores `fiber.entry.options.config` to its previous state if `fiber.entry.parent.tree.write()` throws an error, ensuring in-memory loader options never diverge from durable disk state upon write failures.
+- **Dynamic Bridge Security Policy Rotation (#365)**: The direct HTTP bridge dynamically evaluates `lanPin`, `unlockPrivileged` (and `allowPrivileged`), `privilegedExtra`, and `tunnelPin` on every incoming request, enabling instantaneous rotation of LAN PINs and access policies without bridge listener restarts.
+- **Strict Response Validation in Client Card (#401)**: Enhanced `saveSettings` validation to verify that HTTP 200 responses contain a valid contract payload (`status: 'ready'`, `status: 'ok'`, or `ok: true`) and reject empty objects `{}` or `{ status: 'error' }` payloads, preventing deceptive success indications on client errors.
+- **Verification Suite (#364, #365, #401)**: Added unit and integration tests covering entry rollback on disk write failure, dynamic LAN PIN rotation on live bridges, and client card response rejection contracts.
+
 ## 0.8.27
 
 ### Configuration Save Lifecycle, Dynamic Bridge State & Card Error Handling
