@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.30
+
+### Dynamic Bootstrap Flags & Session Duration Synchronization (#412)
+- **Dynamic HTML Bootstrap Flags (#412)**: In `lib/index.js`, the `pieces` object (`settings`, `randomUuid`, `clipboard`, `mobileEnterSends`) now uses dynamic getters on `config`, and `ctx.webServer.tapIndex` serializes `window.__DSH_LANMODE__` dynamically per HTML request. Saving configuration updates immediately affects newly loaded pages without requiring host restart.
+- **Dynamic Session Duration (#412)**: Added `setSessionDurationDays` to `AuthManager` (`lib/auth.js`). `updateLiveState` in `lib/config-validator.js` and `onConfigUpdated` in `lib/index.js` now dynamically update active `sessionDurationMs` whenever `authSessionDays` changes, ensuring subsequent remember-me sessions instantly adhere to the new duration.
+- **Independent Audit Verification (#412)**: Verified against independent audit runner `bootstrap.mjs`, ensuring zero divergence between runtime state, injected HTML, and authentication session lifetimes.
+
 ## 0.8.29
 
 ### Dynamic Secret Resolution & Credential Reference Preservation (#365)
