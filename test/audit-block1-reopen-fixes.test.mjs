@@ -629,3 +629,150 @@ test('Issue #365 Reopen: PATCH /dsh-lanmode/api/config rejects unresolvable lanP
   assert.equal(effective.lanPinRef, 'KNOWN_REF', 'effective.lanPinRef must not mutate on rejected patch')
   assert.equal(state.lanPinValue, '5555', 'state.lanPinValue must remain protected')
 })
+
+test('Issue #412: bootstrap flags in tapIndex and authSessionDays apply dynamically without restart', async () => {
+  const { apply } = await import('../lib/index.js')
+  const { AuthManager } = await import('../lib/auth.js')
+
+  const routes = new Map()
+  let tapCallback = null
+  const cleanups = []
+
+  const mockCtx = {
+    webServer: {
+      port: 3088,
+      register(route) {
+        routes.set(route.path, route.handler)
+        return () => routes.delete(route.path)
+      },
+      tapIndex(fn) {
+        tapCallback = fn
+        return () => { tapCallback = null }
+      },
+    },
+    logger: { info() {}, warn() {}, debug() {} },
+    get() { return undefined },
+    inject() { return () => {} },
+    on() { return () => {} },
+    effect(fn) {
+      const d = fn()
+      if (typeof d === 'function') cleanups.push(d)
+    },
+  }
+
+  const durations = []
+  const origCreateSession = AuthManager.prototype.createSession
+  AuthManager.prototype.createSession = function (...args) {
+    durations.push(this.sessionDurationMs)
+    return origCreateSession.apply(this, args)
+  }
+
+  try {
+    const config = {
+      mode: 'proxy',
+      tls: 'off',
+      mdns: false,
+      diagnostics: true,
+      passwordAuth: false,
+      authUser: 'test-admin',
+      authPassword: 'secret-password',
+      authSessionDays: 30,
+      allow: ['127.0.0.0/8'],
+      settings: true,
+      randomUuid: true,
+      clipboard: true,
+      mobileEnterSends: false,
+    }
+
+    apply(mockCtx, config)
+
+    function getInjectedFlags() {
+      assert.ok(tapCallback, 'tapIndex callback must be registered')
+      const html = tapCallback('<html><head></head><body>test</body></html>')
+      const match = html.match(/window\.__DSH_LANMODE__=({[^;]+});/)
+      assert.ok(match, 'window.__DSH_LANMODE__ must be present in HTML')
+      return JSON.parse(match[1])
+    }
+
+    async function login() {
+      const loginHandler = routes.get('/dsh-lanmode/auth/login')
+      assert.ok(loginHandler, 'login handler must be registered')
+      const req = new EventEmitter()
+      Object.assign(req, {
+        method: 'POST',
+        url: '/dsh-lanmode/auth/login',
+        headers: { host: 'localhost', 'content-type': 'application/json' },
+        socket: { remoteAddress: '127.0.0.1' },
+      })
+      return new Promise((resolve) => {
+        const res = {
+          writeHead(status) { this.status = status },
+          end(body) { resolve({ status: this.status, body: JSON.parse(body || '{}') }) },
+        }
+        loginHandler(req, res)
+        queueMicrotask(() => {
+          req.emit('data', Buffer.from(JSON.stringify({ username: 'test-admin', password: 'secret-password', remember: true })))
+          req.emit('end')
+        })
+      })
+    }
+
+    const beforeFlags = getInjectedFlags()
+    assert.equal(beforeFlags.settings, true)
+    assert.equal(beforeFlags.randomUuid, true)
+    assert.equal(beforeFlags.clipboard, true)
+    assert.equal(beforeFlags.mobileEnterSends, false)
+
+    await login()
+    assert.equal(durations[0], 30 * 86400000)
+
+    // PATCH config to update flags and session duration
+    const handler = routes.get('/dsh-lanmode/api/config')
+    assert.ok(handler, 'config API handler must be registered')
+
+    const patchReq = new EventEmitter()
+    Object.assign(patchReq, {
+      method: 'PATCH',
+      url: '/dsh-lanmode/api/config',
+      headers: { host: 'localhost', 'content-type': 'application/json' },
+      socket: { remoteAddress: '127.0.0.1' },
+    })
+
+    const patchRes = await new Promise((resolve) => {
+      const res = {
+        writeHead(status) { this.status = status },
+        end(body) { resolve({ status: this.status, body: JSON.parse(body || '{}') }) },
+      }
+      handler(patchReq, res)
+      queueMicrotask(() => {
+        patchReq.emit('data', Buffer.from(JSON.stringify({
+          settings: false,
+          randomUuid: false,
+          clipboard: false,
+          mobileEnterSends: true,
+          authSessionDays: 7,
+        })))
+        patchReq.emit('end')
+      })
+    })
+
+    assert.equal(patchRes.status, 200)
+    assert.equal(patchRes.body.restart, false)
+
+    // Verify fresh HTML renders updated bootstrap flags
+    const afterFlags = getInjectedFlags()
+    assert.equal(afterFlags.settings, false)
+    assert.equal(afterFlags.randomUuid, false)
+    assert.equal(afterFlags.clipboard, false)
+    assert.equal(afterFlags.mobileEnterSends, true)
+
+    // Subsequent login gets 7 days
+    await login()
+    assert.equal(durations[1], 7 * 86400000)
+  } finally {
+    AuthManager.prototype.createSession = origCreateSession
+    for (const cleanup of cleanups) {
+      try { cleanup() } catch {}
+    }
+  }
+})
