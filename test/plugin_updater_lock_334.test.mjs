@@ -22,13 +22,13 @@ test('Issue #334: checkProfileLock distinguishes live PID from dead PID and clea
     assert.equal(liveCheck.pid, process.pid)
     assert.ok(fs.existsSync(lockFile), 'Lockfile with live PID must remain')
 
-    // 2. Dead PID (unlikely to exist)
+    // 2. Dead PID (Issue #414: must not delete lockfile or report unlocked via TOCTOU)
     const deadPid = 9999999
     fs.writeFileSync(lockFile, String(deadPid))
     const deadCheck = checkProfileLock(tmpDir)
-    assert.equal(deadCheck.locked, false)
-    assert.equal(deadCheck.stalePid, deadPid)
-    assert.ok(!fs.existsSync(lockFile), 'Stale lockfile must be removed')
+    assert.equal(deadCheck.locked, true)
+    assert.equal(deadCheck.pid, deadPid)
+    assert.ok(fs.existsSync(lockFile), 'Lockfile must never be deleted by checkProfileLock')
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true })
   }
