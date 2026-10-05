@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.33
+
+### Lockfile Safety, Tunnel Lifecycle Escalation & HTTPS Auto-Start with Named Hostname (#414, #343, #373, #47)
+- **Eliminate Updater Lockfile TOCTOU Race (#414)**: `checkProfileLock` in `lib/plugin-updater.js` never unlinks `package.json.lock` upon detecting dead PIDs, eliminating destructive TOCTOU races against other package managers or profiles and requiring controlled operator recovery. Removed bare side-effect invocations from child process exit handlers.
+- **Tunnel Lifecycle Immediate Rejection & SIGKILL Escalation (#343)**: `CloudflareTunnel.stop()` now immediately rejects in-flight `start()` promises with `Error("Tunnel stopped")`, clears start timeouts, and fixes the process escalation timer so `SIGKILL` is reliably sent when the child process hangs, avoiding the dead-check caused by `subprocess.killed`. Active tunnels restart cleanly when configuration options change.
+- **HTTPS Tunnel Auto-Start Coordination (#373)**: WAN tunnel auto-start is now synchronized with listener readiness via `syncTunnel`, ensuring direct HTTPS bridge scheme, port, and CA pool are fully established before `cloudflared` launches, preventing plaintext HTTP fallback to the core socket.
+- **Named Tunnel Hostname Support (#47)**: Added `tunnelHostname` across schema (`Config`), validator, health report, and settings card (`lib/client-parts/`), enabling persistent Cloudflare Named Tunnels with custom public domains and correct QR code URL generation.
+
 ## 0.8.32
 
 ### Device Token Security, Revocation Persistence & TLS Fail-Closed Protection (#266, #354, #361, #369)
