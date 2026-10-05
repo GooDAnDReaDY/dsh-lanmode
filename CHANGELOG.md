@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.35
+
+### Supply-Chain Quarantine, WAN PIN & Tunnel Documentation Alignment, and Protected Status Checks (#426, #378, #377)
+- **pnpm Release-Age Quarantine Enforcement (#426)**: In `lib/plugin-updater.js`, child `dsh plugin add` strictly preserves pnpm's default release age quarantine policy, prohibiting `--config.minimumReleaseAge=0` or unverified bypass arguments per #214 / #426.
+- **Accurate Documentation for WAN PIN & Administrative Endpoints (#378)**: Clarified in `README.md`, `README.ru.md`, `README.zh.md`, and `docs/design/DESIGN.md` that `GET /dsh-lanmode/tunnel` is a protected administrative endpoint requiring `verifyAdminAccess` (403 for guest callers), detailed LAN PIN 15-minute brute-force lockout semantics (returning HTTP 429 Retry-After), and verified that `tunnelPin` challenges WAN tunnel requests when `lanPin` is configured.
+- **Enforced Gitea Branch Protection & Quality Gate (#377)**: Configured branch protection on `main` requiring passing CI status checks (`quality-gate`) prior to merge, and verified tracked `.gitea/workflows/ci.yml` in regression tests.
+
 ## 0.8.34
 
 ### Credentials Injection, Live Auth/Interface State & Full UI Localization (#1, #329, #417, #419)
