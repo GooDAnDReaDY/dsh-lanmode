@@ -81,9 +81,9 @@ By default, modern web browsers and the **DeepSeek Harness** frontend deliberate
 ### 7. 🛡️ Access Control, LAN PIN & Security
 * **`unlockPrivileged`**: Master gate for settings & credentials mutation from LAN.
 * **`lanPin` / `lanPinRef`**: Optional PIN protection for privileged operations. When enabled, LAN guests can chat freely, but changing system settings, installing plugins, or mutating credentials requires PIN verification.
-* **Brute-Force Rate Limiting**: PIN authentication enforces automatic rate limiting (HTTP 429 status after 5 consecutive failed attempts per IP) with temporary lockout.
+* **Brute-Force Rate Limiting**: PIN authentication enforces automatic rate limiting (HTTP 429 status after 5 consecutive failed attempts per IP) with a 15-minute temporary lockout. Password authentication enforces a 30-second lockout after 5 failed attempts.
 * **Subnet Role Separation**: Distinct `adminAllow` and `guestAllow` CIDR rules. Subnets designated under `guestAllow` are strictly prohibited from mutating system settings, revoking sessions, or toggling WAN tunnels (`403 Forbidden`).
-* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`, `/dsh-lanmode/api/config`) feature built-in fail-closed defense-in-depth authorization. Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
+* **Administrative & Diagnostic Endpoints Protection**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/devices/revoke`, `/dsh-lanmode/devices/kill-all`, `/dsh-lanmode/tunnel`, `/dsh-lanmode/tunnel/toggle`, `/dsh-lanmode/api/interfaces`, `/dsh-lanmode/api/telemetry`, `/dsh-lanmode/api/config`) feature built-in fail-closed defense-in-depth authorization. GET `/dsh-lanmode/tunnel` requires administrator verification (403 for guests). Bypassing the local bridge or accessing from untrusted networks requires valid admin credentials or trusted loopback origins.
 * Login, settings, device revoke, and tunnel toggle stop reading a body after 64 KiB and answer 413. The action is not applied.
 * **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
 * **Password Storage & Verification**: Passwords support both plaintext strings (for configuration compatibility) and robust scrypt digests (`scrypt$16384$8$1$salt$hash`) generated via `hashAuthPassword()`. Credential verification runs in constant time (`timingSafeEqual`), with unknown usernames incurring an identical dummy scrypt cost to equalize response latency against user enumeration. Changing the password revokes other active sessions for that user immediately.
@@ -121,7 +121,7 @@ By default, modern web browsers and the **DeepSeek Harness** frontend deliberate
 
 ### 12. ☁️ Cloudflare WAN Tunnels & Tunnel PIN
 * **Zero-Config Quick Tunnels & Persistent Named Tunnels**: Remote WAN access via Cloudflare without port forwarding or public static IP. Supports temporary Quick Tunnels (`trycloudflare.com`) and persistent Named Tunnels configured with `tunnelToken` or `tunnelTokenRef`, complete with fast readiness detection from connection logs.
-* **Mandatory Tunnel PIN Guard**: Inbound requests through Cloudflare WAN tunnels can be required to pass the LAN PIN challenge (`tunnelPin: true`, enabled by default) before gaining access.
+* **Tunnel PIN Guard**: When `lanPin` (or `lanPinRef`) is configured, inbound HTTP requests and WebSocket upgrades (#367) arriving through Cloudflare WAN tunnels are challenged with the LAN PIN (`tunnelPin: true`, enabled by default). When no PIN is configured, tunnel traffic does not require a PIN.
 
 ### 13. 🔄 In-App One-Click Plugin Updates
 * Built-in updater service and settings card UI (`/api/dsh-lanmode/update`):
