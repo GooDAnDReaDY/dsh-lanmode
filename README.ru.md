@@ -114,11 +114,9 @@
 * Поддержка протокола HTTP/2 (ALPN `h2`) на мосту наряду с HTTP/1.1 для мультиплексирования потоков.
 
 ### 11. 🚀 Изоляция пулов соединений HTTP и SSE-стриминга
-* Исходящие соединения к DeepSeek Harness разделены на два независимых пула:
-  * **Пул стандартного HTTP**: Включён Keep-Alive с пулом до 100 сокетов для быстрой отдачи статических файлов интерфейса, скриптов плагинов и коротких REST-запросов. Оснащён таймаутом очереди (15 с по умолчанию), предотвращающим зависание запросов при перегрузке (возврат HTTP 503).
-  * **Выделенный стриминговый пул**: Независимое выделение сокетов для долгоживущих подключений Server-Sent Events (SSE), потоковой генерации токенов моделей (`/api/chat/stream`) и подписок на события. Сотни активных потоковых сессий не занимают слоты пула статики и не замедляют работу WebUI. Тело ответа передаётся потоком и не собирается в один буфер.
-* Клиенты локальной сети не получают gzip и brotli. При включённом `adaptiveCompression` (по умолчанию) удалённые клиенты по-прежнему могут получить сжатый ответ.
-* Если порт harness не задан, мост пробует `127.0.0.1` на портах 3080, затем 3081, затем 3082. Явно заданный порт не пробуется.
+* Исходящие соединения разделены на два пула: стандартный HTTP (до 100 сокетов Keep-Alive с таймаутом очереди) и выделенный стриминговый пул (SSE, `/api/chat/stream`). Потоки не блокируют статику, тело ответа стримится напрямую.
+* Клиенты LAN не получают gzip/brotli. При `adaptiveCompression` удалённые клиенты могут получить сжатый ответ.
+* Без явного порта мост проверяет порты 3080, 3081, 3082 на loopback.
 
 ### 12. ☁️ Туннели Cloudflare WAN и Tunnel PIN
 * **Быстрые Quick Tunnels и постоянные Named Tunnels**: Удаленный доступ через Cloudflare без проброса портов и публичного статического IP. Поддерживаются как временные Quick Tunnels (`trycloudflare.com`), так и постоянные именованные туннели через `tunnelToken` / `tunnelTokenRef` с быстрым распознаванием готовности соединения.
@@ -149,24 +147,24 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 # ~/.dsh/profiles/web/cordis.patch.yml
 - id: dsh-lanmode
   config:
-    mode: direct             # 'direct', 'proxy' или 'auto'
-    directHost: 0.0.0.0      # По умолчанию: 127.0.0.1 (только localhost)
+    mode: direct             # direct, proxy или auto
+    directHost: 0.0.0.0      # 127.0.0.1 по умолчанию
     directPort: 3080
-    mdns: true               # Анонс dsh.local в LAN
-    pwa: true                # PWA manifest и мобильный viewport
-    tls: self-signed         # 'self-signed' (с Root CA), 'files' или 'off'
-    unlockPrivileged: true   # Разрешить настройки и ключи из LAN
-    lanPinRef: ""            # Ссылка на секрет в credentials или ENV для LAN PIN
-    tunnelTokenRef: ""       # Ссылка на секрет для токена туннеля
-    allow:                   # По умолчанию: ['127.0.0.0/8'] (только loopback)
+    mdns: true               # dsh.local в LAN
+    pwa: true                # PWA manifest
+    tls: self-signed         # self-signed, files или off
+    unlockPrivileged: true   # Настройки из LAN
+    lanPinRef: ""            # Секрет LAN PIN
+    tunnelTokenRef: ""       # Секрет туннеля
+    allow:
       - 192.168.0.0/16
       - 10.0.0.0/8
-    passwordAuth: false      # Требовать имя и пароль
-    authPasswordRef: ""      # Имя секрета пароля; сам пароль сюда не писать
-    publicHost: ""           # Имя узла на карточке входа
-    disabledUsers: []        # Имена, чьи сессии отзываются
-    trustedProxyCidrs: []    # Прокси, которым можно задавать X-Forwarded-For
-    tlsSites: []             # Дополнительные сертификаты {host, cert, key} по имени
+    passwordAuth: false      # Парольная защита
+    authPasswordRef: ""      # Секрет пароля
+    publicHost: ""
+    disabledUsers: []
+    trustedProxyCidrs: []
+    tlsSites: []
     adaptiveCompression: true
 ```
 
