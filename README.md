@@ -69,8 +69,8 @@ By default, modern browsers and DeepSeek Harness block key capabilities when acc
 * **CSRF Mitigation**: Mutating POST requests reject cross-site invocations (`Sec-Fetch-Site: cross-site`) and validate origin headers.
 * **Password Storage & Verification**: Passwords support both plaintext and scrypt digests (`scrypt$16384$8$1$salt$hash`) via `hashAuthPassword()`. Verification runs in constant time (`timingSafeEqual`), with dummy scrypt passes preventing timing attacks. Changing password immediately revokes all other active sessions for that user.
 * **Session & Device Tokens**: Active sessions and device tokens are indexed via SHA-256 digests (`hashToken`); raw session and cookie tokens are never stored in memory registry, JSON API, or serialized disk files (`dsh-lanmode-devices.json` and `.bak`).
-* **Atomic Backup Snapshots & Fail-Closed Storage**: Registry and ban `.bak` files are generated atomically using temporary files and atomic rename. Corrupted data files without valid backup engage fail-closed security mode (HTTP 403 for non-loopback traffic).
-* **Instant Secret Rotation**: Secret references (`lanPinRef`, `authPasswordRef`, `tunnelTokenRef`) query the provider context fresh per operation without positive TTL cache, applying external rotations immediately.
+* **Atomic Backup Snapshots & Fail-Closed Storage**: Registry and ban `.bak` files are generated atomically using temporary files and atomic rename. Corrupted data files without valid backup engage fail-closed security mode (HTTP 403 for non-loopback traffic) that persists across routine writes and reloads, with automatic recovery from backup if the primary file is missing.
+* **Instant Secret Rotation**: Secret references (`lanPinRef`, `authPasswordRef`, `tunnelTokenRef`) query the provider context fresh per operation across all API endpoints, applying external rotations immediately to subsequent requests without requiring restarts or configuration resaves.
 * **UI Localization**: PIN modal dynamically resolves localization via `parts.translate` across Chinese, English, and Russian without exposing raw dictionary keys.
 
 ### 8. 📱 Connected Devices & Session Management

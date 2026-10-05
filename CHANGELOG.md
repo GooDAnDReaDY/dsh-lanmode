@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.8.37
+
+### Dynamic PIN Consumer Rotation, Durable Storage Fail-Closed, Independent Diagnostics Routes & Login Script Fix (#361, #415, #440, #439, #378)
+- **Dynamic PIN Consumer Rotation (#361)**: In `lib/routes/config.js`, `lib/routes/tunnel.js`, and `lib/plugin-updater.js`, when `lanPinRef` is configured, the PIN secret is resolved dynamically on each incoming protected request, rejecting old credentials (HTTP 403) and accepting rotated secrets immediately without requiring service restarts or settings resave.
+- **Durable Fail-Closed Storage & .bak Recovery (#415)**: `readBanFile` and `DeviceRegistry.load()` recover cleanly from valid `.bak` when main storage is missing, enter fail-closed `corrupted: true` mode when backups are damaged or during disappearing main race seams, and refuse disk writes while in corrupted state (`return false`), preserving fail-closed protection across routine writes and reloads.
+- **Independent Auth & Device Routes from Diagnostics (#440)**: Moved `registerAuthRoutes`, `registerDeviceRoutes`, and `registerTunnelRoutes` outside `if (config.diagnostics !== false)` in `lib/index.js`, ensuring login endpoints (`/dsh-lanmode/auth/login`, `/logout`, `/session`) remain fully functional when diagnostics endpoints are disabled.
+- **Fix Syntax Error in Generated Login Page Script (#439)**: Removed stray `});` and duplicated input handler blocks in `lib/login-page.js`, ensuring generated inline script compiles and executes without `SyntaxError` across all locales.
+- **Documentation and Unit Specification Alignment (#378)**: Aligned `README.md`, `README.ru.md`, `README.zh.md`, and `docs/design/DESIGN.md` with actual audit findings, corrected the pack size unit specification in DESIGN.md, and documented durability guarantees.
+
+## 0.8.36
+
+### Token Security, Atomic Backups, Proxy PINref & Lockfile Integrity (#1, #266, #366, #373, #436)
+- **Token Hashing in Memory & Disk (#266)**: SHA-256 digests used for all token tracking in memory and disk storage.
+- **Atomic Snapshots and Fail-Closed Storage (#415)**: Temporary file writes with atomic rename for storage snapshots.
+- **Proxy Mode PINref Resolution (#366)**: Resolved `lanPinRef` at proxy startup and returned HTTP 503 on resolution failure.
+- **Safe Cloudflare Tunnel Auto-Start (#373)**: Prevented tunnel launch when direct listener fails TLS or wildcard listen.
+- **PIN Modal Translation Resolution (#1)**: Resolved PIN modal strings dynamically through `parts.translate`.
+- **PeerDependencies and Lockfile Synchronization (#436)**: Regenerated `pnpm-lock.yaml` cleanly with all declared peer dependencies.
+
 ## 0.8.35
 
 ### Supply-Chain Quarantine, WAN PIN & Tunnel Documentation Alignment, and Protected Status Checks (#426, #378, #377)
