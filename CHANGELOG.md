@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.38
+
+### Direct HTTP/WS Bridge Dynamic PINref Rotation & Full API Coverage (#361, #378)
+- **Direct HTTP/WS Bridge Dynamic PINref Rotation (#361)**: In `lib/bridge.js` and `lib/bridge-ws.js`, HTTP requests and WebSocket upgrades targeting privileged core endpoints or Cloudflare tunnel resolve `lanPinRef` dynamically fresh per operation. Rotated secrets are accepted immediately (HTTP 200 / WS 101) while old credentials are synchronously rejected (HTTP 403) without requiring service restart or manual settings save. Unresolved refs safely fail closed to HTTP/WS 403.
+- **Documentation and Full Rotation Guarantee Alignment (#378)**: Confirmed dynamic secret rotation across all communication surfaces (HTTP config API, core bridge endpoints, WebSocket streams, and Cloudflare tunnel) and synchronized `README.md`, `README.ru.md`, `README.zh.md`, `CHANGELOG.md`, and `docs/design/DESIGN.md`.
+
 ## 0.8.37
 
 ### Dynamic PIN Consumer Rotation, Durable Storage Fail-Closed, Independent Diagnostics Routes & Login Script Fix (#361, #415, #440, #439, #378)
