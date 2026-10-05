@@ -150,3 +150,13 @@ test('Block 8 (Issue #378): Package manifest integrity and file boundary complia
   assert.ok(!files.includes('test/'), 'package.json must exclude test/')
   assert.ok(!files.includes('scripts/'), 'package.json must exclude scripts/')
 })
+
+test('Block 8 (Issue #377): CI workflow exists and defines required quality gate', () => {
+  const ciPath = path.join(REPO_ROOT, '.gitea/workflows/ci.yml')
+  assert.ok(fs.existsSync(ciPath), '.gitea/workflows/ci.yml must exist')
+  const ciContent = fs.readFileSync(ciPath, 'utf8')
+  assert.match(ciContent, /quality-gate:/, 'ci.yml must define quality-gate job')
+  assert.match(ciContent, /npm test/, 'ci.yml must run npm test')
+  assert.match(ciContent, /check:static/, 'ci.yml must run static checks')
+  assert.match(ciContent, /pack:check/, 'ci.yml must run pack check')
+})

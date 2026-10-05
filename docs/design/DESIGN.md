@@ -212,7 +212,7 @@
 | `/dsh-lanmode/api/devices/revoke` | POST | На мосте `denyUnlessAdmin`. Тело больше 64 КиБ — 413, реестр не меняется. | `lib/bridge.js` |
 | `/dsh-lanmode/api/devices/revoke-others` | POST | На мосте `denyUnlessAdmin`. Тело больше 64 КиБ — 413. | `lib/bridge.js` |
 
-Чтение, которое стоит рядом: GET `/dsh-lanmode/api/config` тоже требует `verifyAdminAccess` и маскирует PIN, токен туннеля и пароль. GET `/dsh-lanmode/api/devices` на мосте требует администратора. GET `/dsh-lanmode/tunnel` администратора не требует. GET `/dsh-lanmode/api/interfaces` и GET `/dsh-lanmode/api/telemetry` при включённом пароле требуют сессию (#157).
+Чтение, которое стоит рядом: GET `/dsh-lanmode/api/config` тоже требует `verifyAdminAccess` и маскирует PIN, токен туннеля и пароль. GET `/dsh-lanmode/api/devices` на мосте требует администратора. GET `/dsh-lanmode/tunnel` требует администратора (`verifyAdminAccess`). GET `/dsh-lanmode/api/interfaces` и GET `/dsh-lanmode/api/telemetry` при включённом пароле требуют сессию (#157).
 
 ## Publication Set
 
@@ -644,6 +644,7 @@ Shim сохраняет `?token=` в `localStorage` и регистрирует 
 - **Отказоустойчивое хранение банов и устройств (#415)**: Реализовано автоматическое создание атомарных `.bak` копий и восстановление при повреждении файлов `bans.json` и `devices.json`. Исключено двойное хеширование 64-символьных SHA-256 идентификаторов.
 - **Защита настроек, туннеля и обновления через PIN (#366)**: Добавлена проверка LAN PIN и rate limit (с возвратом HTTP 429) для `PATCH /dsh-lanmode/api/config`, `/dsh-lanmode/tunnel/toggle` и `/api/dsh-lanmode/update`.
 - **Защита WebSocket-апгрейдов через Cloudflare WAN (#367)**: В `lib/bridge-ws.js` добавлена строгая проверка `tunnelPin` и доверенных прокси Cloudflare для всех входящих запросов на повышение протокола до WebSocket.
+- **Карантин и безопасность цепочки поставок (#426)**: В `lib/plugin-updater.js` строго соблюдается официальная политика возраста релизов pnpm (`--config.minimumReleaseAge=0` запрещён per #214 / #426).
 - **Синхронизация отзыва сессий с активными сокетами (#54)**: Реестр активных сокетов индексирует как сырые токены, так и их SHA-256 хеши. При вызове `revokeSession`, `revokeSessionsForUser` или `revokeAll` все ассоциированные сокеты немедленно разрываются с обеих сторон.
 
 ## Release 0.8.30 — Dynamic Bootstrap Flags & Session Duration Synchronization (#412)

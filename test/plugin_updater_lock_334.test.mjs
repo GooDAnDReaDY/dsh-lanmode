@@ -5,9 +5,10 @@ import path from 'node:path'
 import os from 'node:os'
 import { isPidAlive, checkProfileLock, registerPluginUpdater } from '../lib/plugin-updater.js'
 
-test('Issue #334: plugin-updater does not contain minimumReleaseAge=0', () => {
+test('Issue #334 / #426: plugin-updater respects pnpm release-age supply-chain guard and does not contain minimumReleaseAge', () => {
   const updaterSource = fs.readFileSync(new URL('../lib/plugin-updater.js', import.meta.url), 'utf8')
-  assert.ok(!updaterSource.includes('minimumReleaseAge=0'), 'minimumReleaseAge=0 must not be present')
+  assert.ok(!updaterSource.includes('minimumReleaseAge'), 'minimumReleaseAge must not be present in updater')
+  assert.ok(!updaterSource.includes('--config.minimumReleaseAge'), '--config.minimumReleaseAge must not be present in updater')
 })
 
 test('Issue #334: checkProfileLock distinguishes live PID from dead PID and cleans stale lock', () => {
