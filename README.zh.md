@@ -83,9 +83,9 @@
 ### 7. 🛡️ 访问控制、局域网 PIN 与安全
 * **`unlockPrivileged`**：是否允许从局域网修改设置和凭据。
 * **`lanPin` / `lanPinRef`**：特权操作的可选 PIN。开启后，局域网访客可以聊天，但修改系统设置、安装插件或改凭据需要验证 PIN。
-* **暴力尝试限制**：同一 IP 连续 5 次 PIN 失败后返回 HTTP 429，并暂时锁定。
+* **暴力尝试限制**：同一 IP 连续 5 次 PIN 失败后进入 15 分钟临时锁定，后续尝试返回 HTTP 429。密码认证连续 5 次失败后锁定 30 秒。
 * **子网角色分离**：`adminAllow` 与 `guestAllow` 是分开的 CIDR。`guestAllow` 中的子网不能修改系统设置、吊销会话或切换 WAN 隧道（`403 Forbidden`）。
-* **管理与诊断端点保护**：内部路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel/toggle`、`/dsh-lanmode/api/interfaces`、`/dsh-lanmode/api/telemetry`、`/dsh-lanmode/api/config`）默认拒绝。绕过本地桥或从不受信任的网络访问时，需要有效的管理员凭据或受信任的回环来源。
+* **管理与诊断端点保护**：内部路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel`、`/dsh-lanmode/tunnel/toggle`、`/dsh-lanmode/api/interfaces`、`/dsh-lanmode/api/telemetry`、`/dsh-lanmode/api/config`）默认拒绝。GET `/dsh-lanmode/tunnel` 需要管理员权限（`verifyAdminAccess`，访客返回 403）。绕过本地桥或从不受信任的网络访问时，需要有效的管理员凭据或受信任的回环来源。
 * 登录、设置、设备吊销和隧道开关在请求体超过 64 KiB 时停止读取并返回 413，操作不会生效。
 * **CSRF**：会改变状态的 POST 拒绝跨站请求（`Sec-Fetch-Site: cross-site`），并核对 Origin。
 * **密码存储与验证**：密码支持纯文本格式（配置向后兼容）和强大的 scrypt 摘要（`scrypt$16384$8$1$salt$hash`，通过 `hashAuthPassword()` 生成）。凭据验证使用恒定时间比较（`timingSafeEqual`），未知用户名与错误密码耗时一致，防止用户名枚举。修改密码会立即吊销该用户的其他活跃会话。
@@ -123,7 +123,7 @@
 
 ### 12. ☁️ Cloudflare WAN 隧道与隧道 PIN
 * **零配置 Quick Tunnel 与持久 Named Tunnel**：通过 Cloudflare 实现远程广域网访问，无需端口映射或公网 IP。支持临时 Quick Tunnel（`trycloudflare.com`）和通过 `tunnelToken` / `tunnelTokenRef` 配置的命名隧道，具备快速就绪检测机制。
-* **强制隧道 PIN 门禁**：通过 Cloudflare 隧道进入的请求可强制要求输入局域网 PIN（`tunnelPin: true`，默认开启），有效阻断未授权的公网直接访问。
+* **隧道 PIN 保护**：配置 `lanPin`（或 `lanPinRef`）时，通过 Cloudflare 隧道进入的入站 HTTP 请求与 WebSocket 连接（#367）均要求验证局域网 PIN（`tunnelPin: true`，默认开启）。未配置 PIN 时不要求 PIN。
 
 ### 13. 🔄 界面内一键更新
 * 更新服务和设置卡片（`/api/dsh-lanmode/update`）：

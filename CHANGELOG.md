@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.35
+
+### Supply-Chain Quarantine, WAN PIN & Tunnel Documentation Alignment, and Protected Status Checks (#426, #378, #377)
+- **pnpm Release-Age Quarantine Enforcement (#426)**: In `lib/plugin-updater.js`, child `dsh plugin add` strictly preserves pnpm's default release age quarantine policy, prohibiting `--config.minimumReleaseAge=0` or unverified bypass arguments per #214 / #426.
+- **Accurate Documentation for WAN PIN & Administrative Endpoints (#378)**: Clarified in `README.md`, `README.ru.md`, `README.zh.md`, and `docs/design/DESIGN.md` that `GET /dsh-lanmode/tunnel` is a protected administrative endpoint requiring `verifyAdminAccess` (403 for guest callers), detailed LAN PIN 15-minute brute-force lockout semantics (returning HTTP 429 Retry-After), and verified that `tunnelPin` challenges WAN tunnel requests when `lanPin` is configured.
+- **Enforced Gitea Branch Protection & Quality Gate (#377)**: Configured branch protection on `main` requiring passing CI status checks (`quality-gate`) prior to merge, and verified tracked `.gitea/workflows/ci.yml` in regression tests.
+
+## 0.8.34
+
+### Credentials Injection, Live Auth/Interface State & Full UI Localization (#1, #329, #417, #419)
+- **Credentials Service ReadRecord Key & Injection Guard (#329)**: `resolveBrowserAuthSecret` passes a single valid `CredentialKey` `'client-connection/browser-session'` to `creds.readRecord(key)` conforming to `@deepseek-ai/dsh-credentials`, safely guards against missing or un-injected credentials services without filesystem access to `.credentials.yaml`.
+- **Live State Active Auth & Interface Exposure (#417, #419)**: State now dynamically populates `browserAuthSecret` upon listener initialization and captures the active loopback cookie in `state.dshAuthCookie` via `onAuthCookie` bridge callback (#417). State provides a live getter `interfaces` returning categorized network interfaces (`getCategorizedInterfaces`) for telemetry and health reports (#419).
+- **Full Localization for PIN Modal & Standalone Login Page (#1)**: PIN prompt modal in `lib/shim.js` uses `translate()` helper for `pinModalTitle`, `pinModalDesc`, `pinModalPlaceholder`, `pinModalCancel`, and `pinModalUnlock` with full EN/ZH dictionary registration in `lib/client-parts/02-i18n.js`. Standalone HTTP login page in `lib/login-page.js` supports `locale` parameter for server-rendered EN and ZH layouts, client-side language adaptation, and localized session notice alerts.
+
 ## 0.8.33
 
 ### Lockfile Safety, Tunnel Lifecycle Escalation & HTTPS Auto-Start with Named Hostname (#414, #343, #373, #47)
