@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.32
+
+### Device Token Security, Revocation Persistence & TLS Fail-Closed Protection (#266, #354, #361, #369)
+- **Device Token Leakage Prevention (#266)**: AuthManager sessions now register devices using SHA-256 token digests (key), preventing raw session cookies from ever entering the device registry, appearing in /dsh-lanmode/devices API responses, or persisting in plaintext on disk.
+- **Fail-Closed TLS Files Mode (#354)**: When custom certificate files (tls: 'files') are unreadable or missing, the direct bridge now fails closed with state.listener = null, refusing to open an unencrypted HTTP listener on network interfaces.
+- **Context-Isolated Credential Cache & Safe Resolution (#361)**: Isolated the credential cache per context/provider via WeakMap with instant rotation via clearSecretCache() on config updates. Unresolvable credentials safely return fallback or empty values rather than leaking ref identifiers.
+- **Revocation Persistence Across LRU Eviction & Restarts (#369)**: Device LRU eviction (at 200 devices) now skips revoked devices, and save() writes permanent tombstones to disk, ensuring active revocations survive server restarts and traffic bursts.
+
 ## 0.8.31
 
 ### Hardened Fail-Safe Storage, PIN Rate Limiting & WebSocket Revocation Desync (#415, #366, #367, #54)
