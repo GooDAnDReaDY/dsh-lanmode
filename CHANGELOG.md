@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.39
+
+- **Theme Tokens Alignment (#445)**: Replaced non-existent  theme tokens across UI components with canonical DSH core 0.2.0-rc.2 design tokens; replaced shadow tokens with border/ring; added regression test .
+- **Durable Backup Error Logging & Degradation State (#446)**: Replaced silent empty catches when writing  snapshots for  and  with warning logs () and added  flag exposed in  status and diagnostic JSON without breaking main storage files.
+- **Human-Readable Quarantine & Registry Indexing Errors (#447)**: Mapped  and  errors in  to HTTP 409 Conflict with clear explanation, preserving strict supply-chain quarantine enforcement.
+- **Production Configuration Alignment (#444)**: Confirmed PIN preservation in system while honoring operator preference for personal instance; cleaned extraneous docker bridge IPs from allowlist.
+
 ## 0.8.38
 
 ### Direct HTTP/WS Bridge Dynamic PINref Rotation & Full API Coverage (#361, #378)
