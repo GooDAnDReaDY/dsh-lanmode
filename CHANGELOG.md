@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.40
+
+- **Strict Canonical Theme Whitelist & Token Cleanup (#445)**: Replaced non-canonical `--dsw-alias-fill-l1` with `--dsw-alias-bg-layer-3` in `lib/shim.js`, and `--dsw-alias-bg-layer-4` with `--dsw-alias-interactive-bg-hover` in `lib/client-parts/03-styles.js`. Aligned `CANONICAL_CORE_TOKENS` in `test/theme-tokens.test.mjs` with the exact 107 canonical CSS declarations from `@deepseek-ai/dsh-client-ui-theme@0.2.0-rc.2`, removing 10 unreleased phantom entries.
+- **Health Diagnostics JSON Contract Documentation Alignment (#450)**: Aligned `docs/design/DESIGN.md` with actual JSON schema for `/dsh-lanmode/health?format=json`, clarifying that the field is boolean `persistenceDegraded: boolean` (`false` / `true`) rather than `persistenceState: DEGRADED`. Distinguished machine-readable boolean property from human-readable HTML status label.
+
 ## 0.8.39
 
 - **Theme Tokens Alignment (#445)**: Replaced non-existent  theme tokens across UI components with canonical DSH core 0.2.0-rc.2 design tokens; replaced shadow tokens with border/ring; added regression test .
