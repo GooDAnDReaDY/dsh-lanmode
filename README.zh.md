@@ -82,6 +82,7 @@
 
 ### 7. 🛡️ 访问控制、局域网 PIN 与安全
 * **`unlockPrivileged`**：是否允许从局域网修改设置和凭据。
+* **`allowUnprivilegedLan`**：显式启用允许局域网客户端在无 PIN 码情况下执行特权操作（默认 `false`，fail-closed 安全策略）。
 * **`lanPin` / `lanPinRef`**：特权操作的可选 PIN。开启后，局域网访客可以聊天，但修改系统设置、安装插件或改凭据需要验证 PIN。
 * **暴力尝试限制**：同一 IP 连续 5 次 PIN 失败后进入 15 分钟临时锁定，后续尝试返回 HTTP 429。密码认证连续 5 次失败后锁定 30 秒。
 * **子网角色分离**：`adminAllow` 与 `guestAllow` 是分开的 CIDR。`guestAllow` 中的子网不能修改系统设置、吊销会话或切换 WAN 隧道（`403 Forbidden`）。

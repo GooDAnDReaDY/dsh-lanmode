@@ -63,6 +63,7 @@ By default, modern browsers and DeepSeek Harness block key capabilities when acc
 
 ### 7. 🛡️ Access Control, LAN PIN & Security
 * **`unlockPrivileged`**: Master gate for settings & credentials mutation from LAN.
+* **`allowUnprivilegedLan`**: Explicit opt-in permitting remote LAN clients to access privileged endpoints without PIN authentication (default `false`, fail-closed).
 * **`lanPin` / `lanPinRef`**: Optional PIN protection for privileged operations. LAN PIN supports both plaintext and PBKDF2 digests (`pbkdf2$sha512$100000$salt$hash`) generated via `hashPin()`. Brute-force rate limiting enforces a 15-minute lockout after 5 consecutive failed attempts per IP (HTTP 429).
 * **Subnet Role Separation**: Distinct `adminAllow` and `guestAllow` CIDR rules. Subnets designated under `guestAllow` are strictly prohibited from mutating system settings or revoking sessions (`403 Forbidden`).
 * **Route Protection & Body Limits**: Internal plugin routes (`/dsh-lanmode/devices`, `/dsh-lanmode/tunnel`, `/dsh-lanmode/api/config`) feature fail-closed authorization. `GET /dsh-lanmode/tunnel` requires administrator verification (403 for guests). Login, config, and tunnel requests stop reading after 64 KiB and return HTTP 413.

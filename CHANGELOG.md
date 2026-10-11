@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.41
+
+- **Privileged LAN Access Code Gate & Opt-In (#453)**: Enforced fail-closed code gate in `lib/bridge.js` and `lib/bridge-ws.js` rejecting privileged calls from remote LAN clients without a configured PIN (HTTP 403 `x-dsh-lan-pin-required: 1`). Added explicit `allowUnprivilegedLan` config option (default `false`) with security warning logging and `/health` visibility for operators intentionally permitting unauthenticated LAN access. Added full test matrix in `test/privileged-lan-gate-453.test.mjs`.
+
 ## 0.8.40
 
 - **Strict Canonical Theme Whitelist & Token Cleanup (#445)**: Replaced non-canonical `--dsw-alias-fill-l1` with `--dsw-alias-bg-layer-3` in `lib/shim.js`, and `--dsw-alias-bg-layer-4` with `--dsw-alias-interactive-bg-hover` in `lib/client-parts/03-styles.js`. Aligned `CANONICAL_CORE_TOKENS` in `test/theme-tokens.test.mjs` with the exact 107 canonical CSS declarations from `@deepseek-ai/dsh-client-ui-theme@0.2.0-rc.2`, removing 10 unreleased phantom entries.
