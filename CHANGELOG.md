@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.42
+
+- **Architecture Decoupling & Automated Pack Headroom (#455)**: Extracted WebSocket tracking, live session metadata, and kill switch eviction from `lib/bridge.js` into dedicated `lib/bridge-sockets.js`, reducing `lib/bridge.js` from 592 to 557 lines. Extracted TLS certificate resolution and self-signed CA logic from `lib/index.js` into `lib/listener-tls.js`, reducing `lib/index.js` from 596 to 565 lines, ensuring all modules remain strictly <= 600 lines. Compressed 4-space client parts indentation, maintaining unpacked package size within 524,288 bytes.
+- **Active Device Sessions Live View & Instant Revoke (#456)**: Enhanced WebSocket connection tracking to capture client user agent, remote IP, connection timestamp, and real-time activity timestamps. Exposed authenticated `/dsh-lanmode/api/sessions` endpoint registered under gated plugin routes in `lib/route-guard.js`.
+- **Tailscale MagicDNS & Headscale Hostname Auto-Detection (#457)**: Created `lib/tailscale.js` querying `tailscale status --json` with 60-second TTL caching and graceful fallback. Integrated MagicDNS detection into `lib/network-interfaces.js`, providing zero-config `.ts.net` addresses for remote devices.
+
 ## 0.8.41
 
 - **Privileged LAN Access Code Gate & Opt-In (#453)**: Enforced fail-closed code gate in `lib/bridge.js` and `lib/bridge-ws.js` rejecting privileged calls from remote LAN clients without a configured PIN (HTTP 403 `x-dsh-lan-pin-required: 1`). Added explicit `allowUnprivilegedLan` config option (default `false`) with security warning logging and `/health` visibility for operators intentionally permitting unauthenticated LAN access. Added full test matrix in `test/privileged-lan-gate-453.test.mjs`.
