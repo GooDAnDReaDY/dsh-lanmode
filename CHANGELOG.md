@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.43
+
+- **Prevent Parasitic Fiber Restart on Cosmetic Settings PATCH (#460)**: In `lib/config-validator.js`, replaced unconditional `fiber.update()` with `loader.update(fiber.entry.id, { config })`. Dropped direct `fiber.update()`, preventing uncoordinated restarts and connection drops across live settings saves.
+- **Fail-Closed Same-Origin Validation (#460)**: In `lib/access.js`, `isTrustedSameOrigin` now fails closed when `req` or `req.headers` is missing or when neither `origin` nor `host` is present, eliminating the previous fail-open vulnerability.
+- **Strict Prefix Route Boundary Matching (#460)**: In `lib/route-guard.js`, `isPublicPluginPath` requires exact path match or slash-separated subpath boundary (`prefix + '/'`), preventing prefix substring bypass exploits.
+- **Volatile Schema Fields Alignment (#460)**: Marked secret and live-editable configuration fields (`lanPin`, `lanPinRef`, `tunnelToken`, `tunnelTokenRef`, `authPassword`, `authPasswordRef`) as `.volatile()` in `lib/config-schema.js` and aligned `setupDynamicConfig` with real Cordis loader `(paths)` arrays.
+
 ## 0.8.42
 
 - **Architecture Decoupling & Automated Pack Headroom (#455)**: Extracted WebSocket tracking, live session metadata, and kill switch eviction from `lib/bridge.js` into dedicated `lib/bridge-sockets.js`, reducing `lib/bridge.js` from 592 to 557 lines. Extracted TLS certificate resolution and self-signed CA logic from `lib/index.js` into `lib/listener-tls.js`, reducing `lib/index.js` from 596 to 565 lines, ensuring all modules remain strictly <= 600 lines. Compressed 4-space client parts indentation, maintaining unpacked package size within 524,288 bytes.
