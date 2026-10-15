@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.45
+
+- **Web Push Notifications for Background Tasks & Approvals (#459)**:
+  - Added zero-dependency Web Push module `lib/push.js` implementing RFC 8291 payload encryption (`aes128gcm`) with ECDH P-256 and HKDF derivation, and RFC 8292 VAPID ES256 JWT authorization using native Node.js `crypto`.
+  - Added Service Worker push handlers (`push`, `notificationclick`) in `REOPEN_SW` in `lib/bridge-local.js` to receive background push and focus/open the application on click.
+  - Added `pushSubscription` field and persistence in `lib/devices.js` (`DeviceRegistry`: `savePushSubscription`, `removePushSubscription`, `getPushSubscriptions`), persisting push subscriptions across device records in `devices.json`.
+  - Integrated `WebPushManager` into Cordis lifecycle in `lib/index.js` to broadcast notifications on DSH core events (`turn/end` and `approval/asked`) to registered mobile devices.
+  - Added authenticated REST endpoints in `lib/routes/devices.js` with registration in `GATED_PLUGIN_ROUTES` (`lib/route-guard.js`): `/dsh-lanmode/api/push/vapid-public-key`, `/dsh-lanmode/api/push/subscribe`, `/dsh-lanmode/api/push/unsubscribe`, `/dsh-lanmode/api/push/test`.
+  - Added Web Push toggle, status indicator, and test push button in settings card and mobile controls (`lib/client-parts/04-card.js`, `lib/client-parts/06-card-body-1.js`, `lib/client-parts/02-i18n.js`).
+  - Added comprehensive unit test suite in `test/web-push-459.test.mjs` (9 tests, 480 total passing tests).
+
 ## 0.8.44
 
 - **Optional UPnP IGD & NAT-PMP Port Forwarding Gateway (#458)**:
