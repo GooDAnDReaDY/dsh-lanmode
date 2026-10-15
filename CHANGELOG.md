@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.44
+
+- **Optional UPnP IGD & NAT-PMP Port Forwarding Gateway (#458)**:
+  - Added zero-dependency `lib/upnp.js` implementing SSDP discovery multicast (`239.255.255.250:1900`), UPnP IGD SOAP port mapping (`AddPortMapping`, `DeletePortMapping`, `GetExternalIPAddress` on `WANIPConnection:1` and `WANPPPConnection:1`), and fallback to NAT-PMP opcode 2 (`5351/udp`).
+  - Added `upnp: z.boolean().default(false)` configuration option in `lib/config-schema.js`.
+  - Wired lifecycle management in `lib/index.js` to automatically forward ports on router when running in `mode=direct` with `upnp: true`, and cleanly release mappings on shutdown.
+  - Exposed UPnP status (`enabled`, `active`, `protocol`, `externalPort`, `externalIp`, `error`) in `hostReport` (`/dsh-lanmode/health?format=json`).
+  - Added comprehensive test suite in `test/upnp-gateway-458.test.mjs` (8 tests).
+
 ## 0.8.43
 
 - **Prevent Parasitic Fiber Restart on Cosmetic Settings PATCH (#460)**: In `lib/config-validator.js`, replaced unconditional `fiber.update()` with `loader.update(fiber.entry.id, { config })`. Dropped direct `fiber.update()`, preventing uncoordinated restarts and connection drops across live settings saves.
