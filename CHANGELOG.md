@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.48
+
+- feat(network): Smart Network Auto-Switch between local LAN and WAN tunnel (#466)
+  - Adaptive connection probe in `lib/shim.js` detecting Wi-Fi drop / cellular transitions.
+  - Transparent failover between fast local LAN (`https://dsh.local:3080`) and WAN tunnel (Cloudflare/Tailscale) without losing chat session context.
+  - Visual active transport indicator pill (`LAN` vs `WAN`) in mobile navigation bar (`lib/mobile-nav.js`).
+  - Configurable `networkAutoSwitch` boolean toggle in settings schema and UI card.
+  - Dynamic probe endpoint CORS support and Service Worker WAN URL routing cache.
+
 ## 0.8.47
 
 - **Actionable Web Push Notifications with Lock Screen Approvals (#465)**:
