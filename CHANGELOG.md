@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.47
+
+- **Actionable Web Push Notifications with Lock Screen Approvals (#465)**:
+  - Added opt-in `actionablePush: z.boolean().default(false)` configuration in `lib/config-schema.js`.
+  - In `lib/push.js`, extended `WebPushManager` with interactive notification actions (`actions: [{ action: 'approve', title: 'Approve' }, { action: 'reject', title: 'Reject' }]`) on `approval/asked` core events, managed `pendingApprovals` registry, and `resolveApproval(id, action)` handler.
+  - In `lib/bridge-local.js`, updated Service Worker (`REOPEN_SW`) to display notification action buttons and dispatch background `fetch('/dsh-lanmode/api/push/approval/respond')` on `notificationclick` without opening the browser.
+  - Added authenticated REST endpoint `POST /dsh-lanmode/api/push/approval/respond` in `lib/routes/devices.js` with registration in `GATED_PLUGIN_ROUTES` (`lib/route-guard.js`).
+  - Added settings toggle in settings card and mobile controls (`lib/client-parts/`).
+  - Added comprehensive test suite in `test/issue-465-actionable-push.test.mjs` (6 tests, 491 total passing tests).
+
 ## 0.8.46
 
 - **Core Auth Cookie Injection on WebSocket Upgrade (#470)**:
