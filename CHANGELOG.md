@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.46
+
+- **Core Auth Cookie Injection on WebSocket Upgrade (#470)**:
+  - In `lib/bridge-ws.js`, inject upstream core authentication cookie (`dsh-auth-*`) into WebSocket `upgradeHeaders.cookie` on HTTP upgrade (`handleUpgrade`), resolving infinite reconnection loops in `remote.mux` on DSH 0.2.1-rc.2.
+  - Listen for upstream `Set-Cookie` in upgrade and response listeners in `handleUpgrade` and update cached auth cookie via `updateCachedAuthCookie`.
+  - In `lib/dsh-auth-cookie.js`, updated `mergeDshAuthCookie` to check matching cookie name (`targetName = cached.split('=')[0].trim()`) rather than generic prefix `/^dsh-auth-/`, allowing loopback authority cookie injection when client authority cookie exists.
+  - In `lib/bridge.js`, centralized `resolveCoreAuthCookie` and `updateCachedAuthCookie` and exposed them to `handleUpgrade`.
+  - Added unit test suite in `test/issue-470-ws-core-auth.test.mjs` (5 tests, 485 total passing tests).
+
 ## 0.8.45
 
 - **Web Push Notifications for Background Tasks & Approvals (#459)**:
