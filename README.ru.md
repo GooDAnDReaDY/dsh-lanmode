@@ -34,7 +34,7 @@
    - Токены устройств и сессий защищены `SHA-256` хешированием перед сохранением в реестре.
    - Разделение ролей подсетей (`adminAllow`, `guestAllow`). Гости изолированы от настроек.
 7. **☁️ Cloudflare WAN и Tailscale Funnel**:
-   - Поддерживаются временные `Quick Tunnels` (trycloudflare.com) и постоянные `Named Tunnels` с токеном.
+   - Поддерживаются временные `Quick Tunnels` (trycloudflare.com) и постоянные `Named Tunnels` с токеном (передаётся через переменную окружения `TUNNEL_TOKEN`, скрыт из `ps aux`).
    - Опция `tunnelPin` требует ввод LAN PIN для запросов через Cloudflare туннель.
    - 1-клик интеграция с `Tailscale Funnel` с автоматическими доверенными сертификатами Let's Encrypt.
 8. **📱 Управление устройствами**: Реестр подключённых устройств, отслеживание сессий и отзыв в один клик.
@@ -54,24 +54,12 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 ```yaml
 - id: dsh-lanmode
   config:
-    mode: direct             # direct, proxy или auto
-    directHost: 0.0.0.0
+    mode: direct
     directPort: 3080
-    mdns: true               # dsh.local
-    pwa: true
-    tls: self-signed
-    unlockPrivileged: true
-    lanPinRef: ""
     tunnel: off              # off, quick или named
-    tunnelTokenRef: ""
     tunnelPin: true
     tailscaleFunnel: false
-    allow:
-      - 192.168.0.0/16
-      - 10.0.0.0/8
     passwordAuth: false
-    authPasswordRef: ""
-    adaptiveCompression: true
 ```
 
 ---

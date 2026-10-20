@@ -35,7 +35,7 @@
    - 设备与会话 Token 均采用 `SHA-256` 哈希加盐存储。
    - 子网角色分离（`adminAllow` 与 `guestAllow`），访客子网禁止改写系统设置。
 7. **☁️ Cloudflare 隧道与 Tailscale Funnel**：
-   - 支持临时 `Quick Tunnel` (trycloudflare.com) 与固定 `Named Tunnel` 模式。
+   - 支持临时 `Quick Tunnel` (trycloudflare.com) 与固定 `Named Tunnel` 模式（Token 通过 `TUNNEL_TOKEN` 环境变量传递，不暴露在进程列表）。
    - 配置项 `tunnelPin` 强制外网访问通过 LAN PIN 鉴权。
    - 支持一键开启 `Tailscale Funnel`，自带权威 Let's Encrypt 证书。
 8. **📱 设备与会话管理**：自动识别连接设备型号与操作系统，支持一键撤销单个或全部其它会话。
@@ -56,21 +56,11 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 - id: dsh-lanmode
   config:
     mode: direct
-    directHost: 0.0.0.0
     directPort: 3080
-    mdns: true
-    pwa: true
-    tls: self-signed
-    unlockPrivileged: true
-    lanPinRef: ""
-    tunnel: off
+    tunnel: off              # off, quick 或 named
     tunnelPin: true
     tailscaleFunnel: false
-    allow:
-      - 192.168.0.0/16
-      - 10.0.0.0/8
     passwordAuth: false
-    adaptiveCompression: true
 ```
 
 ---

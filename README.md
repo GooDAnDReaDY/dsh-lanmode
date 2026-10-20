@@ -35,7 +35,7 @@
    - Device and session tokens stored exclusively as salted `SHA-256` digests.
    - Subnet role separation (`adminAllow` and `guestAllow`). Guest subnets cannot mutate settings or revoke sessions.
 7. **☁️ Cloudflare WAN Tunnels & Tailscale Funnel**:
-   - Supports zero-config `Quick Tunnels` (trycloudflare.com) and persistent `Named Tunnels` via token.
+   - Supports zero-config `Quick Tunnels` (trycloudflare.com) and persistent `Named Tunnels` via token (passed securely via `TUNNEL_TOKEN` env, hidden from `ps aux`).
    - The `tunnelPin` option enforces LAN PIN verification for all requests arriving over WAN tunnels.
    - 1-click `Tailscale Funnel` integration providing public HTTPS with automated trusted Let's Encrypt certificates.
 8. **📱 Device Registry & Session Revocation**: Track connected devices and revoke active sessions individually or all-at-once.
@@ -55,22 +55,12 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 ```yaml
 - id: dsh-lanmode
   config:
-    mode: direct             # direct, proxy, or auto
-    directHost: 0.0.0.0
+    mode: direct
     directPort: 3080
-    mdns: true               # dsh.local
-    pwa: true
-    tls: self-signed
-    unlockPrivileged: true
-    lanPinRef: ""
     tunnel: off              # off, quick, or named
     tunnelPin: true
     tailscaleFunnel: false
-    allow:
-      - 192.168.0.0/16
-      - 10.0.0.0/8
     passwordAuth: false
-    adaptiveCompression: true
 ```
 
 ---
