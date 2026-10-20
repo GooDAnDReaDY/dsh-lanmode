@@ -1,20 +1,13 @@
 # 📦 @goodandready/dsh-lanmode
 
-浏览器插件的异步初始化会保留其 await 生命周期。
-
 <div align="center">
 
-<h3>DeepSeek Harness 的局域网接入：mDNS（dsh.local）、PWA、根证书、二维码、后台通知与自动 TLS</h3>
+<h3>局域网访问 (LAN)、mDNS (dsh.local)、PWA、Root CA、快速二维码、后台推送与自动 TLS 支持 (DeepSeek Harness)</h3>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@goodandready/dsh-lanmode"><img src="https://img.shields.io/npm/v/@goodandready/dsh-lanmode.svg?style=for-the-badge&color=6366f1&labelColor=1e1b4b" alt="npm version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981.svg?style=for-the-badge&color=10b981&labelColor=064e3b" alt="license"></a>
-  <a href="https://github.com/topics/dsh-plugin"><img src="https://img.shields.io/badge/DSH-Plugin-8b5cf6.svg?style=for-the-badge&labelColor=2e1065" alt="DSH Plugin"></a>
-  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node-20%2B-f59e0b.svg?style=for-the-badge&labelColor=451a03" alt="Node version"></a>
-</p>
-
-<p align="center">
-  <a href="https://goodandready.app/"><img src="https://img.shields.io/badge/All_Author_Projects-goodandready.app-ff4500.svg?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e" alt="All Author Projects"></a>
+  <a href="https://goodandready.app/"><img src="https://img.shields.io/badge/作者所有项目-goodandready.app-ff4500.svg?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e" alt="goodandready.app"></a>
 </p>
 
 <p align="center">
@@ -27,114 +20,29 @@
 
 ---
 
-## ⚡ 为什么 DSH 在局域网上会失败
+## ⚡ 功能概览
 
-现代浏览器和 **DeepSeek Harness** 前端默认限制从非本机地址（例如 `192.168.x.x` 或 `10.x.x.x`）通过明文 HTTP 打开页面：
+`dsh-lanmode` 为 DeepSeek Harness 提供完整的局域网与外网安全访问支持：
 
-1. 🔒 **设置与模型页被锁住**：Web UI 用 `isLoopbackHostname` 判断主机名。从局域网打开时，设置服务退回内存模式：插件配置卡片是空的，分区状态变成 `"unavailable"`，修改在发送前被丢弃，**模型**页显示设置在此浏览器中不可用。
-2. 💥 **UUID 生成直接崩溃**：`crypto.randomUUID()` 只存在于安全上下文（HTTPS 或 localhost）。局域网明文 HTTP 上，上传文件、调用工具和建立会话会立刻失败。
-3. 📋 **剪贴板复制失效**：非安全来源上浏览器禁用 `navigator.clipboard`，代码片段的复制按钮不起作用。
-4. 🎙️ **麦克风与语音输入被拦截**：明文 HTTP 上浏览器拒绝 `navigator.mediaDevices.getUserMedia`，手机和平板上的 [`dsh-voice`](https://github.com/GooDAnDReaDY/dsh-voice) 语音输入无法使用。
-5. 🛡️ **核心 API 只接受回环**：核心方法（`/api/settings.*`、`/api/credentials.*`、`/api/models.*`）拒绝不是来自 `127.0.0.1` 的请求。
-
-`dsh-lanmode` 用非侵入的 `webServer.tapIndex` HTML 垫片、直连桥、mDNS、根证书和设置卡片解决这些限制。
-
----
-
-## ✨ 功能说明
-
-### 1. 📱 Quick QR 弹出层、`/mobileqr` 命令与手机配对
-* **快捷 Quick QR 入口**：侧边栏底部（`sidebar.footer` / `sidebar.rail`）常驻手机图标，点击弹出交互式纯 SVG 二维码，支持 LAN / WAN 模式一键切换和地址复制。
-* **终端与 Agent 聊天工具**：在 Agent 对话中注册 `/mobileqr` 工具即时生成二维码，且在 `dsh web` 启动时于终端 stdout 输出 ASCII 二维码。
-* **诊断与健康检查**：通过 `/dsh-lanmode/qr` 和 `/dsh-lanmode/health` 均可获取矢量二维码。用手机摄像头扫码即可直接访问。
-
-### 2. 📲 PWA 与移动端独立窗口
-* 路由 `/dsh-lanmode/manifest.json`，以及 `viewport-fit=cover`、`apple-mobile-web-app-capable`、`theme-color` 元标签。
-* 移动端样式带有 `data-dsh-plugin="dsh-lanmode"`，宿主可以把它和其他插件的样式区分开。
-* 在 iOS 或 Android 上把 DSH 加到主屏幕后，它以独立应用打开：没有浏览器地址栏，并避开刘海的安全区。
-* `GET /dsh-lanmode/manifest.webmanifest` 是公开的，主屏幕安装不依赖会话。
-* 已保存的启动令牌可以重新打开这个书签。清除站点数据后令牌消失。
-* 扫描 `/dsh-lanmode/pair-accept?token=` 可以配对手机，且不设置 cookie。空令牌和长于 512 字符的令牌会被拒绝。
-* 在手机上，二维码和设置共用页脚一行。长按会话行会打开它的菜单。模型菜单固定在屏幕底部。窄屏会收起宽桌面面板，其他插件仍然可见。
-* 路径以 zip、exe、dmg、pkg、msi、7z、rar、gz、bz2、iso、bin 或 apk 结尾的聊天链接和文件打开会下载，而不是在页面里打开。
-
-### 3. 🌐 自动 mDNS（`dsh.local`）
-* 内置轻量 UDP 5353 应答：在局域网宣布 **`dsh.local`**。不必记住会变的 IP。
-
-### 4. 🔐 长期信任的本地根证书
-* 两级证书：**`dsh-lanmode Local Root CA`**（10 年）签发 **服务器证书**（SAN 包含 `dsh.local`、局域网 IP 和 localhost）。
-* 下载 `GET /dsh-lanmode/ca.crt`：在 iPhone、iPad 或 Android 上安装一次，即可长期信任 HTTPS。[`dsh-voice`](https://github.com/GooDAnDReaDY/dsh-voice) 语音输入可以正常使用。
-* 已保存的证书会在重启后继续使用。新签发的证书还会为每个地址带上 sslip.io 和 nip.io 名称。
-* 这些名称只写进证书。桥不会在 sslip.io 或 nip.io 主机名上监听。
-* `tlsSites` 为指定主机名增加证书和密钥文件。该主机名的请求使用自己的证书。IP、localhost 和未知名称仍用默认证书。空列表不会启用按名称选择。
-
-### 5. 🔔 后台网页通知（turn/end）
-* 接入 `turn/end` 和 `approval/asked` 会话事件。
-* 标签页或手机不在前台（`document.hidden`）时发出系统通知。点通知会把聊天窗口带回前台。
-
-### 6. 🎨 「设置 → 插件」里的设置卡片
-* 符合 DSH 设计的插件卡片：
-  * 连接状态与当前模式；
-  * 一键复制局域网地址；
-  * 卡片内开关二维码；
-  * 一键开关后台通知；
-  * 下载根证书（`ca.crt`）。
-
-### 7. 🛡️ 访问控制、局域网 PIN 与安全
-* **`unlockPrivileged`**：是否允许从局域网修改设置和凭据。
-* **`allowUnprivilegedLan`**：显式启用允许局域网客户端在无 PIN 码情况下执行特权操作（默认 `false`，fail-closed 安全策略）。
-* **`lanPin` / `lanPinRef`**：特权操作的可选 PIN。开启后，局域网访客可以聊天，但修改系统设置、安装插件或改凭据需要验证 PIN。
-* **暴力尝试限制**：同一 IP 连续 5 次 PIN 失败后进入 15 分钟临时锁定，后续尝试返回 HTTP 429。密码认证连续 5 次失败后锁定 30 秒。
-* **子网角色分离**：`adminAllow` 与 `guestAllow` 是分开的 CIDR。`guestAllow` 中的子网不能修改系统设置、吊销会话或切换 WAN 隧道（`403 Forbidden`）。
-* **管理与诊断端点保护**：内部路由（`/dsh-lanmode/devices`、`/dsh-lanmode/devices/revoke`、`/dsh-lanmode/devices/kill-all`、`/dsh-lanmode/tunnel`、`/dsh-lanmode/tunnel/toggle`、`/dsh-lanmode/api/interfaces`、`/dsh-lanmode/api/telemetry`、`/dsh-lanmode/api/config`）默认拒绝。GET `/dsh-lanmode/tunnel` 需要管理员权限（`verifyAdminAccess`，访客返回 403）。绕过本地桥或从不受信任的网络访问时，需要有效的管理员凭据或受信任的回环来源。
-* 登录、设置、设备吊销和隧道开关在请求体超过 64 KiB 时停止读取并返回 413，操作不会生效。
-* **CSRF**：会改变状态的 POST 拒绝跨站请求（`Sec-Fetch-Site: cross-site`），并核对 Origin。
-* **密码存储与验证**：密码支持纯文本格式（配置向后兼容）和强大的 scrypt 摘要（`scrypt$16384$8$1$salt$hash`，通过 `hashAuthPassword()` 生成）。凭据验证使用恒定时间比较（`timingSafeEqual`），未知用户名与错误密码耗时一致，防止用户名枚举。修改密码会立即吊销该用户的其他活跃会话。
-* **局域网 PIN 保护**：局域网 PIN 支持纯文本与 PBKDF2 摘要（`pbkdf2$sha512$100000$salt$hash`，通过 `hashPin()` 生成）。防爆破保护在连续 5 次失败后将该 IP 临时锁定 15 分钟。
-* **会话与设备令牌**：活跃会话通过 SHA-256 摘要（`hashToken`）校验，确保令牌密文不以明文保存在持久化设备注册表文件（`dsh-lanmode-devices.json`）中。
-* 第一次设置密码、密码引用或 `passwordAuth: true` 只能在本机完成。远程地址得到 403，配置保持不变。
-* 密码认证保持开启时，不能把密码和密码引用同时清空。关闭密码认证仍然允许。
-* `POST /dsh-lanmode/bans`，正文 `{ "ip" }`，用于封禁地址。该地址在登录页之前收到纯文本 `403 Forbidden`。不能封禁 loopback 和管理员自己的地址。名单保存在设备登记旁边。
-* `disabledUsers` 中的用户名会在 5 秒内失去会话。
-* 只有 `trustedProxyCidrs` 中的对端可以设置 `X-Forwarded-For` 和 `CF-Connecting-IP`。直连客户端不能伪造地址。
-* 已登录的 API 返回 401 且带 `x-dsh-auth-required: 1` 时，页面会再次询问密码，不离开当前页，草稿保留。
-* 登录卡片显示正在登录的主机名。
-
-### 8. 📱 已连接设备与会话
-* 实时记录客户端，并识别系统与浏览器（iOS、Android、Windows、macOS、Linux）。
-* 在设置卡片中按设备吊销令牌，并提供「注销其他所有会话」。
-* 桥上列出或吊销设备的路由只对管理员开放。访客得到 403。
-* 每个设备行可以显示从 User-Agent 取出的短名称。
-* 设备列表、隧道状态、更新检查或延迟请求失败时，卡片显示失败原因，而不是空的成功状态。
-
-### 9. 🌐 多网卡与网格网络
-* 自动识别本地局域网、Tailscale（100.x.y.z）、WireGuard 和 VPN 网卡，并用快捷按钮选择。
-* 可为 Windows Defender Firewall、Linux UFW 和 firewalld 管理防火墙规则。
-
-### 10. ⚡ 实时网络遥测与 HTTP/2 ALPN
-* 小组件显示 RTT、并发连接数和传输字节。
-* 桥同时支持 HTTP/2（ALPN `h2`）和 HTTP/1.1，便于多路复用的低延迟流。
-
-### 11. 🚀 连接池与 SSE 隔离
-* 到 DeepSeek Harness 的上游连接分成两个池：
-  * **普通 HTTP 池**：keep-alive，最多 100 个可复用套接字，用于界面资源、脚本和 REST。队列超时默认 15 秒，饱和时返回 HTTP 503，而不是一直卡住。
-  * **专用流池**：长连接单独处理，包括 Server-Sent Events、令牌流（`/api/chat/stream`）和实时通知。一百路以上的流不会占满界面和 API 的连接。响应体是管道转发，不会先收成一整块。
-* 本地局域网客户端跳过 gzip 和 brotli。`adaptiveCompression` 开启时（默认开启），远程客户端仍可收到压缩响应。
-* 未配置 harness 端口时，桥依次探测 `127.0.0.1` 的 3080、3081、3082。显式端口按原值使用。
-
-### 12. ☁️ Cloudflare WAN 隧道与隧道 PIN
-* **零配置 Quick Tunnel 与持久 Named Tunnel**：通过 Cloudflare 实现远程广域网访问，无需端口映射或公网 IP。支持临时 Quick Tunnel（`trycloudflare.com`）和通过 `tunnelToken` / `tunnelTokenRef` 配置的命名隧道，具备快速就绪检测机制。
-* **隧道 PIN 保护**：配置 `lanPin`（或 `lanPinRef`）时，通过 Cloudflare 隧道进入的入站 HTTP 请求与 WebSocket 连接（#367）均要求验证局域网 PIN（`tunnelPin: true`，默认开启）。未配置 PIN 时不要求 PIN。
-
-### 13. 🔄 界面内一键更新
-* 更新服务和设置卡片（`/api/dsh-lanmode/update`）：
-  * 显示当前安装版本，以及 npm 上是否有新版本；
-  * 安全边界：必须带 `x-dsh-plugin-update: 1`，并通过同源检查和管理员门禁。开启密码认证时，即使来自 loopback 也需要有效会话；未开启时，仅 loopback 或管理员网段可以更新。访客会被拒绝；
-  * 在 DSH 设置卡片里一键升级 `@goodandready/dsh-lanmode`，不必使用终端。
+1. **📱 Quick QR 快速二维码**：侧边栏底部 (`Quick QR` 位于 `sidebar.footer` / `sidebar.rail`) 提供纯 SVG 二维码弹窗，支持移动端扫码即连。终端支持 `/mobileqr` 工具与 ASCII 二维码输出。
+2. **📲 PWA 与独立应用模式**：提供 `manifest.json`，iOS/Android 全屏独立模式与刘海屏安全边距 (`viewport-fit=cover`)。
+3. **🌐 自动 mDNS (`dsh.local`)**：内置 UDP 5353 responder，自动在局域网广播 `dsh.local`。
+4. **🔐 本地 Root CA 与 HTTPS**：生成 10 年有效期的本地根证书及带 SAN 的服务器证书。访问 `/dsh-lanmode/ca.crt` 即可一键下载信任。
+5. **🔔 后台通知 (Web Notifications API)**：在后台标签页接收回合结束与审批请求系统推送。
+6. **🛡️ 安全与认证体系**：
+   - 登录密码支持纯文本与 scrypt 密钥派生，使用 `timingSafeEqual` 进行恒定时间比较防时序攻击。
+   - LAN PIN 验证：支持纯文本与 `PBKDF2` 强哈希（`pbkdf2$sha512$100000$salt$hash`）。5 次失败自动锁定 15 分钟。
+   - 设备与会话 Token 均采用 `SHA-256` 哈希加盐存储。
+   - 子网角色分离（`adminAllow` 与 `guestAllow`），访客子网禁止改写系统设置。
+7. **☁️ Cloudflare 隧道与 Tailscale Funnel**：
+   - 支持临时 `Quick Tunnel` (trycloudflare.com) 与固定 `Named Tunnel` 模式。
+   - 配置项 `tunnelPin` 强制外网访问通过 LAN PIN 鉴权。
+   - 支持一键开启 `Tailscale Funnel`，自带权威 Let's Encrypt 证书。
+8. **📱 设备与会话管理**：自动识别连接设备型号与操作系统，支持一键撤销单个或全部其它会话。
 
 ---
 
-## 📦 快速安装
+## 📦 安装方法
 
 ```bash
 dsh plugin --profile web add @goodandready/dsh-lanmode
@@ -142,41 +50,31 @@ dsh plugin --profile web add @goodandready/dsh-lanmode
 
 ---
 
-## ⚙️ 配置参考（profile `cordis.patch.yml`）
-
-自 v0.8.0（DSH 0.1.7+）起，配置写在 profile 行的 `config:` 里。
-编辑 profile 的 `cordis.patch.yml` 可以覆盖默认值：
+## ⚙️ 配置说明 (`cordis.patch.yml`)
 
 ```yaml
-# ~/.dsh/profiles/web/cordis.patch.yml
 - id: dsh-lanmode
   config:
-    mode: direct             # 'direct', 'proxy', or 'auto'
-    directHost: 0.0.0.0      # Default: 127.0.0.1 (localhost only)
+    mode: direct
+    directHost: 0.0.0.0
     directPort: 3080
-    mdns: true               # Announce dsh.local in LAN
-    pwa: true                # PWA manifest, splash screen & mobile viewport
-    mobileEnterSends: false  # When false (default), Enter adds newline on mobile touch
-    tls: self-signed         # 'self-signed' (with Root CA), 'files', or 'off'
-    unlockPrivileged: true   # Permit settings & credentials from LAN
-    lanPinRef: ""            # Credential reference name or ENV var for LAN PIN
-    tunnel: off              # Cloudflare WAN tunnel: 'off', 'quick', or 'named'
-    tunnelTokenRef: ""       # Credential reference name or ENV var for tunnel token
-    tunnelPin: true          # Require PIN for requests from WAN
-    allow:                   # Default: ['127.0.0.0/8'] (loopback only)
+    mdns: true
+    pwa: true
+    tls: self-signed
+    unlockPrivileged: true
+    lanPinRef: ""
+    tunnel: off
+    tunnelPin: true
+    tailscaleFunnel: false
+    allow:
       - 192.168.0.0/16
       - 10.0.0.0/8
     passwordAuth: false
-    authPasswordRef: ""
-    publicHost: ""
-    disabledUsers: []
-    trustedProxyCidrs: []
-    tlsSites: []
     adaptiveCompression: true
 ```
 
 ---
 
-## 📄 许可证
+## 📄 开源许可证
 
 MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)

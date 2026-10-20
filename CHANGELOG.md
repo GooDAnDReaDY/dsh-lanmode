@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.49
+
+- **Security (#474)**: Generic LAN clients matching defaultRules default to guest role instead of inheriting admin unconditionally. Administrative actions require explicit adminAllow, valid passwordAuth session, or valid LAN PIN.
+- **Network Feature (#467)**: 1-Click Tailscale Funnel integration with trusted Let's Encrypt HTTPS certificates and settings card management.
+
 ## 0.8.48
 
 - feat(network): Smart Network Auto-Switch between local LAN and WAN tunnel (#466)
