@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.50
+
+- **Feature (PWA / Notifications #468)**: Live Activity and Lock Screen progress widget for running agent turns with throttled silent updates (`tag: 'dsh-active-progress'`), Unicode progress bars, and auto-dismiss on completion.
+- **Feature (Performance #469)**: Data-Saver mode with adaptive SSE token delta throttling (50-80ms buffer window) and fast streaming compression on cellular networks, including mobile navbar toggle.
+
 ## 0.8.49
 
 - **Security (#474)**: Generic LAN clients matching defaultRules default to guest role instead of inheriting admin unconditionally. Administrative actions require explicit adminAllow, valid passwordAuth session, or valid LAN PIN.
