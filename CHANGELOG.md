@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.52
+
+- **Bugfix (TLS #353)**: Reconnect `stillGood(info, hosts, now)` in `lib/tls.js:ensureCertificate`. The server certificate is now reissued automatically when new network addresses or hostnames appear in `hosts`, ensuring proper Subject Alternative Names (SAN) coverage while preserving Root CA trust.
+- **Tech Debt / Hygiene (#480)**:
+  - Fixed flaky VAPID key generation in `lib/push.js` by ensuring P-256 scalar private key is strictly padded to 32 bytes.
+  - Eliminated server-side `console.error` calls in `lib/devices.js` and `lib/bans.js`.
+  - Removed unused exports `canonicalDeviceId` (`lib/devices.js`), `mintCoreAuthCookie` (`lib/dsh-auth-cookie.js`), and `isPidAlive` (`lib/plugin-updater.js`).
+  - Documented and annotated all intentional empty `catch` blocks across `lib/` to satisfy preflight rules.
+
 ## 0.8.51
 
 - **Security (#477)**: Pass Cloudflare named tunnel token via `TUNNEL_TOKEN` environment variable instead of `--token` command-line argument (`argv`). Prevents sensitive token exposure in `ps aux`, `/proc/<pid>/cmdline`, and crash dumps. Added token redaction to error messages.
