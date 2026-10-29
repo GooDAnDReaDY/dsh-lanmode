@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.53
+
+- **Security (#479)**: Protect plugin mutating endpoints and sensitive reads under LAN PIN and prevent core auth cookie leakage to unauthenticated LAN clients:
+  - Non-GET mutating requests (POST, PUT, DELETE, PATCH) targeting plugin routes (/dsh-* and /api/dsh-*) and sensitive read paths (config, save-key, ccounts, xport, import, ault, ackup, credentials) are now classified as privileged in lib/privileged.js.
+  - Mutating plugin actions from LAN clients require valid LAN PIN challenge or active passwordAuth session when protection is active.
+  - The direct bridge (lib/bridge.js:prepareClientHeaders) strictly forbids minting and delivering loopback core authentication cookies (dsh-auth-*) to unauthenticated LAN clients when PIN or password protection is active.
+
 ## 0.8.52
 
 - **Bugfix (TLS #353)**: Reconnect `stillGood(info, hosts, now)` in `lib/tls.js:ensureCertificate`. The server certificate is now reissued automatically when new network addresses or hostnames appear in `hosts`, ensuring proper Subject Alternative Names (SAN) coverage while preserving Root CA trust.
